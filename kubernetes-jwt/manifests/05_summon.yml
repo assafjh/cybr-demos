@@ -80,8 +80,6 @@ spec:
         volumeMounts:
           - mountPath: /run/conjur
             name: conjur-access-token
-          #- mountPath: /etc/conjur/ssl
-          #  name: conjur-certs
       volumes:
       - emptyDir:
           medium: Memory
@@ -90,9 +88,6 @@ spec:
         configMap:
           name: summon-config
           defaultMode: 0755
-      #- emptyDir:
-      #    medium: Memory
-      #  name: conjur-certs
       - downwardAPI:
           defaultMode: 420
           items:
