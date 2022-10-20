@@ -1,0 +1,76 @@
+---
+# Deployment for Conjur sidecar - push to file mode
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: conjur-push-to-file
+  name: demo-sidecar-push-to-file-jwt
+  namespace: conjur
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: conjur-push-to-file
+  template:
+    metadata:
+      labels:
+        app: conjur-push-to-file
+      annotations:
+        # Secrets Provider configuration
+        conjur.org/container-mode: sidecar
+        conjur.org/secrets-destination: file
+        conjur.org/conjur-secrets-policy-path.safe1: kubernetes/applications/safe/
+        conjur.org/conjur-secrets.safe1: |
+          - secret3: secret3
+          - secret7: secret7
+        conjur.org/secret-file-path.safe1: "./credentials.yaml"
+        conjur.org/secret-file-format.safe1: "yaml"
+        conjur.org/secrets-refresh-interval: 10s
+        conjur.org/secrets-refresh-enabled: "true"
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      # Our demo application
+      - name: demo-application
+        image: centos:latest
+        imagePullPolicy: Always
+        command: ["sleep"]
+        args: ["infinity"]
+        # Path to the file with the secrets 
+        volumeMounts:
+          - name: conjur-secrets
+            mountPath: /opt/secrets/conjur
+            readOnly: true
+      # Sidecar
+      - name: sidecar-push-to-file
+        image: 'cyberark/secrets-provider-for-k8s:latest'
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: conjur-connect
+        volumeMounts:
+          - name: podinfo
+            mountPath: /conjur/podinfo
+          - name: conjur-secrets
+            mountPath: /conjur/secrets
+      volumes:
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "annotations"
+                fieldRef:
+                  fieldPath: metadata.annotations
+        # This is where the sidecar keeps is authentiction token recieved from Conjur
+        - name: conjur-secrets
+          emptyDir:
+            medium: Memory
