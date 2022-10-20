@@ -1,5 +1,5 @@
 FROM alpine:latest
-MAINTAINER AssafHazan
+LABEL maintainer=AssafHazan
 
 RUN  apk update \
   && apk add curl tar \
