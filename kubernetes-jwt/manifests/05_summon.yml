@@ -1,0 +1,104 @@
+---
+# This will config map will hold our summon configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: summon-config
+  namespace: conjur
+data:
+  secrets.yml: |
+    SECRET2: !var kubernetes/applications/safe/secret2
+  demo_consumer.sh: |
+    #!/bin/sh
+    echo "=================="
+    echo "SECRET2: $SECRET2"
+    echo "=================="
+    # Adding the below to keep the container alive
+    while true; do sleep 36000; done
+---
+# Summon deployment manifest with empty centos application to consume the secrets
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: demo-summon
+  name: demo-summon
+  namespace: conjur
+spec:
+  selector:
+    matchLabels:
+      app: demo-summon
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: demo-summon
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      # Demo container - summon
+      - name: summon-demo-app
+        image: docker.io/assafhazan/summon:v1
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: CONJUR_AUTHN_TOKEN_FILE
+            value: /run/conjur/access-token
+        envFrom:
+          - configMapRef:
+              name: conjur-connect
+        volumeMounts:
+          - name: summon-conf
+            mountPath: /etc/summon/config
+          - name: summon-conf
+            mountPath: /etc/summon/demo_app
+          - mountPath: /run/conjur
+            name: conjur-access-token
+            readOnly: true
+      # Conjur Authenticator init container for summon
+      initContainers:
+      - image: cyberark/conjur-authn-k8s-client:latest
+        imagePullPolicy: IfNotPresent
+        name: cyberark-secrets-provider-for-k8s
+        env:
+          - name: CONTAINER_MODE
+            value: init
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        envFrom:
+          - configMapRef:
+              name: conjur-connect
+        volumeMounts:
+          - mountPath: /run/conjur
+            name: conjur-access-token
+          #- mountPath: /etc/conjur/ssl
+          #  name: conjur-certs
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: conjur-access-token
+      - name: summon-conf
+        configMap:
+          name: summon-config
+          defaultMode: 0755
+      #- emptyDir:
+      #    medium: Memory
+      #  name: conjur-certs
+      - downwardAPI:
+          defaultMode: 420
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations
+            path: annotations
+        name: podinfo
+---
