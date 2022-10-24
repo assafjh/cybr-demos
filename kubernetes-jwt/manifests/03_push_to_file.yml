@@ -6,7 +6,7 @@ metadata:
   labels:
     app: conjur-push-to-file
   name: demo-sidecar-push-to-file-jwt
-  namespace: conjur
+  namespace: conjur-jwt
 spec:
   replicas: 1
   selector:

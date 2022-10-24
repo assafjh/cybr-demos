@@ -4,7 +4,7 @@ SUDO=
 CONTAINER_MGR=podman
 CONJUR_LEADER_PORT=443
 CONTAINER_ID=$(curl -s -k "https://127.0.0.1:$CONJUR_LEADER_PORT/info" | awk '/container/ {print $2}' | tr -d '",')
-AUTHN_TO_ENABLE=authn-jwt/k8s-cluster1
+AUTHN_TO_ENABLE=authn-k8s/k8s-cluster1
 #==========
 echo "Enabling $AUTHN_TO_ENABLE authn for Conjur"
 CONJUR_AUTHENTICATORS=$($SUDO $CONTAINER_MGR exec $CONTAINER_ID evoke variable list | grep CONJUR_AUTHENTICATORS)

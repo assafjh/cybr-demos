@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: summon-config
-  namespace: conjur
+  namespace: conjur-cert
 data:
   secrets.yml: |
     SECRET2: !var kubernetes/applications/safe/secret2
@@ -23,7 +23,7 @@ metadata:
   labels:
     app: demo-summon
   name: demo-summon
-  namespace: conjur
+  namespace: conjur-cert
 spec:
   selector:
     matchLabels:
@@ -60,6 +60,8 @@ spec:
         imagePullPolicy: IfNotPresent
         name: cyberark-authn-k8s-for-summon
         env:
+          - name: CONJUR_AUTHN_LOGIN
+            value: host/kubernetes/applications/demo-application-summon
           - name: CONTAINER_MODE
             value: init
           - name: MY_POD_NAME
