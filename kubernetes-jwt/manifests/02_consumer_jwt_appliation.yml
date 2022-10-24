@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: jwt-retrieve
-  namespace: conjur
+  namespace: conjur-jwt
 data:
   retrieve.sh: |
     #!/bin/bash
@@ -18,7 +18,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: k8s-jwt-app1
-  namespace: conjur
+  namespace: conjur-jwt
   labels:
     app: jwtsecrets
 spec:
