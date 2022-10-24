@@ -50,10 +50,10 @@
 
 # Create the JWT identity that we will use to authenticate to Conjur 
 - !host
-  id: applications/system:serviceaccount:conjur:conjur-demo-acct
+  id: applications/system:serviceaccount:conjur-jwt:conjur-demo-acct
   owner: !group managers
   annotations:
-    authn-jwt/k8s-cluster1/kubernetes.io/namespace: conjur
+    authn-jwt/k8s-cluster1/kubernetes.io/namespace: conjur-jwt
     authn-jwt/k8s-cluster1/kubernetes.io/serviceaccount/name: conjur-demo-acct
 
 # Add the host we have created to the layer 
@@ -61,5 +61,5 @@
   roles:
     - !layer applications/jwt
   members:
-    - !host applications/system:serviceaccount:conjur:conjur-demo-acct
+    - !host applications/system:serviceaccount:conjur-jwt:conjur-demo-acct
 
