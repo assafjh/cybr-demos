@@ -4,7 +4,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: summon-config
-  namespace: conjur
+  namespace: conjur-jwt
 data:
   secrets.yml: |
     SECRET2: !var kubernetes/applications/safe/secret2
@@ -23,7 +23,7 @@ metadata:
   labels:
     app: demo-summon
   name: demo-summon
-  namespace: conjur
+  namespace: conjur-jwt
 spec:
   selector:
     matchLabels:
