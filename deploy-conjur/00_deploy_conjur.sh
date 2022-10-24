@@ -17,10 +17,10 @@ $SUDO $CONTAINER_MGR run \
     --detach \
     --restart=unless-stopped \
     --security-opt seccomp=$CONTAINER_VOLUME_PATH/"$CONTAINER_NAME"_"$CONTAINER_TAG"/security/seccomp.json \
-    --publish "443:443" \
-    --publish "444:444" \
-    --publish "5432:5432" \
-    --publish "1999:1999" \
+    --publish "${SERVER_PORT:-443}:443" \
+    --publish "${LB_VERIFICATION_PORT:-444}:444" \
+    --publish "${DB_PORT:-5432}:5432" \
+    --publish "${AUDIT_REPLICATION_PORT:-1999}:1999" \
     --log-driver journald \
     --volume $CONTAINER_VOLUME_PATH/"$CONTAINER_NAME"_"$CONTAINER_TAG"/config:/etc/conjur/config:Z \
     --volume $CONTAINER_VOLUME_PATH/"$CONTAINER_NAME"_"$CONTAINER_TAG"/security:/opt/cyberark/dap/security:Z \
