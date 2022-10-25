@@ -2,6 +2,7 @@ ant:latest
 antisamy-markup-formatter:latest
 authorize-project:latest
 build-timeout:latest
+credentials:latest
 cloudbees-folder:latest
 configuration-as-code:latest
 credentials-binding:latest
@@ -20,10 +21,11 @@ timestamper:latest
 workflow-aggregator:latest
 ws-cleanup:latest
 jackson2-api:latest
-credentials:latest
 instance-identity:latest
 trilead-api:latest
 sshd:latest
 javax-activation-api:latest
 javax-mail-api:latest
+caffeine-api:latest
+role-strategy:latest
 conjur-credentials:latest
