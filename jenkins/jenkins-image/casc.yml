@@ -1,17 +1,34 @@
 jenkins:
+  authorizationStrategy:
+    roleBased:
+      roles:
+        global:
+          - name: "administrators"
+            description: "Jenkins administrators"
+            pattern: ".*"
+            permissions:
+              - "Overall/Administer"
+            assignments:
+              - "${JENKINS_ADMIN_ID}"
+          - name: "readonly"
+            description: "Read-only users"
+            pattern: ".*"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
+            assignments:
+              - "authenticated"
+  projectNamingStrategy:
+    roleBased:
+      forceExistingJobs: true
+  disabledAdministrativeMonitors:
+  - "jenkins.diagnostics.ControllerExecutorsNoAgents"
   securityRealm:
     local:
       allowsSignup: false
       users:
        - id: ${JENKINS_ADMIN_ID}
          password: ${JENKINS_ADMIN_PASSWORD}
-  authorizationStrategy:
-    globalMatrix:
-      permissions:
-        - "Overall/Administer:admin"
-        - "Overall/Read:authenticated"
-  remotingSecurity:
-    enabled: true
 security:
   queueItemAuthenticator:
     authenticators:
