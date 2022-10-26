@@ -1,12 +1,14 @@
 #!/bin/bash
+# This script is meant for containerized Jenkins, if this is not the case - copy and use the keytool command from below.
 #============ Variables ===============
 # Internal
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source $SCRIPT_DIR/conjur_env.properties
-source $SCRIPT_DIR/scripts.properties
+SUDO=
+CONTAINER_MGR=podman
+CONJUR_HOST_AND_PORT="$(hostname)":443
+JENKINS_CONTAINER_ID=$(podman ps -a --filter "name=.*jenkins.*" --format "{{.ID}}")
 #========== Functions ===============
 COMPARE_VERSION() {
-    if [[ $1 == $2 ]]
+    if [[ $1 == [[$2]] ]]
     then
         return 0
     fi
@@ -37,16 +39,16 @@ COMPARE_VERSION() {
 }
 function SET_CACERTS_PATH() {
 	CACERTS="-storetype JKS -keystore $JAVA_HOME/jre/lib/security/cacerts"
-	JAVA_VERSION=$($CONTAINER_MGR exec -it "$JENKINS_CONTAINER_ID" java -version 2>&1 | awk -F '"' '{print $2}')
+	JAVA_VERSION=$($SUDO $CONTAINER_MGR exec -it "$JENKINS_CONTAINER_ID" java -version 2>&1 | awk -F '"' '{print $2}')
 	COMPARE_VERSION "$JAVA_VERSION" "1.9"
 	if [[ $? -eq 1 ]]; then
 		CACERTS="-cacerts"
 	fi
 }
 #--------------- Script ------------
-[ ! -d "$SCRIPT_DIR/certs" ] && mkdir $SCRIPT_DIR/certs
-echo "Saving Conjur public key in base64 encoded DER format: $SCRIPT_DIR/certs/conjur-public-key.pem"
-openssl s_client -showcerts -connect $HOSTNAME:443 < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > "$SCRIPT_DIR"/certs/conjur-public-key.pem
-$CONTAINER_MGR cp "$SCRIPT_DIR"/certs/conjur-public-key.pem "$JENKINS_CONTAINER_ID":/tmp
+if [[ ! -f "$HOME/conjur-server.pem" ]]; then 
+    openssl s_client -showcerts -connect "$CONJUR_HOST_AND_PORT" < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > "$HOME/conjur-server.pem"
+fi
+$CONTAINER_MGR cp "$HOME/conjur-server.pem" "$JENKINS_CONTAINER_ID":/tmp
 SET_CACERTS_PATH
-$CONTAINER_MGR exec --user=0 -it "$JENKINS_CONTAINER_ID" keytool -import -alias conjur_pub_key -file /tmp/conjur-public-key.pem ${CACERTS} -storepass changeit -noprompt
+$CONTAINER_MGR exec --user=0 -it "$JENKINS_CONTAINER_ID" keytool -import -alias conjur_pub_key -file /tmp/conjur-server.pem ${CACERTS} -storepass changeit -noprompt
