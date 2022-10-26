@@ -1,0 +1,17 @@
+pipeline {
+    agent any
+    stages {
+        stage('Print') {
+            steps {
+                withCredentials([conjurSecretCredential(credentialsId: 'jenkins-projects-safe-project1-secret2', variable: 'SECRET2')]) {
+                    echo "Secret2: $SECRET2"
+                }
+            }
+        }
+        stage('Results') {
+            steps {
+                echo "Finished!"
+            }
+        }
+    }
+}
