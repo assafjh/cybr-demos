@@ -1,3 +1,12 @@
+# Deploy Conjur
+These scripts will quickly deploy Conjur containers.
+
+### Uses
+Can be used to deploy Leader and two Standby containers.
+
+### scripts.properties
+This file is used as a central configuration file for all scripts, please refer to the below for parameter explanation:
+```bash
 #==== for scripts internal usage ====
 # Is sudo required to run docker/podman - leave empty if no need
 SUDO=
@@ -31,3 +40,45 @@ LB_VERIFICATION_PORT=444
 DB_PORT=5432
 # Conjur audit update port - logs from followers are saved at the Leader Audit DB
 AUDIT_REPLICATION_PORT=1999
+```
+### Steps
+1. Update scripts.properties with relevant data
+#### Leader
+1. Connect to Leader VM
+2. Deploy Conjur container
+```bash
+./01_deploy_conjur.sh
+```
+3. Configure as container as Leader
+```bash
+./02_configure_leader.sh
+```
+#### Standbys
+1. Connect to Leader VM.
+2. Generate seed file and copy it to the Standbys:
+```bash
+./03_copy_keys_to_standbys.sh
+```
+3. Connect to Standby1 VM.
+4. Deploy Conjur container:
+```bash
+./01_deploy_conjur.sh
+```
+5. Configure as container as Standby:
+```bash
+./04_configure_standby.sh
+```
+6. Connect to Standby2 VM.
+7. Deploy Conjur container:
+```bash
+./01_deploy_conjur.sh
+```
+8. Configure as container as Standby:
+```bash
+./04_configure_standby.sh
+```
+9. Connect to the Leader VM.
+10. Enable Synchronous replication:
+```bash
+./05_enable_synchronous_replication.sh
+```
