@@ -7,7 +7,7 @@ source $SCRIPT_DIR/scripts.properties
 $SUDO $CONTAINER_MGR exec "$CONTAINER_NAME"_"$CONTAINER_TAG" evoke configure master \
   --accept-eula \
   --hostname $(hostname -f) \
-  --master-altnames "$(hostname -s)" \
+  --master-altnames "$MASTER_ALTNAMES" \
   --admin-password "$CONJUR_ADM_PWD" \
   "$CONJUR_ORG"
 
