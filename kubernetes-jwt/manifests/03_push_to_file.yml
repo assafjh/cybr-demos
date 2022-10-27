@@ -1,5 +1,5 @@
 ---
-# Deployment for Conjur sidecar - push to file mode
+# Deployment for Conjur Secrets Provider - push to file mode as sidecar
 apiVersion: apps/v1
 kind: Deployment
 metadata:
