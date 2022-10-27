@@ -1,7 +1,7 @@
 # CYBR-Demos
 My personal demos repository.
 
-Instructions for each scenario can be found at its respective folder.
+Instructions for each scenario can be found in its respective folder.
 
 ## Scenarios
 1. deploy-conjur: Scripts to quickly deploy Conjur
