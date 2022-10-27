@@ -1,8 +1,10 @@
 #!/bin/bash
-#==========
-COP_CLI=kubectl
+#============ Variables ===============
+# Path to our safe at Conjur, leave as is
 SAFE_PATH=kubernetes/applications/safe/secret
-#==========
+# Using kubectl/oc
+COP_CLI=kubectl
+#============ Script ===============
 
 # Checking if a user is logged-in to Conjur-CLI
 conjur whoami
