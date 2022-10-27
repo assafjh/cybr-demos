@@ -82,7 +82,7 @@ scripts/03_enable_authenticator.sh
 ```Bash
 scripts/04_populate_variables.sh | tee -a 04_populate_variables.log
 ```
-### 5. Logout from Conjur CLI
+### 6. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
