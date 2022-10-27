@@ -1,10 +1,12 @@
 #!/bin/bash
-#==========
+#============ Variables ===============
+# Path to our safe at Conjur, leave as is
 SAFE_PATH=jenkins/projects/safe/project
+# Secret variable name, leave as is
 VARIABLE_NAME=secret
-JENKINS_URL=http://ec2-35-178-244-130.eu-west-2.compute.amazonaws.com:8080
-
-#==========
+# Jenkins URL with port 
+JENKINS_URL=
+#============ Script ===============
 
 # Checking if a user is logged-in to Conjur-CLI
 conjur whoami
