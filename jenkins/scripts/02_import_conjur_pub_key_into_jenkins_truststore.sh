@@ -1,10 +1,13 @@
 #!/bin/bash
 # This script is meant for containerized Jenkins, if this is not the case - copy and use the keytool command from below.
 #============ Variables ===============
-# Internal
+# Is sudo required to run docker/podman - leave empty if no need
 SUDO=
+# Using docker/podman
 CONTAINER_MGR=podman
+# Conjur FQDN and port without scheme
 CONJUR_HOST_AND_PORT="$(hostname)":443
+# Jenkins container ID
 JENKINS_CONTAINER_ID=$(podman ps -a --filter "name=.*jenkins.*" --format "{{.ID}}")
 #========== Functions ===============
 COMPARE_VERSION() {
@@ -45,7 +48,7 @@ function SET_CACERTS_PATH() {
 		CACERTS="-cacerts"
 	fi
 }
-#--------------- Script ------------
+#============ Script ===============
 if [[ ! -f "$HOME/conjur-server.pem" ]]; then 
     openssl s_client -showcerts -connect "$CONJUR_HOST_AND_PORT" < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > "$HOME/conjur-server.pem"
 fi

@@ -1,3 +1,5 @@
+Use the below pipeline script:
+
 pipeline {
     agent any
     stages {
