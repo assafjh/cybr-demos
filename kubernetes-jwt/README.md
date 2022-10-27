@@ -8,7 +8,7 @@ Four Use cases are included:
 - Application that consumes secrets from environment parameters using Summon. 
 
 ## How does the JWT Authenticator works?
-![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator?raw=true)
+![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
 
 ## What is Summon?
 Summon is a command-line tool that reads a file in secrets.yml format and injects secrets as environment variables into any process. Once the process exits, the secrets are gone.
