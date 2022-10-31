@@ -8,7 +8,7 @@ Three Use cases are included:
 
 **Note:** If the selected platform is Rancher, adjustments may be needed, check the official documentation site: [Rancher Integration](https://docs.cyberark.com/Product-Doc/OnlineHelp/AAM-DAP/Latest/en/Content/Integrations/k8s-ocp/cjr-Rancher.htm?tocpath=Integrations)
 
-## How does the JWT Authenticator works?
+## How does the Kubernetes Cert Authenticator works?
 ![Conjur k8s cert authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-cert/k8s-cert-authenticator.png?raw=true)
 
 ### More Info on the authenticator
@@ -147,7 +147,7 @@ conjur logout
 -- Role: conjur-demo-allow-to-read-secrets
 -- RoleBinding: conjur-demo-allow-to-read-secrets-binding
 -- ConfigMap: conjur-demo-credentials
--- Deployment: demo-init-container-kubernetes-secrets-jwt
+-- Deployment: demo-init-container-kubernetes-secrets
 ```bash
 kubectl apply -f manifests/04_push_to_file.yml
 ```
