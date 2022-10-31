@@ -1,11 +1,17 @@
 #!/bin/bash
-#==========
-COP_CLI=kubectl
+#============ Variables ===============
+# Path to our safe at Conjur, leave as is
 SAFE_PATH=kubernetes/applications/safe/secret
-#==========
+# Using kubectl/oc
+COP_CLI=kubectl
+#============ Script ===============
+# Retrieving Kubernetes API URL
 COP_API_URL="$($COP_CLI config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.server}')"
+# Retrieving SA JWT secret name
 TOKEN_SECRET_NAME="$($COP_CLI get secrets -n conjur-cert | grep "conjur-demo-acct.*service-account-token" | head -n1 | awk '{print $1}')"
+# Retrieving JWT
 SA_TOKEN=$($COP_CLI get secret $TOKEN_SECRET_NAME -n conjur-cert --output='go-template={{ .data.token }}' | base64 -d)
+# Below are different methods to get the Kubernetes API certificate, comment and uncomment as needed.
 # General:
 # openssl s_client -showcerts -connect $KUBE_API_HOST:6443 < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ./kube-api-public-key.pem
 # K3S:
