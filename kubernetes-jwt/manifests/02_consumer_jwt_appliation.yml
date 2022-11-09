@@ -9,7 +9,7 @@ data:
   retrieve.sh: |
     #!/bin/bash
     JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-    token=$(curl -k -s --request POST "$CONJUR_AUTHN_URL/demo/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$JWT")
+    token=$(curl -k -s --request POST "$CONJUR_AUTHN_URL/$CONJUR_ACCOUNT/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$JWT")
     secret=$(curl -k -s -X GET -H "Authorization: Token token=\"$token\"" "$CONJUR_APPLIANCE_URL/secrets/demo/variable/kubernetes/applications/safe/secret1")
     echo $secret
 ---
