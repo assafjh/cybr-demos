@@ -29,6 +29,12 @@ jenkins:
       users:
        - id: ${JENKINS_ADMIN_ID}
          password: ${JENKINS_ADMIN_PASSWORD}
+  log:
+    recorders:
+    - loggers:
+      - level: "ALL"
+        name: "org.conjur.jenkins"
+      name: "Conjur"
 security:
   queueItemAuthenticator:
     authenticators:
@@ -37,7 +43,7 @@ security:
 unclassified:
   location:
     url: http://${JENKINS_ADDRESS}:${JENKINS_PORT}/
-globalConjurConfiguration:
+  globalConjurConfiguration:
     authWebServiceId: "authn-jwt/jenkins1"
     conjurConfiguration:
       account: "${CONJUR_ACCOUNT}"
@@ -45,14 +51,8 @@ globalConjurConfiguration:
     enableContextAwareCredentialStore: true
     enableJWKS: true
     identityFieldsSeparator: "-"
-    identityFieldName: "conjur_host"
     identityFormatFieldsFromToken: "jenkins_full_name"
     jwtAudience: "conjur-jenkins-demo1"
     keyLifetimeInMinutes: 60
     tokenDurarionInSeconds: 120
-log:
-    recorders:
-    - loggers:
-      - level: "ALL"
-        name: "org.conjur.jenkins"
-      name: "Conjur"
+

@@ -28,6 +28,6 @@ done
 # Populate authenticator values
 conjur variable set -i conjur/authn-jwt/jenkins1/identity-path -v "/jenkins/projects"
 conjur variable set -i conjur/authn-jwt/jenkins1/issuer -v "$JENKINS_URL"
-conjur variable set -i conjur/authn-jwt/jenkins1/token-app-property -v "conjur_host"
+conjur variable set -i conjur/authn-jwt/jenkins1/token-app-property -v "identity"
 conjur variable set -i conjur/authn-jwt/jenkins1/jwks-uri -v "$JENKINS_URL/jwtauth/conjur-jwk-set"
 conjur variable set -i conjur/authn-jwt/jenkins1/audience -v "conjur-jenkins-demo1"
