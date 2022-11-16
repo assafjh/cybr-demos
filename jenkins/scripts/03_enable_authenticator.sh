@@ -5,7 +5,7 @@
 # Is sudo required to run docker/podman - leave empty if no need
 SUDO=
 # Using docker/podman
-CONTAINER_MGR=podman
+CONTAINER_MGR=docker
 # Conjur Leader port
 CONJUR_LEADER_PORT=443
 # Conjur Leader container ID

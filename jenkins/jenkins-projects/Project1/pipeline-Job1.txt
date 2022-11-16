@@ -1,4 +1,4 @@
-Use the below pipeline script:
+// Use the below pipeline script:
 
 pipeline {
     agent any
