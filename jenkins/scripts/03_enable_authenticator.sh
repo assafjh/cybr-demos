@@ -24,5 +24,6 @@ if [[ "${IFS}${array[*]}${IFS}" =~ "${IFS}$AUTHN_TO_ENABLE${IFS}" ]]; then
     unset IFS
 else
     unset IFS
+    [ -z "$CONJUR_AUTHENTICATORS" ] && CONJUR_AUTHENTICATORS=authn
     $SUDO $CONTAINER_MGR exec -it $CONTAINER_ID evoke variable set CONJUR_AUTHENTICATORS $CONJUR_AUTHENTICATORS,$AUTHN_TO_ENABLE
 fi
