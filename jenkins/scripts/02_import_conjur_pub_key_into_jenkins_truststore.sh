@@ -4,11 +4,11 @@
 # Is sudo required to run docker/podman - leave empty if no need
 SUDO=
 # Using docker/podman
-CONTAINER_MGR=podman
+CONTAINER_MGR=docker
 # Conjur FQDN and port without scheme
-CONJUR_HOST_AND_PORT="$(hostname)":443
+CONJUR_HOST_AND_PORT="$(hostname)":8443
 # Jenkins container ID
-JENKINS_CONTAINER_ID=$(podman ps -a --filter "name=.*jenkins.*" --format "{{.ID}}")
+JENKINS_CONTAINER_ID=$($CONTAINER_MGR ps -a --filter "name=.*jenkins.*" --format "{{.ID}}")
 #========== Functions ===============
 COMPARE_VERSION() {
     if [[ $1 == [[$2]] ]]
@@ -54,4 +54,4 @@ if [[ ! -f "$HOME/conjur-server.pem" ]]; then
 fi
 $CONTAINER_MGR cp "$HOME/conjur-server.pem" "$JENKINS_CONTAINER_ID":/tmp
 SET_CACERTS_PATH
-$CONTAINER_MGR exec --user=0 -it "$JENKINS_CONTAINER_ID" keytool -import -alias conjur_pub_key -file /tmp/conjur-server.pem ${CACERTS} -storepass changeit -noprompt
+$CONTAINER_MGR exec --user=0 -it "$JENKINS_CONTAINER_ID" keytool -import -alias conjur_pub_key_$(date +%d-%m-%Y) -file /tmp/conjur-server.pem ${CACERTS} -storepass changeit -noprompt
