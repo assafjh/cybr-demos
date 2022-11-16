@@ -16,6 +16,7 @@ AUTHN_TO_ENABLE=authn-jwt/jenkins1
 echo "Enabling $AUTHN_TO_ENABLE authn for Conjur"
 CONJUR_AUTHENTICATORS=$($SUDO $CONTAINER_MGR exec $CONTAINER_ID evoke variable list | grep CONJUR_AUTHENTICATORS)
 CONJUR_AUTHENTICATORS=$(echo $CONJUR_AUTHENTICATORS | awk -F "=" '{print $2}')
+CONJUR_AUTHENTICATORS=$(sed -e 's/^"//' -e 's/"$//' <<< "$CONJUR_AUTHENTICATORS")
 IFS=','
 read -a array <<< "$CONJUR_AUTHENTICATORS"
 if [[ "${IFS}${array[*]}${IFS}" =~ "${IFS}$AUTHN_TO_ENABLE${IFS}" ]]; then
