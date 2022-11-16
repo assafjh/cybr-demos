@@ -3,11 +3,11 @@
 # Is sudo required to run docker/podman - leave empty if no need
 SUDO=
 # Using docker/podman
-CONTAINER_MGR=podman
+CONTAINER_MGR=docker
 # Docker image URL
 CONTAINER_IMG=docker.io/assafhazan/jenkins:conjur
 # Jenkins URL (usually, hostname)
-JENKINS_ADDRESS=
+JENKINS_ADDRESS=$(hostname -f)
 # Jenkins port
 JENKINS_PORT=8080
 # Jenkins admin user ID
@@ -15,12 +15,14 @@ JENKINS_ADMIN_ID=
 # Jenkins admin user password
 JENKINS_ADMIN_PASSWORD=
 # Conjur FQDN with scheme and port
-CONJUR_FQDN=
+CONJUR_FQDN=https://$(hostname -f):8443
 CONJUR_ACCOUNT=demo
 #============ Script ===============
+$SUDO $CONTAINER_MGR pull assafhazan/jenkins:conjur
 $SUDO $CONTAINER_MGR container run \
   --name jenkins \
   --detach \
+  --restart=always \
   --privileged \
   --publish "$JENKINS_PORT":8080 \
   --env JENKINS_ADMIN_ID="$JENKINS_ADMIN_ID" \
@@ -28,5 +30,5 @@ $SUDO $CONTAINER_MGR container run \
   --env JENKINS_ADDRESS="$JENKINS_ADDRESS" \
   --env JENKINS_PORT="$JENKINS_PORT" \
   --env CONJUR_FQDN="$CONJUR_FQDN" \
-  --env CONJUR_ACCOUNT="$CONJUR_ACCOUNT"
+  --env CONJUR_ACCOUNT="$CONJUR_ACCOUNT" \
   "$CONTAINER_IMG"
