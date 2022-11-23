@@ -43,8 +43,8 @@
   id: apps/conjur-demo
   owner: !group managers
   annotations:
-      authn-jwt/github/repository: assafjh/cybr-demos
-      authn-jwt/github/workflow: conjur-demo
+      authn-jwt/github1/repository: assafjh/cybr-demos
+      authn-jwt/github1/workflow: conjur-demo
 
 # Add the hosts we have created to their respective layer
 - !grant
