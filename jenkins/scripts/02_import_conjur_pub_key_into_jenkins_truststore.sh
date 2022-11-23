@@ -8,7 +8,7 @@ CONTAINER_MGR=docker
 # Conjur FQDN and port without scheme
 CONJUR_HOST_AND_PORT="$(hostname)":8443
 # Jenkins container ID
-JENKINS_CONTAINER_ID=$($CONTAINER_MGR ps -a --filter "name=.*jenkins.*" --format "{{.ID}}")
+JENKINS_CONTAINER_ID=$($CONTAINER_MGR ps --filter "name=.*jenkins.*" --format "{{.ID}}")
 #========== Functions ===============
 COMPARE_VERSION() {
     if [[ $1 == [[$2]] ]]
