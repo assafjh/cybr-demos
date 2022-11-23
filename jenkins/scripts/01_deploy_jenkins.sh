@@ -14,8 +14,8 @@ JENKINS_PORT=8080
 JENKINS_ADMIN_ID=
 # Jenkins admin user password
 JENKINS_ADMIN_PASSWORD=
-# Conjur FQDN with scheme and port
-CONJUR_FQDN=https://$(hostname -f):8443
+# Conjur FQDN with port (no scheme)
+CONJUR_FQDN=$(hostname -f):8443
 CONJUR_ACCOUNT=demo
 #============ Script ===============
 $SUDO $CONTAINER_MGR pull assafhazan/jenkins:conjur
