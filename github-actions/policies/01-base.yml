@@ -1,0 +1,51 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization that uses GitHub applications
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define GitHub branch, create users, hosts, groups, layers, variables
+- !policy
+  id: github
+  owner: !group admins
+
+# github/managers group will admin everything under GitHub branch
+- !group
+  id: github/managers
+  owner: !group admins
+
+- !permit
+  role: !group github/managers
+  privileges: [read,update,create]
+  resource: !policy github
+
+- !permit
+  role: !group github/managers
+  privileges: [read,update,create]
+  resource: !group github/managers
+
+- !user
+  id: github-manager01
+  owner: !group github/managers
+
+- !grant
+  role: !group github/managers
+  members: 
+    - !user github-manager01
