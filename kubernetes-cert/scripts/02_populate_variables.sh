@@ -28,7 +28,7 @@ conjur whoami
 # Populate safe secrets with values
 for i in {1..8}
 do
-   if command -p md5sum  >/dev/null 2>&1
+   if command -p md5sum  /dev/null >/dev/null 2>&1
     then
         conjur variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5sum | head -c 20; echo;)"
     else

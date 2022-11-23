@@ -16,7 +16,7 @@ for i in {1..3}
 do
     for k in {1..3}
     do
-        if command -p md5sum  >/dev/null 2>&1
+        if command -p md5sum  /dev/null >/dev/null 2>&1
         then
             conjur variable set -i "$SAFE_PATH$i/$VARIABLE_NAME$k" -v "$(echo $RANDOM | md5sum | head -c 20; echo;)"
         else
