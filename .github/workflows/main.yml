@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Import Secrets using CyberArk Conjur Secret Fetcher
-        uses: assafjh/conjur-action@main
+        uses: assafjh/conjur-action@master
         with:
           url: ${{ secrets.CONJUR_URL }}
           account: demo
