@@ -37,6 +37,11 @@
   # This variable contains what "aud" is the JWT.
   - !variable
     id: audience
+
+  #In this example, "enforced-claims" is set to "workflow,repository"
+  #Please refer to README.md for detailed policy and commands
+  - !variable
+    id: enforced-claims
   
   - !permit
     role: !layer ../../../github/apps/jwt
