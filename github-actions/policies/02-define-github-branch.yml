@@ -2,10 +2,6 @@
 # Load policy into github branch
 # This policy defines the demo branch github
 
-- !policy
-  id: applications
-  owner: !group managers
-
 # apps is a layer that will aggregate safe permissions for github project1
 - !layer
   id: apps
