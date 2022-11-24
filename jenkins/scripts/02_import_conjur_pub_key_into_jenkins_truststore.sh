@@ -54,4 +54,4 @@ if [[ ! -f "$HOME/conjur-server.pem" ]]; then
 fi
 $CONTAINER_MGR cp "$HOME/conjur-server.pem" "$JENKINS_CONTAINER_ID":/tmp
 SET_CACERTS_PATH
-$CONTAINER_MGR exec --user=0 -it "$JENKINS_CONTAINER_ID" keytool -import -alias conjur_pub_key_$(date +%d-%m-%Y) -file /tmp/conjur-server.pem ${CACERTS} -storepass changeit -noprompt
+$CONTAINER_MGR exec --user=0 -it "$JENKINS_CONTAINER_ID" keytool -import -alias conjur_pub_key_$(date +%d-%m-%Y-%s) -file /tmp/conjur-server.pem ${CACERTS} -storepass changeit -noprompt
