@@ -1,9 +1,0 @@
-{
-    "created_roles": {
-        "demo:user:circleci-manager01": {
-            "id": "demo:user:circleci-manager01",
-            "api_key": "14j471226h3g3n3exbhcgm391ym3649h3r1evzq2r14ecb0x35th2tx"
-        }
-    },
-    "version": 19
-}
