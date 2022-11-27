@@ -16,7 +16,12 @@ jobs:
       - checkout
       - run:
           name: "Say hello"
-          command: "echo $CIRCLE_OIDC_TOKEN"
+          command: |
+            # Store OIDC token in temp file
+            echo $CIRCLE_OIDC_TOKEN > /home/circleci/oidc_token.json
+            echo "ASSAF" > /tmp/bla.txt
+            cat /home/circleci/oidc_token.json
+            cat /tmp/bla.txt
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
