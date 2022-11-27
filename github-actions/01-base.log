@@ -1,9 +1,0 @@
-{
-    "created_roles": {
-        "demo:user:github-manager01": {
-            "id": "demo:user:github-manager01",
-            "api_key": "csw98h3cevdjs303bfsy35064rysc3vkp150yhej29cjx811e6kc1t"
-        }
-    },
-    "version": 7
-}

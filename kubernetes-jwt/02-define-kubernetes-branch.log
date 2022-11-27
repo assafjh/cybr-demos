@@ -1,9 +1,0 @@
-{
-    "created_roles": {
-        "demo:host:kubernetes/applications/system:serviceaccount:conjur-jwt:conjur-demo-acct": {
-            "id": "demo:host:kubernetes/applications/system:serviceaccount:conjur-jwt:conjur-demo-acct",
-            "api_key": "3c2apcz34phbpa1pr7mezjtb6sf3pkra6j3rgkhev3s551jq2rv29x6"
-        }
-    },
-    "version": 1
-}
