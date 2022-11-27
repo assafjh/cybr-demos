@@ -6,6 +6,9 @@ The action supports authenticating with CyberArk Conjur using host identity and 
 
 This demo will use JWT authentication.
 
+## How does the JWT Authenticator works?
+![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
+
 For more details on action, take a look at [CyberArk Conjur Secret Fetcher](https://github.com/marketplace/actions/cyberark-conjur-secret-fetcher)
 
 ## 1. Loading Conjur policies
