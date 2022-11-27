@@ -1,0 +1,51 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization that uses circleci applications
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define circleci branch, create users, hosts, groups, layers, variables
+- !policy
+  id: circleci
+  owner: !group admins
+
+# circleci/managers group will admin everything under circleci branch
+- !group
+  id: circleci/managers
+  owner: !group admins
+
+- !permit
+  role: !group circleci/managers
+  privileges: [read,update,create]
+  resource: !policy circleci
+
+- !permit
+  role: !group circleci/managers
+  privileges: [read,update,create]
+  resource: !group circleci/managers
+
+- !user
+  id: circleci-manager01
+  owner: !group circleci/managers
+
+- !grant
+  role: !group circleci/managers
+  members: 
+    - !user circleci-manager01
