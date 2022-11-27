@@ -43,9 +43,9 @@
   owner: !group managers
   annotations:
     # CircleCI Limitation : Only one context is supported.
-    authn-jwt/circleci1/oidc.circleci.com/context-ids: b9a76464-3200-450d-9024-89c1aa4c0344
+    authn-jwt/circleci1/oidc.circleci.com/context-ids: [ "$CIRCLECI_CONTEXT_ID" ]
     # CircleCI Project ID.
-    authn-jwt/circleci1/oidc.circleci.com/project-id: b092113f-d248-40ee-99b7-8baf91f20593
+    authn-jwt/circleci1/oidc.circleci.com/project-id: $CIRCLECI_PROJECT_ID
 
 # Add the hosts we have created to their respective layer
 - !grant
