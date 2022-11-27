@@ -56,4 +56,4 @@
   roles:
     - !layer apps/jwt
   members:
-    - !host apps/conjur-demo
+    - !host apps/org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
