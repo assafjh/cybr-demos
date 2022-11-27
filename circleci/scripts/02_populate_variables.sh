@@ -3,9 +3,7 @@
 # Path to our safe at Conjur, leave as is
 SAFE_PATH=circleci/apps/safe/secret
 # CircleCI Organization ID
-CIRCLECI_ORG_ID=5da947cd-2655-42c0-b852-4ea1129153fb
-# CircleCI Project ID
-CIRCLECI_PROJECT_ID=b092113f-d248-40ee-99b7-8baf91f20593
+CIRCLECI_ORG_ID=
 #============ Script ===============
 
 # Checking if a user is logged-in to Conjur-CLI
