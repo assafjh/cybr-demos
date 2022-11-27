@@ -1,0 +1,55 @@
+---
+# Load policy into circleci branch
+# This policy defines the demo branch circleci
+
+# apps is a layer that will aggregate safe permissions for circleci project1
+- !layer
+  id: apps
+  owner: !group managers
+
+# projects/jwt is a layer that will aggregate permissions for all circleci projects that want to use JWT authn to consume Conjur secrets
+- !layer
+  id: apps/jwt
+  owner: !group managers
+
+# create secrets
+- !policy
+  id: apps/safe
+  owner: !group managers
+  body:
+  - &circleci-secrets
+    - !variable
+      id: secret1
+      owner: !group ../../managers
+    - !variable
+      id: secret2
+      owner: !group ../../managers
+    - !variable
+      id: secret3
+      owner: !group ../../managers
+
+ # Allow apps layer to consume the secrets we have created
+  - !permit
+    role: !layer ../../apps
+    privileges: [ read, execute ]
+    resource: *circleci-secrets
+
+# Create the Project identities that we will use to authenticate to Conjur 
+- !host
+  id: apps/conjur-demo
+  owner: !group managers
+  #annotations:
+  #    authn-jwt/circleci1/repository: assafjh/cybr-demos
+  #    authn-jwt/circleci1/workflow: conjur-demo
+
+# Add the hosts we have created to their respective layer
+- !grant
+  roles:
+    - !layer apps
+  members:
+    - !host apps/conjur-demo
+- !grant
+  roles:
+    - !layer apps/jwt
+  members:
+    - !host apps/conjur-demo
