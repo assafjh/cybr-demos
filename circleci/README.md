@@ -42,7 +42,7 @@ export CIRCLECI_PROJECT_ID=<MY_PROJECT_ID>
 export CIRCLECI_USER_ID=<MY_USER_ID>
 export CIRCLECI_CONTEXT_ID=<MY_CONTEXT_ID>
 envsubst < policies/02-define-circleci-branch.yml > 02-define-circleci-branch.yml
-conjur policy update -b circleci -f policies/02-define-circleci-branch.yml | tee -a 02-define-circleci-branch.log
+conjur policy update -b circleci -f 02-define-circleci-branch.yml | tee -a 02-define-circleci-branch.log
 ```
 #### 3. Logout from Conjur CLI
 ```Bash
