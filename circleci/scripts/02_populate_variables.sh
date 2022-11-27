@@ -23,7 +23,7 @@ do
 done
 
 # Populate authenticator values
-conjur variable set -i conjur/authn-jwt/github1/issuer -v "https://token.actions.githubusercontent.com"
+conjur variable set -i conjur/authn-jwt/github1/issuer -v "https://oidc.circleci.com/org/$CIRCLECI_ORG_ID"
 conjur variable set -i conjur/authn-jwt/github1/jwks-uri -v "https://oidc.circleci.com/org/$CIRCLECI_ORG_ID/.well-known/jwks-pub.json"
 conjur variable set -i conjur/authn-jwt/github1/token-app-property -v "sub"
 conjur variable set -i conjur/authn-jwt/github1/audience -v "$CIRCLECI_ORG_ID"
