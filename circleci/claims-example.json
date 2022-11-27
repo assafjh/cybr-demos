@@ -3,7 +3,7 @@
   "aud": "$ORG_ID",
   "oidc.circleci.com/project-id": "$PROJECT_ID",
   "oidc.circleci.com/context-ids": [
-    "b9a76464-3200-450d-9024-89c1aa4c0344"
+    "$CONTEXT_ID"
   ],
   "iss": "https://oidc.circleci.com/org/$ORG_ID",
   "exp": 1669567276,
