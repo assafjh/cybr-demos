@@ -5,7 +5,7 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  say-hello:
+  get-secret:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Get-Secret"
+          name: "Get Secret"
           command: |
             # Store OIDC token in temp file
             token=$(curl -k --request POST "https://ec2-3-10-224-97.eu-west-2.compute.amazonaws.com:8443/authn-jwt/circleci1/demo/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
