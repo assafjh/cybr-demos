@@ -2,30 +2,33 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  consume-secret:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  consume-secrets-from-conjur:
     docker:
       - image: cimg/base:stable
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
-      - checkout
       - run:
-          name: "consume-secret"
+          name: "Authenticating to Conjur"
+          command: |
+            # Store Conjur Token in temp file
+            TOKEN=$(curl -s -k --request POST "$CONJUR_FQDN/authn-jwt/$AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
+      - run:
+          name: "Consuming secret from Conjur"
           command: |
             # Store OIDC token in temp file
-            token=$(curl -s -k --request POST "$CONJUR_FQDN/authn-jwt/$AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
-            secret=$(curl -s -k -X GET -H "Authorization: Token token=\"$token\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
-            echo $secret
+            TOKEN=$(curl -s -k --request POST "$CONJUR_FQDN/authn-jwt/$AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
+            SECRET=$(curl -s -k -X GET -H "Authorization: Token token=\"$token\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
+      - run:
+          name: "Print secret"
+          command: |
+            echo "================"
+            echo "secret1: $SECRET"
+            echo "================"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   get-secrets-workflow:
     jobs:
-      - consume-secret:
+      - consume-secrets-from-conjur:
           context: Conjur
