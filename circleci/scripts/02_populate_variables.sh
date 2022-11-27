@@ -1,7 +1,7 @@
 #!/bin/bash
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
-SAFE_PATH=github/apps/safe/secret
+SAFE_PATH=circleci/apps/safe/secret
 # CircleCI Organization ID
 CIRCLECI_ORG_ID=5da947cd-2655-42c0-b852-4ea1129153fb
 # CircleCI Project ID
@@ -23,8 +23,8 @@ do
 done
 
 # Populate authenticator values
-conjur variable set -i conjur/authn-jwt/github1/issuer -v "https://oidc.circleci.com/org/$CIRCLECI_ORG_ID"
-conjur variable set -i conjur/authn-jwt/github1/jwks-uri -v "https://oidc.circleci.com/org/$CIRCLECI_ORG_ID/.well-known/jwks-pub.json"
-conjur variable set -i conjur/authn-jwt/github1/token-app-property -v "sub"
-conjur variable set -i conjur/authn-jwt/github1/audience -v "$CIRCLECI_ORG_ID"
-conjur variable set -i conjur/authn-jwt/github1/identity-path -v "/circleci/apps"
+conjur variable set -i conjur/authn-jwt/circleci1/issuer -v "https://oidc.circleci.com/org/$CIRCLECI_ORG_ID"
+conjur variable set -i conjur/authn-jwt/circleci1/jwks-uri -v "https://oidc.circleci.com/org/$CIRCLECI_ORG_ID/.well-known/jwks-pub.json"
+conjur variable set -i conjur/authn-jwt/circleci1/token-app-property -v "sub"
+conjur variable set -i conjur/authn-jwt/circleci1/audience -v "$CIRCLECI_ORG_ID"
+conjur variable set -i conjur/authn-jwt/circleci1/identity-path -v "/circleci/apps"
