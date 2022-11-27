@@ -15,17 +15,17 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Say hello"
+          name: "Get-Secret"
           command: |
             # Store OIDC token in temp file
-            echo $CIRCLE_OIDC_TOKEN > /home/circleci/oidc_token.json
-            echo "ASSAF" > /tmp/bla.txt
-            cat /home/circleci/oidc_token.json
-            cat /tmp/bla.txt
+            token=$(curl -k --request POST "https://ec2-3-10-224-97.eu-west-2.compute.amazonaws.com:8443/authn-jwt/circleci1/demo/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
+            secret=$(curl -k -X GET -H "Authorization: Token token=\"$token\"" "https://ec2-3-10-224-97.eu-west-2.compute.amazonaws.com:8443/secrets/demo/variable/circleci/apps/safe/secret1")
+            echo $secret
+            
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   say-hello-workflow:
     jobs:
-      - say-hello
+      - Get-Secret
