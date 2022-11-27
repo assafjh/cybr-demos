@@ -18,10 +18,9 @@ jobs:
           name: "consume-secret"
           command: |
             # Store OIDC token in temp file
-            token=$(curl -s -k --request POST "https://ec2-3-10-224-97.eu-west-2.compute.amazonaws.com:8443/authn-jwt/circleci1/demo/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
-            secret=$(curl -s -k -X GET -H "Authorization: Token token=\"$token\"" "https://ec2-3-10-224-97.eu-west-2.compute.amazonaws.com:8443/secrets/demo/variable/circleci/apps/safe/secret1")
+            token=$(curl -s -k --request POST "$CONJUR_FQDN/authn-jwt/$AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
+            secret=$(curl -s -k -X GET -H "Authorization: Token token=\"$token\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
             echo $secret
-            curl -v -k --request POST "https://ec2-3-10-224-97.eu-west-2.compute.amazonaws.com:8443/authn-jwt/circleci1/demo/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN"
             
 
 # Invoke jobs via workflows
@@ -29,4 +28,5 @@ jobs:
 workflows:
   get-secrets-workflow:
     jobs:
-      - consume-secret
+      - consume-secret:
+          context: Conjur
