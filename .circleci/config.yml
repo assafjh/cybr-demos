@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Get Secret"
+          name: "consume-secret"
           command: |
             # Store OIDC token in temp file
             token=$(curl -k --request POST "https://ec2-3-10-224-97.eu-west-2.compute.amazonaws.com:8443/authn-jwt/circleci1/demo/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
@@ -26,6 +26,6 @@ jobs:
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  get-secret-workflow:
+  get-secrets-workflow:
     jobs:
-      - Get-Secret
+      - consume-secret

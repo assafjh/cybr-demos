@@ -1,0 +1,220 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conjur-follower
+  namespace: conjur-followers-jwt
+  labels:
+    app: follower
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: follower
+  template:
+    metadata:
+      labels:
+        app: follower
+    spec:
+      serviceAccountName: conjur-demo-acct
+      automountServiceAccountToken: false
+      volumes:
+        - name: conjur-certs
+          emptyDir:
+            medium: Memory
+        - name: conjur-config
+          emptyDir:
+            medium: Memory
+        - name: conjur-datakey
+          emptyDir:
+            medium: Memory
+        - name: conjur-api-token
+          emptyDir:
+            medium: Memory
+        - name: conjur-seedfile
+          emptyDir:
+            medium: Memory
+        - name: audit-socket
+          emptyDir:
+            medium: Memory
+        - name: conjur-config-file-volume
+          configMap:
+            name: conjur-followers-authn-config
+            items:
+              - key: conjur.yml
+                path: conjur.yml
+            defaultMode: 0777
+      initContainers:
+        - name: configurator
+          image: cyberark/dap-seedfetcher
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: conjur-connect
+          env:
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: conjur-certs
+              mountPath: /opt/conjur/etc/ssl
+            - name: conjur-config
+              mountPath: /opt/conjur/etc/config
+            - name: conjur-datakey
+              mountPath: /opt/conjur/etc/data_key
+            - name: conjur-api-token
+              mountPath: /run/conjur
+            - name: conjur-seedfile
+              mountPath: /tmp/seedfile
+      containers:
+        - name: postgres
+          image: localhost:5000/cyberark/conjur-kubernetes-follower-postgres:2.2.1-547-42e5e4d
+          imagePullPolicy: IfNotPresent
+          ports:
+          - name: postgres
+            containerPort: 5432
+          volumeMounts:
+            - name: conjur-config
+              mountPath: /opt/conjur/etc/config
+              readOnly: false
+            - name: conjur-certs
+              mountPath: /opt/conjur/etc/ssl
+              readOnly: false
+          livenessProbe:
+            tcpSocket:
+              port: postgres
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 90 # 1.5 minutes
+          readinessProbe:
+            tcpSocket:
+              port: postgres
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 1200 # 20 minutes
+        - name: syslog-ng
+          image: localhost:5000/cyberark/conjur-kubernetes-follower-syslog-ng:2.2.1-547-42e5e4d
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: conjur-config
+              mountPath: /opt/conjur/etc/config
+              readOnly: false
+            - name: conjur-certs
+              mountPath: /opt/conjur/etc/ssl
+              readOnly: false
+            - name: audit-socket
+              mountPath: /run/conjur
+              readOnly: false
+        - name: conjur
+          image: localhost:5000/cyberark/conjur-kubernetes-follower-conjur:2.2.1-547-42e5e4d
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: CONJUR_DATABASE_HOSTNAME
+              value: localhost:5000
+            - name: KUBERNETES_SERVICE_HOST
+              value: ""
+            - name: KUBERNETES_SERVICE_PORT_HTTPS
+              value: ""
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: conjur-config
+              mountPath: /opt/conjur/etc/config
+              readOnly: false
+            - name: conjur-datakey
+              mountPath: /opt/conjur/etc/data_key
+              readOnly: false
+            - name: conjur-certs
+              mountPath: /opt/conjur/etc/ssl
+              readOnly: false
+            - name: audit-socket
+              mountPath: /run/conjur
+              readOnly: false
+            - name: conjur-config-file-volume
+              mountPath: /etc/conjur/config/
+              readOnly: false
+          # The Conjur container will not start serving http traffic until its
+          # Rails server starts, at which point it is fully initialized.
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 180 # 3 minutes
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 30
+            timeoutSeconds: 30
+            failureThreshold: 180 # 3 minutes
+        - name: nginx
+          image: localhost:5000/cyberark/conjur-kubernetes-follower-nginx:2.2.1-547-42e5e4d
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 9443
+            name: https
+          - containerPort: 9000
+            name: http
+          volumeMounts:
+            - name: conjur-certs
+              mountPath: /opt/conjur/etc/ssl
+              readOnly: false
+          # nginx starts serving traffic to /status once it is up and running.
+          livenessProbe:
+            httpGet:
+              path: /status
+              scheme: HTTPS
+              port: https
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 180 # 3 minutes
+          readinessProbe:
+            httpGet:
+              path: /status
+              scheme: HTTPS
+              port: https
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 180 # 3 minutes
+        - name: info
+          image: localhost:5000/cyberark/conjur-kubernetes-follower-info:2.2.1-547-42e5e4d
+          imagePullPolicy: IfNotPresent
+          ports:
+          - name: info
+            containerPort: 5611
+          volumeMounts:
+            - name: conjur-config
+              mountPath: /opt/conjur/etc/config
+              readOnly: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conjur-follower
+  namespace: conjur-followers-jwt
+spec:
+  ports:
+  - port: 443
+    name: https
+    targetPort: 9443
+  selector:
+    app: follower
