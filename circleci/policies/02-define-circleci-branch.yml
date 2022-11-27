@@ -35,11 +35,15 @@
     resource: *circleci-secrets
 
 # Create the Project identities that we will use to authenticate to Conjur 
+# before loading this, change the variables below or export and load with envsubst
+# envsubst < policies/02-define-circleci-branch.yml > 02-define-circleci-branch.yml 
+# How to get User ID: GET https://circleci.com/api/v2/me
 - !host
-  id: apps/conjur-demo
+  id: apps/org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
   owner: !group managers
-  #annotations:
-  #    authn-jwt/circleci1/repository: assafjh/cybr-demos
+  annotations:
+  # CircleCI Limitation : Only one context is supported.
+    authn-jwt/circleci1/oidc.circleci.com/context-ids: Conjur
   #    authn-jwt/circleci1/workflow: conjur-demo
 
 # Add the hosts we have created to their respective layer
