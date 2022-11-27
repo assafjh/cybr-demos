@@ -1,0 +1,9 @@
+{
+    "created_roles": {
+        "demo:host:kubernetes/followers/conjur-follower": {
+            "id": "demo:host:kubernetes/followers/conjur-follower",
+            "api_key": "3b7aw6fh8ykcw1stk3jr19s9zar1je5yg81ex4bm9jgbd0j153r48y"
+        }
+    },
+    "version": 13
+}

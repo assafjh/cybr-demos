@@ -1,0 +1,9 @@
+{
+    "created_roles": {
+        "demo:user:k8s-manager01": {
+            "id": "demo:user:k8s-manager01",
+            "api_key": "2g6xc993xx67nx3qpvt552qj8pc2956m1t2hh9xyt39e4jtx2sy22tb"
+        }
+    },
+    "version": 3
+}

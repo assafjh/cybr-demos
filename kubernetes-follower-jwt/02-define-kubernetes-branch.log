@@ -1,0 +1,30 @@
+{
+    "created_roles": {
+        "demo:host:kubernetes/followers/system:serviceaccount:conjur-followers-jwt:conjur-demo-acct": {
+            "id": "demo:host:kubernetes/followers/system:serviceaccount:conjur-followers-jwt:conjur-demo-acct",
+            "api_key": "3szcc4v157a95a3gwzw1q2w8zpd43zpjm05368ajpevjmaqbxwgxtc"
+        }
+    },
+    "version": 10
+}
+{
+    "created_roles": {},
+    "version": 11
+}
+{
+    "created_roles": {},
+    "version": 12
+}
+{
+    "created_roles": {
+        "demo:host:kubernetes/applications/followers/system:serviceaccount:conjur-followers-jwt:conjur-demo-acct": {
+            "id": "demo:host:kubernetes/applications/followers/system:serviceaccount:conjur-followers-jwt:conjur-demo-acct",
+            "api_key": "3r9p8s82gkmdzp3p31g9g1zdznnh2hjq58dd8x48z2y58rapbqzcgq"
+        }
+    },
+    "version": 14
+}
+{
+    "created_roles": {},
+    "version": 15
+}

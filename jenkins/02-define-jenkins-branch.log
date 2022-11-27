@@ -1,0 +1,17 @@
+{
+    "created_roles": {
+        "demo:host:jenkins/projects/Project1/Job1": {
+            "id": "demo:host:jenkins/projects/Project1/Job1",
+            "api_key": "2z1tetd2cw4t252jpwvs1163g0zk3pxeeb72e0htg428hs0bt31cqs67"
+        },
+        "demo:host:jenkins/projects/Project2/Job1": {
+            "id": "demo:host:jenkins/projects/Project2/Job1",
+            "api_key": "wxfnwv1a73emdjmmzj721k4tes1xk467c2qv34kxwtp1h0324eda5"
+        },
+        "demo:host:jenkins/projects/Project3/Job1": {
+            "id": "demo:host:jenkins/projects/Project3/Job1",
+            "api_key": "2swgzbt1w6b2d7ykewss1wthhpgnhgc11mnkny812mh2hq2m0a1mz"
+        }
+    },
+    "version": 1
+}

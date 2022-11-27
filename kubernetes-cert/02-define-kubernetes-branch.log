@@ -1,0 +1,17 @@
+{
+    "created_roles": {
+        "demo:host:kubernetes/applications/demo-application-push-to-file": {
+            "id": "demo:host:kubernetes/applications/demo-application-push-to-file",
+            "api_key": "1tkp4e82ecmatf2wssyws313nz2h2ywnwzf2jq8e78kctbbe4rzc64"
+        },
+        "demo:host:kubernetes/applications/demo-application-push-to-secrets": {
+            "id": "demo:host:kubernetes/applications/demo-application-push-to-secrets",
+            "api_key": "9c3nd7dyx081ke0hk42v9pd0y1c0j1p51hacvm2m121h34p3qf6"
+        },
+        "demo:host:kubernetes/applications/demo-application-summon": {
+            "id": "demo:host:kubernetes/applications/demo-application-summon",
+            "api_key": "24g2jv4zp76ag3c9rm1j2wxesgt5chdhjpjk3h2kg4v2h13etxzj"
+        }
+    },
+    "version": 2
+}
