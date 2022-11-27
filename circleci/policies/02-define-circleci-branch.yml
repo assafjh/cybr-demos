@@ -43,7 +43,7 @@
   owner: !group managers
   annotations:
     # CircleCI Limitation : Only one context is supported.
-    authn-jwt/circleci1/oidc.circleci.com/context-ids: [ "$CIRCLECI_CONTEXT_ID" ]
+    authn-jwt/circleci1/"oidc.circleci.com/context-ids"[0]: $CIRCLECI_CONTEXT_ID
     # CircleCI Project ID.
     authn-jwt/circleci1/oidc.circleci.com/project-id: $CIRCLECI_PROJECT_ID
 
