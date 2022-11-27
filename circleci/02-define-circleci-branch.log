@@ -1,0 +1,9 @@
+{
+    "created_roles": {
+        "demo:host:circleci/apps/conjur-demo": {
+            "id": "demo:host:circleci/apps/conjur-demo",
+            "api_key": "3q706hvtv7b9y1k53tht3we195jm9xsn12v0rsxq11qgvafda5q9p"
+        }
+    },
+    "version": 1
+}
