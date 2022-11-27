@@ -16,7 +16,7 @@ jobs:
       - run:
           name: "Consuming secret from Conjur"
           command: |
-            SECRET=$(curl -s -k -X GET -H "Authorization: Token token=\"$token\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
+            SECRET=$(curl -s -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
             echo "export SECRET=$SECRET" >> "$BASH_ENV"
       - run:
           name: "Print secret"
