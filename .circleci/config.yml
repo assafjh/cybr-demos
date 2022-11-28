@@ -13,6 +13,7 @@ jobs:
             # Store Conjur Token in temp file
             RESPONSE_CODE=$(curl -s -o /tmp/token.txt -k --request POST "$CONJUR_FQDN/authn-jwt/$CONJUR_AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
             TOKEN=$(cat /tmp/token.txt)
+            echo $RESPONSE_CODE
             [ "$RESPONSE_CODE" != "200" ] && echo "Authentication failed"; exit 1
             echo "export TOKEN=$TOKEN" >> "$BASH_ENV"
       - run:
