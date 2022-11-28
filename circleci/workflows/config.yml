@@ -11,13 +11,23 @@ jobs:
           name: "Authenticating to Conjur"
           command: |
             # Store Conjur Token in temp file
-            TOKEN=$(curl -s -k --request POST "$CONJUR_FQDN/authn-jwt/$CONJUR_AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
+            RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/token.txt -k --request POST "$CONJUR_FQDN/authn-jwt/$CONJUR_AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
+            TOKEN=$(cat /tmp/token.txt)
+            if [ "$RESPONSE_CODE" != "200" ]; then
+              echo "Autentication Failed"
+              exit 1
+            fi
             echo "export TOKEN=$TOKEN" >> "$BASH_ENV"
       - run:
           name: "Consuming secret from Conjur"
           command: |
-            SECRET=$(curl -s -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
-            echo "export SECRET=$SECRET" >> "$BASH_ENV"
+             RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/secret.txt -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
+             SECRET=$(cat /tmp/secret.txt)
+             if [ "$RESPONSE_CODE" != "200" ]; then
+              echo "Secret retrieval failed"
+              exit 1
+             fi
+             echo "export SECRET=$SECRET" >> "$BASH_ENV"
       - run:
           name: "Print secret"
           command: |
