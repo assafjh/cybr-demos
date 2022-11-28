@@ -82,11 +82,16 @@ conjur logout
 ```
 ## 3. Connect CircleCI to GitHub
 
+## 4. In GitHub, commit and push the file workflows/config.yml to .circleci/config.yml
+
 ## 4. Enable the Project at CircleCI
-### 1. Use the config file: workflows/config.yml
+### 1. In CircleCI Projects page, select your repository and click "Set Up Project"
+### 2. In the form that was opened, select "Fastest", Click Set Up Project
 
 ## 5. Add the context "Conjur" to your project.
-#### 1. Add the following variables:
+#### 1. In CircleCI, click on "*organization settings*" -> "*Contexts*" -> "*Create Context*"
+#### 2. Name the context "*Conjur*"
+#### 3. Add the following environment variables:
 - `CONJUR_AUTHN_ID`- For this demo, the Conjur authenticator ID is: **circleci1**
 - `CONJUR_FQDN` - Add Conjur FQDN with scheme and port
 - `CONJUR_ORG` - or this demo, the Conjur organization ID is: **demo**
