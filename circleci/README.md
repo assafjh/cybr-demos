@@ -58,7 +58,7 @@ conjur login -i admin01
 ```Bash
 conjur policy update -b root -f policies/03-define-jwt-auth.yml | tee -a 03-define-jwt-auth.log
 ```
-#### 4. Enable the authenticator
+#### 3. Enable the authenticator
 - This step will work from the Conjur Leader VM only.
 1. Modify the variables at enable authenticator script:
 ```bash 
