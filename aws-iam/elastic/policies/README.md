@@ -1,3 +1,6 @@
-# Conjur policies for AWS IAM integration
+# Conjur policies for EC2 IAM Role authentication
+
 The below diagram describes the organization we are loading into Conjur.
-![Conjur policies for AWS IAM integration](https://github.com/assafjh/cybr-demos/blob/main/circleci/policies/circleci-policies.png?raw=true)
+
+![Conjur policies for EC2 integration](
+https://github.com/assafjh/cybr-demos/blob/main/aws-iam/elastic/policies/elastic-policies.png?raw=true)

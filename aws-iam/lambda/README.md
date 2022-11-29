@@ -1,8 +1,34 @@
 # Use case: Amazon Elastic Compute Cloud (EC2) IAM role authentication
 
-It is assumed an IAM role is already associated with the ec2 instance. 
+It is assumed that you can create a new lambda function and that an IAM role is already associated with the lambda function.
 
-## 1. Loading Conjur policies
+For more information on lambda functions: [AWS Docs - lambda](https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html)
+
+## 1. Configure Lambda function
+### 1. Create a new lambda function with runtime Python v3.9
+**Note**: The packaging script supports the latest lambda python runtime env, currently it is v3.9
+### 2. Package the function
+```bash
+scripts/01-package-function.sh
+```
+### 2. Upload the zip file to you lambda function
+```bash
+# File will be generated under:
+function-source-code/conjur-lambda-package.zip
+```
+### Configure the following Environment variables:
+```properties
+AUTHN_IAM_SERVICE_ID=demo
+CONJUR_ACCOUNT=demo
+# Conjur FQDN with scheme and port
+CONJUR_APPLIANCE_URL=https://$CONJUR_FQDN:$PORT
+# Conjur host ID
+CONJUR_AUTHN_LOGIN=$CONJOR_HOST
+# AWS IAM Role Name
+IAM_ROLE_NAME=$ROLE_NAME
+```
+
+## 2. Loading Conjur policies
 - Policy statements are loaded into either the Conjur root policy branch or a policy branch under root
 - Per best practices, most policies will be created in branches off of root. 
 - Branches have the following advantages: better organizing, help policy isolation for least privilege assignments, enforce RBAC, allowing relevant users to manage their own policy.
@@ -53,42 +79,27 @@ conjur policy update -b root -f policies/03-define-iam-auth.yml | tee -a 03-defi
 - This step will work from the Conjur Leader VM only.
 1. Modify the variables at enable authenticator script:
 ```bash 
-vi scripts/01-enable-authenticator.sh
+vi scripts/02-enable-authenticator.sh
 ```
 2. Run the script:
 ```bash
-scripts/01-enable-authenticator.sh
+scripts/02-enable-authenticator.sh
 ```
 #### 5. Populate safe variables
 1. Modify the variables at populate variables script:
 ```bash 
-vi scripts/02-populate-variables.sh
+vi scripts/03-populate-variables.sh
 ```
 ```Bash
-scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
+scripts/03-populate-variables.sh | tee -a 03-populate-variables.log
 ```
 ### 5. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
 
-## 4. Run the use case
-### 1. Build the python environment
-```bash
-scripts/03-build-python-env.sh
-```
-### 3 Modify .env with relevant environment details
-```bash
-vi python/.env
-```
-### 3 Load .env
-```bash
-source python/.env
-```
-### 4. Run python shell script: ec2
-```bash
-python/ec2.py
-```
-### 5. Validate that the output is correct
+## 4. Test your function
+### 1. From AWS console, go to the lambda function and click Test
+### 2. Validate that the output is correct
 
 
