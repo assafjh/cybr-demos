@@ -1,0 +1,1 @@
+# Use case: Amazon Elastic Compute Cloud IAM role authenticaton
