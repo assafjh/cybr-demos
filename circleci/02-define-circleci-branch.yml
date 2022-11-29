@@ -2,7 +2,7 @@
 # Load policy into circleci branch
 # This policy defines the demo branch circleci
 
-# apps is a layer that will aggregate safe permissions for circleci
+# apps is a layer that will aggregate safe permissions for circleci project1
 - !layer
   id: apps
   owner: !group managers
@@ -39,19 +39,23 @@
 # envsubst < policies/02-define-circleci-branch.yml > 02-define-circleci-branch.yml 
 # How to get User ID: GET https://circleci.com/api/v2/me
 - !host
-  id: apps/org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
+  id: apps/org/5da947cd-2655-42c0-b852-4ea1129153fb/project/b092113f-d248-40ee-99b7-8baf91f20593/user/0ac79f3f-cdf3-4caf-a74e-860ee86d943a
   owner: !group managers
   annotations:
-    authn-jwt/circleci1/sub: org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
+    # CircleCI Limitation : Only one context is supported.
+    # authn-jwt/circleci1/oidc.circleci.com/context-ids: b9a76464-3200-450d-9024-89c1aa4c0344
+    # CircleCI Project ID.
+    # authn-jwt/circleci1/project-id': b092113f-d248-40ee-99b7-8baf91f20593
+    authn-jwt/circleci1/sub: org/5da947cd-2655-42c0-b852-4ea1129153fb/project/b092113f-d248-40ee-99b7-8baf91f20593/user/0ac79f3f-cdf3-4caf-a74e-860ee86d943a
 
 # Add the hosts we have created to their respective layer
 - !grant
   roles:
     - !layer apps
   members:
-    - !host apps/org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
+    - !host apps/org/5da947cd-2655-42c0-b852-4ea1129153fb/project/b092113f-d248-40ee-99b7-8baf91f20593/user/0ac79f3f-cdf3-4caf-a74e-860ee86d943a
 - !grant
   roles:
     - !layer apps/jwt
   members:
-    - !host apps/org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
+    - !host apps/org/5da947cd-2655-42c0-b852-4ea1129153fb/project/b092113f-d248-40ee-99b7-8baf91f20593/user/0ac79f3f-cdf3-4caf-a74e-860ee86d943a
