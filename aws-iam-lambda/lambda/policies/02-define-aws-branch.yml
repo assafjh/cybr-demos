@@ -1,0 +1,46 @@
+---
+# Load policy into aws branch
+# This policy defines the demo branch aws
+
+# lambda is a layer that will aggregate safe permissions for aws lambda functions
+- !layer
+  id: lambda
+  owner: !group managers
+
+# create secrets
+- !policy
+  id: lambda/safe
+  owner: !group managers
+  body:
+  - &aws-secrets
+    - !variable
+      id: secret1
+      owner: !group ../../managers
+    - !variable
+      id: secret2
+      owner: !group ../../managers
+    - !variable
+      id: secret3
+      owner: !group ../../managers
+
+ # Allow lambda layer to consume the secrets we have created
+  - !permit
+    role: !layer ../../lambda
+    privileges: [ read, execute ]
+    resource: *aws-secrets
+
+# Create the Project identities that we will use to authenticate to Conjur 
+# before loading this, change the variables below or export and load with envsubst
+# envsubst < policies/02-define-aws-branch.yml > 02-define-aws-branch.yml
+# host id is $AWS_ACCOUNT/$ROLENAME 
+# EXAMPLE: arn:aws:iam::1234:role/service-role/ajh-lambda-conjur-role-123 -> 1234/ajh-lambda-conjur-role-123
+- !host
+  id: lambda/$ROLE_ARN
+  owner: !group managers
+
+# Add the hosts we have created to their respective layer
+- !grant
+  roles:
+    - !layer lambda
+  members:
+    - !host lambda/$ROLE_ARN

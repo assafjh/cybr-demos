@@ -1,2 +1,3 @@
-function-source-code/package/*
-*.zip
+**/function-source-code/package/*
+**/*.zip
+**/__pycache__/*
