@@ -1,0 +1,14 @@
+---
+# Load policy into root branch
+# This policy defines an AWS IAM authenticator
+# policy id needs to match the convention `conjur/authn-iam/<service ID>`
+- !policy
+  id: conjur/authn-iam/demo
+  owner: !group aws/managers
+  body:
+  - !webservice
+  
+  - !permit
+    role: !layer ../../../aws/elastic
+    privilege: [ read, authenticate ]
+    resource: !webservice

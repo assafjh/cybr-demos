@@ -1,0 +1,51 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization that uses aws applications
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define aws branch, create users, hosts, groups, layers, variables
+- !policy
+  id: aws
+  owner: !group admins
+
+# aws/managers group will admin everything under aws branch
+- !group
+  id: aws/managers
+  owner: !group admins
+
+- !permit
+  role: !group aws/managers
+  privileges: [read,update,create]
+  resource: !policy aws
+
+- !permit
+  role: !group aws/managers
+  privileges: [read,update,create]
+  resource: !group aws/managers
+
+- !user
+  id: aws-manager01
+  owner: !group aws/managers
+
+- !grant
+  role: !group aws/managers
+  members: 
+    - !user aws-manager01
