@@ -1,5 +1,5 @@
 import sys, datetime, hashlib, hmac, json, os
-import requests
+import requests # pip install requests
 from conjur import Client
 from datetime import timedelta
 import urllib.parse
@@ -18,6 +18,21 @@ class ConjurIAMAuthnException(Exception):
     def __init__(self):
         Exception.__init__(self,"Conjur IAM authentication failed with 401 - Unauthorized. Check conjur logs for more information") 
 
+class IAMRoleNotAvailableException(Exception):
+    def __init__(self):
+        Exception.__init__(self,"Most likely the ec2 instance is configured with no or an incorrect iam role") 
+
+class InvalidAwsAccountIdException(Exception):
+    def __init__(self):
+        Exception.__init__(self,"The AWS Account ID specified in the CONJUR_AUTHN_LOGIN is invalid and must be a 12 digit number") 
+
+def valid_aws_account_number(host_id):
+    parts = host_id.split("/")
+    account_id = parts[len(parts)-2]
+    if len(account_id) == 12:
+        return True
+    return False
+
 # Key derivation functions. See:
 # http://docs.aws.amazon.com/general/latest/gr/signature-v4-examples.html#signature-v4-examples-python
 def sign(key, msg):
@@ -30,6 +45,27 @@ def get_signature_key(key, dateStamp, regionName, serviceName):
     kService = sign(kRegion, serviceName)
     kSigning = sign(kService, 'aws4_request')
     return kSigning
+
+def get_aws_region():
+    # return requests.get(AWS_AVAILABILITY_ZONE).text[:-1]
+    return "us-east-1"
+
+def get_iam_role_name():
+    r = requests.get(AWS_METADATA_URL)
+    return r.text
+
+def get_iam_role_metadata(role_name):
+    r = requests.get(AWS_METADATA_URL + role_name)
+    if r.status_code == 404:
+        raise IAMRoleNotAvailableException()
+
+    json_dict = json.loads(r.text)
+
+    access_key_id = json_dict["AccessKeyId"]
+    secret_access_key = json_dict["SecretAccessKey"]
+    token = json_dict["Token"]
+
+    return access_key_id, secret_access_key, token
 
 def create_canonical_request(amzdate, token, signed_headers, payload_hash):
     # ************* TASK 1: CREATE A CANONICAL REQUEST *************
@@ -70,15 +106,12 @@ def create_canonical_request(amzdate, token, signed_headers, payload_hash):
 
 def create_conjur_iam_api_key(iam_role_name=None, access_key=None, secret_key=None, token=None):
     if iam_role_name is None:
-        print('The environment variable IAM_ROLE_NAME is not set.')
-        sys.exit()
+        iam_role_name = get_iam_role_name()
     
     if access_key is None and secret_key is None and token is None:
-        access_key = os.environ["AWS_ACCESS_KEY_ID"]
-        secret_key = os.environ["AWS_SECRET_ACCESS_KEY"]
-        token = os.environ["AWS_SESSION_TOKEN"]
+        access_key, secret_key, token = get_iam_role_metadata(iam_role_name)
 
-    region = "us-east-1"
+    region = get_aws_region()
 
     if access_key is None or secret_key is None:
         print('No access key is available.')
@@ -132,29 +165,25 @@ def create_conjur_iam_api_key(iam_role_name=None, access_key=None, secret_key=No
     return '{}'.format(headers).replace("'", '"')
 
 def get_conjur_iam_session_token(appliance_url, account, service_id, host_id, cert_file, iam_role_name=None, access_key=None, secret_key=None, token=None, ssl_verify=True):
+    if not valid_aws_account_number(host_id):
+        raise InvalidAwsAccountIdException()
+
+    appliance_url = appliance_url.rstrip("/")
     url = "{}/authn-iam/{}/{}/{}/authenticate".format(appliance_url, service_id, account, urllib.parse.quote(host_id, safe=''))
     iam_api_key = create_conjur_iam_api_key(iam_role_name, access_key, secret_key, token)
     
     # If cert file is not provided then assume conjur is using valid certificate
-    if cert_file is None:
+    if cert_file == None:
         cert_file = True
 
     # If ssl_verify is explicitly false then ignore ssl certificate even if cert_file is set
     if not ssl_verify:
         cert_file = False
+    
+    r = requests.post(url=url,data=iam_api_key,verify=cert_file)
 
-    try:
-        r = requests.post(url=url,data=iam_api_key,verify=cert_file)
-    except requests.exceptions.HTTPError as err:
-        raise SystemExit("HTTP Error: ", err)
-    except requests.exceptions.ConnectionError as errc:
-        raise SystemExit("Error Connecting: ", errc)
-    except requests.exceptions.Timeout as errt:
-        raise SystemExit("Timeout Error: ", errt)
-    except requests.exceptions.RequestException as e:
-        raise SystemExit("Request Exception: ", e)
-
-    print(r.text)
+    if r.status_code == 401:
+        raise ConjurIAMAuthnException()
     return r.text
 
 """
@@ -162,12 +191,10 @@ If using IAM roles with conjur via the python3 api client use this function.
 The client will not support auto-refreshing of token when using iam authentication so it is recommended to call this method everytime you make a client request.
 An issue/enhancement has ben created on the conjur-python3-api github to address this issue however this is a work around for the time being.
 """
-def create_conjur_iam_client(appliance_url, account, service_id, host_id, cert_file=None, iam_role_name=None, access_key=None, secret_key=None, token=None, ssl_verify=True):
+def create_conjur_iam_client(appliance_url, account, service_id, host_id, cert_file, iam_role_name=None, access_key=None, secret_key=None, token=None, ssl_verify=True):
+    appliance_url = appliance_url.rstrip("/")
     # create our client with a placeholder api key
-    try:
-        client = Client(url=appliance_url, account=account, login_id=host_id, api_key="placeholder", ca_bundle=cert_file, ssl_verify=ssl_verify)
-    except Exception as e:
-        raise SystemExit(e)
+    client = Client(url=appliance_url, account=account, login_id=host_id, api_key="placeholder", ca_bundle=cert_file, ssl_verify=ssl_verify)
 
     # now obtain the iam session_token
     session_token = get_conjur_iam_session_token(appliance_url, account, service_id, host_id, cert_file, iam_role_name, access_key, secret_key, token, ssl_verify)
@@ -190,8 +217,6 @@ def create_conjur_iam_client_from_env(iam_role_name=None, access_key=None, secre
         return create_conjur_iam_client(appliance_url, account, service_id, host_id, cert_file, iam_role_name, access_key, secret_key, token, ssl_verify)
     except KeyError as e:
         raise KeyError("Failed to retrieve environment variable: {}".format(e))
-    except Exception as e:
-        raise e
 
 
 # Examples of using methods:
