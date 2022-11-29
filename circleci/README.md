@@ -7,7 +7,7 @@ The workflow authenticates to Conjur using JWT authentication.
 For more details on CircleCI OIDC, please refer to:
 [CircleCI: Using OpenID Connect Tokens in Jobs](https://circleci.com/docs/openid-connect-tokens/)
 
-For an example CIrcleCI payload, take a look at the file: `claims-example.json`
+For an example CircleCI payload, take a look at the file: `claims-example.json`
 
 ## 1. Loading Conjur policies
 - Policy statements are loaded into either the Conjur  root policy branch or a policy branch under root
