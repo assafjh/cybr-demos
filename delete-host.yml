@@ -1,5 +1,0 @@
-- !delete
-  record: !host aws/lambda/179196310045/role/service-role/ajh-lambda-conjur-role-bbfgg4yi
-
-- !delete
-  record: !host aws/lambda/179196310045/role/service-role/ajh-lambda-conjur-role-k739sfjq 
