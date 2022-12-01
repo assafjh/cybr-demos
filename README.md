@@ -11,3 +11,4 @@ Instructions for each scenario can be found in its respective folder.
 5. github-actions: Integration with GitHub Actions using CyberArk Conjur Secret Fetcher action
 6. circleci: Integration with CircleCI using JWT authentication
 7. aws-iam: Integration with AWS lambda function and EC2
+8. terraform: Integration with Terraform
