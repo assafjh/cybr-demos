@@ -103,19 +103,19 @@ vi scripts/.env
 export CONJUR_APPLIANCE_URL=https://conjur:8443
 # Conjur Account
 export CONJUR_ACCOUNT=demo
-# Conjur identity
-export CONJUR_AUTHN_LOGIN=host/identity
-# Conjur identity api key
-export CONJUR_AUTHN_API_KEY=123456
 # Path to Conjur public key file
 export CONJUR_CERT_FILE="$HOME"/conjur-server.pem
 ...
 ```
 #### Run envvars plan
+- Before run, modify CONJUR_AUTHN_LOGIN and CONJUR_AUTHN_API_KEY in the script.
+# Conjur identity api key
+export CONJUR_AUTHN_API_KEY=123456
 ```bash
 scripts/05-run-envvars-plan.sh
 ```
 #### Run summon plan
+- Before run, modify CONJUR_AUTHN_LOGIN and CONJUR_AUTHN_API_KEY in the script.
 ```bash
 scripts/06-run-summon-plan.sh
 ```

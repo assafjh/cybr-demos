@@ -102,9 +102,4 @@
     - !layer plans/summon
   members:
     - !host plans/summon/plan1
-- !grant
-  roles:
-    - !layer plans/jwt
-  members:
-    - !host plans/attributes/plan1
-    - !host plans/envvars/plan1
+
