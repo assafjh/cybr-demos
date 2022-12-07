@@ -42,10 +42,10 @@
   resource: !group terraform/managers
 
 - !user
-  id: k8s-manager01
+  id: terraform-manager01
   owner: !group terraform/managers
 
 - !grant
   role: !group terraform/managers
   members: 
-    - !user k8s-manager01
+    - !user terraform-manager01
