@@ -5,7 +5,7 @@ SAFE_PATH=terraform/plans/safe/
 # Secret variable name, leave as is
 VARIABLE_NAME=secret
 # safe names, leave as is
-declare -a SAFE_NAMES=("attributes" "envvar" "summon")
+declare -a SAFE_NAMES=("attributes" "envvars" "summon")
 
 #============ Script ===============
 
