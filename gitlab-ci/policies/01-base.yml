@@ -1,6 +1,6 @@
 ---
 # Load policy into root branch
-# This policy defines a demo organization that uses GitHub Actions
+# This policy defines a demo organization that uses GitLab runners
 
 # Define Admins, create admins group, create admin01 user
 - !group
@@ -21,31 +21,31 @@
   members: 
     - !user admin01
 
-# Define GitHub branch, create users, hosts, groups, layers, variables
+# Define gitlab branch, create users, hosts, groups, layers, variables
 - !policy
-  id: github
+  id: gitlab
   owner: !group admins
 
-# github/managers group will admin everything under GitHub branch
+# gitlab/managers group will admin everything under gitlab branch
 - !group
-  id: github/managers
+  id: gitlab/managers
   owner: !group admins
 
 - !permit
-  role: !group github/managers
+  role: !group gitlab/managers
   privileges: [read,update,create]
-  resource: !policy github
+  resource: !policy gitlab
 
 - !permit
-  role: !group github/managers
+  role: !group gitlab/managers
   privileges: [read,update,create]
-  resource: !group github/managers
+  resource: !group gitlab/managers
 
 - !user
-  id: github-manager01
-  owner: !group github/managers
+  id: gitlab-manager01
+  owner: !group gitlab/managers
 
 - !grant
-  role: !group github/managers
+  role: !group gitlab/managers
   members: 
-    - !user github-manager01
+    - !user gitlab-manager01
