@@ -26,9 +26,3 @@ $SUDO $CONTAINER_MGR run --detach \
   --env GITLAB_ROOT_PASSWORD="$GITLAB_ROOT_PASSWORD" \
   "$CONTAINER_IMG"
 
-#Deploying GitLab Runner
-$SUDO $CONTAINER_MGR volume create gitlab-runner-config
-$SUDO $CONTAINER_MGR run -d --name gitlab-runner --restart always \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -v gitlab-runner-config:/etc/gitlab-runner \
-    gitlab/gitlab-runner:latest
