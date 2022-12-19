@@ -11,7 +11,7 @@ GITLAB_HOST=$(hostname -f)
 # GitLab port
 GITLAB_PORT=9080
 # GitLab Instance Registration Token
-GITLAB_REGISTRATION_TOKEN=bbuqBizuGsSoAxv3X7s5
+GITLAB_REGISTRATION_TOKEN=
 #============ Script ===============
 #Deploying GitLab Runner
 $SUDO $CONTAINER_MGR volume create gitlab-runner-config
