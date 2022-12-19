@@ -13,7 +13,7 @@ GITLAB_HTTP_PORT=9080
 # GitLab SSH port
 GITLAB_SSH_PORT=9022
 # GitLab admin user password
-GITLAB_ROOT_PASSWORD=SomePass123@
+GITLAB_ROOT_PASSWORD=
 #============ Script ===============
 #Deploying GitLab
 $SUDO $CONTAINER_MGR run --detach \
