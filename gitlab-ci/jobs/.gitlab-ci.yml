@@ -6,6 +6,8 @@ variables:
 
 # Job: Retrieve variable from Conjur via REST using JWT Authentication
 retrieve-variable-via-rest:
+  tags:
+    - conjur-demo
   variables:
       CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret1
   stage: build
@@ -39,6 +41,8 @@ retrieve-variable-via-summon:
       CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret2
       CONJUR_AUTHN_JWT_HOST_ID: host/gitlab/ci/gitlab-summon
       JWT_TOKEN_PATH: /tmp/ci-job.jwt 
+  tags:
+    - conjur-demo
   stage: build
   before_script:
     - echo "Retrieving Conjur Public Key"
