@@ -1,6 +1,6 @@
 ---
 # Load policy into root branch
-# This policy defines a JWT authenticator to be used with Kubernetis cluster
+# This policy defines a JWT authenticator to be used with GitHub Actions
 - !policy
   id: conjur/authn-jwt/github1
   owner: !group github/managers

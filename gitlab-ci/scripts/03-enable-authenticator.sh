@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script will enable the GitHub JWT Authn in Conjur.
+# This script will enable the GitLab JWT Authn in Conjur.
 # This script is meant to use at the Conjur Leader VM machine.
 #============ Variables ===============
 # Is sudo required to run docker/podman - leave empty if no need
@@ -11,7 +11,7 @@ CONJUR_LEADER_PORT=8443
 # Conjur Leader container ID
 CONTAINER_ID=$(curl -s -k "https://127.0.0.1:$CONJUR_LEADER_PORT/info" | awk '/container/ {print $2}' | tr -d '",')
 # Name of the authn to enable, leave as is
-AUTHN_TO_ENABLE=authn-jwt/github1
+AUTHN_TO_ENABLE=authn-jwt/gitlab1
 #============ Script ===============
 echo "Enabling $AUTHN_TO_ENABLE authn for Conjur"
 CONJUR_AUTHENTICATORS=$($SUDO $CONTAINER_MGR exec $CONTAINER_ID evoke variable list | grep CONJUR_AUTHENTICATORS)
