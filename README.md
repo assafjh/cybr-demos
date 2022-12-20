@@ -12,3 +12,5 @@ Instructions for each scenario can be found in its respective folder.
 6. circleci: Integration with CircleCI using JWT authentication
 7. aws-iam: Integration with AWS lambda function and EC2
 8. terraform: Integration with Terraform
+9. gitlab-ci: Integration with GitLab CI using JWT authentication via REST and Summon
+10. rest-api : Rest API call examples
