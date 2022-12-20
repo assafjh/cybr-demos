@@ -1,15 +1,44 @@
-
 # GitLab CI integration
+This demo shows how to pull secrets from Conjur in GitLab CI.
 
-This demo will use JWT authentication.
+This demo will authenticate to Conjur using GitLab's auto generated JWT  stored under environment parameter: `CI_JOB_JWT` .
+
+#### Use cases:
+1. Job that uses REST API to pull a secret from Conjur.
+2. Job that uses Summon to pull a secret from Conjur.
 
 ## How does the JWT Authenticator works?
 ![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
+- For more details on GitLab CI Predefined variables, please refer to: [GitLab CI: Predefined variables reference](https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
 
-## GitLab documentation: Environment params 
-https://docs.gitlab.com/ee/administration/environment_variables.html
+- For an example GitLab CI payload, take a look at the file: `payload-example.json`
 
-## 1. Loading Conjur policies
+- For more details on Summon, take a look at [CyberArk Summon](https://cyberark.github.io/summon/)
+
+## 1. Deploy GitLab Server
+**Note**: The below will deploy GitLab CE server
+If needed, deploy a GitLab server instance:
+1. Modify the variables at the deployment script:
+```bash 
+vi scripts/01-deploy-gitlab-server.sh
+```
+2. Run the script:
+```bash
+scripts/01-deploy-gitlab-server.sh
+```
+
+## 2. Deploy GitLab Runner
+**Note**: The below will deploy a Shell Executor with the tag "conjur-demo"
+1. Modify the variables at the deployment script:
+```bash 
+vi scripts/02-deploy-gitlab-runner.sh
+```
+2. Run the script:
+```bash
+scripts/02-deploy-gitlab-runner.sh
+```
+
+## 3. Loading Conjur policies
 - Policy statements are loaded into either the Conjur  root policy branch or a policy branch under root
 - Per best practices, most policies will be created in branches off of root. 
 - Branches have the following advantages: better organizing, help policy isolation for least privilege assignments, enforce RBAC, allowing relevant users to manage their own policy.
@@ -27,15 +56,20 @@ conjur policy update -b root -f policies/01_base.yml | tee -a 01_base.log
 ```Bash
 conjur logout
 ```
-### 2. Github branch
-#### 1. Login as user github-manager01
+### 2. GitLab branch
+#### 1. Login as user gitlab-manager01
 - Use the API key as a password from the 01-base.log file for the user jenkins-manager01
 ```bash
-conjur login -i github-manager01
+conjur login -i gitlab-manager01
 ```
-#### 2. Load github policy
+#### 2. Load gitlab policy
+- Before running the export commands below, modify them with the correct values.
 ```bash
-conjur policy update -b github -f policies/02-define-github-branch.yml | tee -a 02-define-github-branch.log
+# How to get Namespace Path: GET $GITLAB_SERVER/api/v4/namespaces
+# Select the path that belongs to "GitLab Instance"
+export NAMESPACE_PATH=<NAME_SPACE_PATH>
+envsubst < policies/02-define-gitlab-branch.yml > 02-define-gitlab-branch.yml
+conjur policy update -b gitlab -f 02-define-gitlab-branch.yml | tee -a 02-define-gitlab-branch.log
 ```
 #### 3. Logout from Conjur CLI
 ```Bash
@@ -55,62 +89,47 @@ conjur policy update -b root -f policies/03-define-jwt-auth.yml | tee -a 03-defi
 - This step will work from the Conjur Leader VM only.
 1. Modify the variables at enable authenticator script:
 ```bash 
-vi scripts/01_enable_authenticator.sh
+vi scripts/03-enable-authenticator.sh
 ```
 2. Run the script:
 ```bash
-scripts/01_enable_authenticator.sh
+scripts/03-enable-authenticator.sh
 ```
 #### 5. Populate the secrets and JWT authenticator variables
+1. Modify the variables at populate variables script:
+```bash 
+vi scripts/04-populate-variables.sh
+```
+2. Run the script:
 ```Bash
-scripts/02_populate_variables.sh | tee -a 02_populate_variables.log
+scripts/04-populate-variables.sh | tee -a 04-populate-variables.log
 ```
 ### 5. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
-## 3. Add conjur-demo workflow to the GitHub repository action
-### 1. Add action secrets to the repository
-#### 1. In your repository web page, click on Settings -> Secrets -> Actions 
-A quick link:
+
+## 4. Create a demo project at GitLab instance
+#### 1. At Instance Dashboard screen, click "New Project"
+#### 2. Select "Create Blank Project"
+#### 3. Fill in a project name (I have used "Demo")
+#### 4. Click Create Project.
+
+## 4. Upload .gitlab-ci.yml to the project
+### 1. Modify line #3 with the correct Conjur URL
 ```bash
-https://github.com/$USERNAME/$REPOSIROTY/settings/secrets/actions
+vi jobs/.gitlab-ci.yml
 ```
-
-#### 2. Add the following secrets:
-- `CONJUR_AUTHN_ID`- For this demo, the Conjur authenticator ID is: **github1**
-- `CONJUR_PUBLIC_KEY` - Add Conjur public key
-- `CONJUR_URL` - Add Conjur FQDN (Including schema and port)
-
-### 2. Add the workflow to actions
-The demo work flow we are going to load, ***conjur-demo*** will run any time something will be pushed to the folder ***github-actions***
-#### 1. Go to the repository folder *workflows*
-#### 2.  Modify conjur-demo.yml
-```bash
+For example
+```yml
 ...
-# Line #9: Change the trigger folder of the workflow:
-      - $FOLDER/**
+CONJUR_APPLIANCE_URL: https://example.conjur.server:8443
 ...
-# Line #15: Change action version to the latest one:
-        uses: infamousjoeg/conjur-action@$TAG
-...
-# Line #18: Change the Conjur account to match your environment:
-        account: $ACCOUNT
 ```
+### 2. Upload the file jobs/.gitlab-ci.yml to the project root
 
-### 3. Add conjur-demo.yml to actions
-#### 1. In your repository web page, click on Actions -> New Workflow ->  set up a workflow yourself
-A quick link:
-```bash
- https://github.com/$USERNAME/$REPOSITORY/new/main?filename=.github%2Fworkflows%2Fmain.yml&workflow_template=blank
-```
-#### 2. Paste the contents of workflows/conjur-demo.yml
-#### 3. Commit the file
-
-### 4. Run the workflow
-#### 1. Modify the file dummy-file and commit
-#### 2. In your repository web page, click on Actions and make sure the workflow ran 
-A quick link:
-```bash
- https://github.com/$USERNAME/$REPOSITORY/actions
-```
+## 5. Check the project's job results
+### 1. At GitLab UI, click CI/CD -> Jobs
+### 2. Take a look at the jobs:
+- retrieve-variable-via-rest
+- retrieve-variable-via-summon

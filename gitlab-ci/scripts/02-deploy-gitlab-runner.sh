@@ -14,12 +14,15 @@ GITLAB_PORT=9080
 GITLAB_REGISTRATION_TOKEN=
 #============ Script ===============
 #Deploying GitLab Runner
-$SUDO $CONTAINER_MGR volume create gitlab-runner-config
-$SUDO $CONTAINER_MGR run -d --name gitlab-runner --restart always \
+$SUDO $CONTAINER_MGR volume create gitlab-runner-conjur-config
+$SUDO $CONTAINER_MGR run -d --name gitlab-runner-conjur --restart always \
     -v /var/run/docker.sock:/var/run/docker.sock \
-    -v gitlab-runner-config:/etc/gitlab-runner \
+    -v gitlab-runner-conjur-config:/etc/gitlab-runner \
     "$CONTAINER_IMG"
 # Registering GitLab runner
-$SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-config:/etc/gitlab-runner \
+$SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-conjur-config:/etc/gitlab-runner \
     "$CONTAINER_IMG" register -u "http://$GITLAB_HOST:$GITLAB_PORT" -r "$GITLAB_REGISTRATION_TOKEN" \
-    --description "Demo Runner" -n --executor shell
+    --description "Demo Runner" -n --tag-list "conjur-demo" --executor shell
+# Deploying Summon on the runner
+$SUDO $CONTAINER_MGR exec -it gitlab-runner-conjur bash -c 'curl -sSL https://raw.githubusercontent.com/cyberark/summon/main/install.sh | bash'
+$SUDO $CONTAINER_MGR exec -it gitlab-runner-conjur bash -c 'curl -sSL https://raw.githubusercontent.com/cyberark/summon-conjur/main/install.sh | bash'
