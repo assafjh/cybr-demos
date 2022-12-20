@@ -1,0 +1,21 @@
+{
+    "namespace_id": "2",
+    "namespace_path": "gitlab-instance-92b7a6e1",
+    "project_id": "2",
+    "project_path": "gitlab-instance-92b7a6e1/demo",
+    "user_id": "1",
+    "user_login": "root",
+    "user_email": "admin@example.com",
+    "pipeline_id": "1",
+    "pipeline_source": "push",
+    "job_id": "1",
+    "ref": "main",
+    "ref_type": "branch",
+    "ref_protected": "true",
+    "jti": "347d8ab5-1a55-4aed-b2b3-0941a277bd31",
+    "iss": "gitlab.host.example.com",
+    "iat": 1671469318,
+    "nbf": 1671469313,
+    "exp": 1671472918,
+    "sub": "job_1"
+  }

@@ -1,9 +1,9 @@
 ---
 # Load policy into root branch
-# This policy defines a JWT authenticator to be used with Kubernetis cluster
+# This policy defines a JWT authenticator to be used with GitLab CI
 - !policy
-  id: conjur/authn-jwt/github1
-  owner: !group github/managers
+  id: conjur/authn-jwt/gitlab1
+  owner: !group gitlab/managers
   body:
   - !webservice
 
@@ -38,12 +38,12 @@
   # - !variable
   #  id: audience
 
-  #In this example, "enforced-claims" is set to "workflow,repository"
-  #Please refer to README.md for detailed policy and commands
+  # In this example, "enforced-claims" is set to "ref,ref_type"
+  # Please refer to README.md for detailed policy and commands
   - !variable
     id: enforced-claims
   
   - !permit
-    role: !layer ../../../github/apps/jwt
+    role: !layer ../../../gitlab/ci/jwt
     privilege: [ read, authenticate ]
     resource: !webservice

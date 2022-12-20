@@ -6,7 +6,8 @@ This demo will use JWT authentication.
 ## How does the JWT Authenticator works?
 ![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
 
-For more details on action, take a look at [CyberArk Conjur Secret Fetcher](https://github.com/marketplace/actions/cyberark-conjur-secret-fetcher)
+## GitLab documentation: Environment params 
+https://docs.gitlab.com/ee/administration/environment_variables.html
 
 ## 1. Loading Conjur policies
 - Policy statements are loaded into either the Conjur  root policy branch or a policy branch under root
