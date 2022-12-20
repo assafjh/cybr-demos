@@ -1,0 +1,60 @@
+# Global Variables
+variables:
+  CONJUR_APPLIANCE_URL: https://$CONJUR_FQDN:$CONJUR_PORT
+  CONJUR_ACCOUNT: demo
+  CONJUR_AUTHN_JWT_SERVICE_ID: gitlab1
+
+# Job: Retrieve variable from Conjur via REST using JWT Authentication
+retrieve-variable-via-rest:
+  variables:
+      CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret1
+  stage: build
+  script:
+    - |
+        # Using CI_JOB_JWT variable to authenticate with Conjur via REST API
+        # Authenticate to Conjur
+        RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/response.txt -k --request POST "$CONJUR_APPLIANCE_URL/authn-jwt/$CONJUR_AUTHN_JWT_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CI_JOB_JWT")
+        TOKEN=$(cat /tmp/response.txt)
+        rm -rf /tmp/response.txt
+        # Check if successful
+        if [ "$RESPONSE_CODE" != "200" ]; then
+          echo "Autentication Failed"
+          exit 1
+        fi
+        # Retrieve variable from Conjur
+        RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/response.txt -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_APPLIANCE_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
+        CONJUR_VARIABLE_VALUE=$(cat /tmp/response.txt)
+        rm -rf /tmp/response.txt
+        # Check if successful
+        if [ "$RESPONSE_CODE" != "200" ]; then
+          echo "Cannot retrieve variable: $CONJUR_VARIABLE_VALUE"
+          exit 1
+        fi
+        # Print the variable path and value
+        printf "=================\nVariable Path: %s\n\nVariable value: %s\n=================\n" "$CONJUR_VARIABLE_PATH" "$CONJUR_VARIABLE_VALUE"
+
+# Job: Retrieve variable from Conjur via Summon using JWT Authentication
+retrieve-variable-via-summon:
+  variables:
+      CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret2
+      CONJUR_AUTHN_JWT_HOST_ID: host/gitlab/ci/gitlab-summon
+      JWT_TOKEN_PATH: /tmp/ci-job.jwt 
+  stage: build
+  before_script:
+    - echo "Retrieving Conjur Public Key"
+    - export CONJUR_SSL_CERTIFICATE=$(openssl s_client -showcerts -connect ${CONJUR_APPLIANCE_URL:8} < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')
+    - echo "Serializing CI_JOB_JWT"
+    - echo "$CI_JOB_JWT" > "$JWT_TOKEN_PATH"
+    - echo "Creating mock application"
+    - | 
+        echo '#!/bin/bash' > /tmp/mock-app.sh
+        echo 'printf "=================\nVariable Path: %s\n\nVariable value: %s\n=================\n" "$CONJUR_VARIABLE_PATH" "$SECRET2"' >> /tmp/mock-app.sh
+        chmod +x /tmp/mock-app.sh
+  script:
+    - |
+        # Using CI_JOB_JWT variable to authenticate with Conjur using Summon
+        echo "injecting variable to mock-app via Summon:"
+        summon -p summon-conjur -D PATH=$CONJUR_VARIABLE_PATH --yaml 'SECRET2: !var $PATH' /tmp/mock-app.sh
+        echo "Running mock-app without Summon:"
+        /tmp/mock-app.sh
+        rm -rf /tmp/ci-job.jwt /tmp/mock-app.sh

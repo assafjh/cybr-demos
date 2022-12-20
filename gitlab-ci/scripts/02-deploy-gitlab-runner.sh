@@ -23,4 +23,3 @@ $SUDO $CONTAINER_MGR run -d --name gitlab-runner --restart always \
 $SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-config:/etc/gitlab-runner \
     "$CONTAINER_IMG" register -u "http://$GITLAB_HOST:$GITLAB_PORT" -r "$GITLAB_REGISTRATION_TOKEN" \
     --description "Demo Runner" -n --executor shell
-

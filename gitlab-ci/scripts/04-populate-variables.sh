@@ -1,7 +1,11 @@
 #!/bin/bash
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
-SAFE_PATH=github/apps/safe/secret
+SAFE_PATH=gitlab/ci/safe/secret
+# GitLab Issuer - usually GitLab server hostname
+GITLAB_ISSUER=
+# GitLab URL
+GITLAB_URL=
 #============ Script ===============
 
 # Checking if a user is logged-in to Conjur-CLI
@@ -19,8 +23,8 @@ do
 done
 
 # Populate authenticator values
-conjur variable set -i conjur/authn-jwt/github1/issuer -v "https://token.actions.githubusercontent.com"
-conjur variable set -i conjur/authn-jwt/github1/jwks-uri -v "https://token.actions.githubusercontent.com/.well-known/jwks"
-conjur variable set -i conjur/authn-jwt/github1/token-app-property -v "workflow"
-conjur variable set -i conjur/authn-jwt/github1/enforced-claims -v "workflow,repository"
-conjur variable set -i conjur/authn-jwt/github1/identity-path -v "/github/apps"
+conjur variable set -i conjur/authn-jwt/gitlab1/issuer -v "$GITLAB_ISSUER"
+conjur variable set -i conjur/authn-jwt/gitlab1/jwks-uri -v "$GITLAB_URL/-/jwks/"
+conjur variable set -i conjur/authn-jwt/gitlab1/token-app-property -v "namespace_path"
+conjur variable set -i conjur/authn-jwt/gitlab1/enforced-claims -v "ref,ref_type"
+conjur variable set -i conjur/authn-jwt/gitlab1/identity-path -v "/gitlab/ci"
