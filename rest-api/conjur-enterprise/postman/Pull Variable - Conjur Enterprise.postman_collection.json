@@ -1,0 +1,124 @@
+{
+	"info": {
+		"_postman_id": "a9c51459-68e7-4c86-a777-67e188eb036e",
+		"name": "Pull Variable - Conjur Enterprise",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"conjur-api-key\",pm.response.text());",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{password}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{username}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{conjur-url}}/authn/{{conjur-account}}/login",
+					"host": [
+						"{{conjur-url}}"
+					],
+					"path": [
+						"authn",
+						"{{conjur-account}}",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Authenticate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"conjur-token\",pm.response.text());",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept-Encoding",
+						"value": "base64"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{conjur-api-key}}"
+				},
+				"url": {
+					"raw": "{{conjur-url}}/authn/{{conjur-account}}/{{username}}/authenticate",
+					"host": [
+						"{{conjur-url}}"
+					],
+					"path": [
+						"authn",
+						"{{conjur-account}}",
+						"{{username}}",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pull Variable",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token token=\"{{conjur-token}}\""
+					}
+				],
+				"url": {
+					"raw": "{{conjur-url}}/secrets/{{conjur-account}}/variable/{{conjur-variable-path}}",
+					"host": [
+						"{{conjur-url}}"
+					],
+					"path": [
+						"secrets",
+						"{{conjur-account}}",
+						"variable",
+						"{{conjur-variable-path}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
