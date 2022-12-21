@@ -41,8 +41,11 @@ spec:
         image: docker.io/assafhazan/summon:v1
         imagePullPolicy: IfNotPresent
         env:
-          - name: CONJUR_AUTHN_TOKEN_FILE
-            value: /run/conjur/access-token
+          - name: CONJUR_AUTHN_JWT_SERVICE_ID
+            valueFrom:
+              configMapKeyRef:
+                name: conjur-connect
+                key: CONJUR_AUTHENTICATOR_ID
         envFrom:
           - configMapRef:
               name: conjur-connect
@@ -51,39 +54,7 @@ spec:
             mountPath: /etc/summon/config
           - name: summon-conf
             mountPath: /etc/summon/demo_app
-          - mountPath: /run/conjur
-            name: conjur-access-token
-            readOnly: true
-      # Conjur Authenticator init container for summon
-      initContainers:
-      - image: cyberark/conjur-authn-k8s-client:latest
-        imagePullPolicy: IfNotPresent
-        name: cyberark-authn-k8s-for-summon
-        env:
-          - name: CONTAINER_MODE
-            value: init
-          - name: MY_POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: MY_POD_IP
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: MY_POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-        envFrom:
-          - configMapRef:
-              name: conjur-connect
-        volumeMounts:
-          - mountPath: /run/conjur
-            name: conjur-access-token
       volumes:
-      - emptyDir:
-          medium: Memory
-        name: conjur-access-token
       - name: summon-conf
         configMap:
           name: summon-config
