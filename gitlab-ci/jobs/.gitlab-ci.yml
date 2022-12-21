@@ -39,7 +39,6 @@ retrieve-variable-via-rest:
 retrieve-variable-via-summon:
   variables:
       CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret2
-      CONJUR_AUTHN_JWT_HOST_ID: host/gitlab/ci/gitlab-summon
       JWT_TOKEN_PATH: /tmp/ci-job.jwt 
   tags:
     - conjur-demo
