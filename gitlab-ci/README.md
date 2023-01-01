@@ -50,7 +50,7 @@ conjur login -i admin
 ```
 #### 2. Load root policy
 ```bash
-conjur policy update -b root -f policies/01_base.yml | tee -a 01_base.log
+conjur policy update -b root -f policies/01-base.yml | tee -a 01-base.log
 ```
 #### 3. Logout from Conjur
 ```Bash
