@@ -28,7 +28,7 @@ secretGenerator:
     type: Opaque
     # Select custom password for Admin
     literals:
-      - password=SomePass123@
+      - password=Ansible123!
 
 resources:
   # Find the latest tag here: https://github.com/ansible/awx-operator/releases
