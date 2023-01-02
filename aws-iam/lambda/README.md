@@ -8,6 +8,7 @@ For more information on lambda functions: [AWS Docs - lambda](https://docs.aws.a
 ### 1. Create a new lambda function with runtime Python v3.9
 **Note**: The packaging script supports the latest lambda python runtime env, currently it is v3.9
 ### 2. Package the function
+**Note**: You can skip this phase by downloading a pre-packaged function from: [Releases - packaged Lambda function](https://github.com/assafjh/cybr-demos/releases/tag/built-lambda-function-python-v3.9)
 ```bash
 scripts/01-package-function.sh
 ```
