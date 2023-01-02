@@ -11,7 +11,7 @@ spec:
   #ingress_tls_secret: awx-secret-tls
 
   # Fill in external hostname or machine FQDN
-  hostname: ec2-3-10-224-97.eu-west-2.compute.amazonaws.com
+  hostname: $HOSTNAME
   ingress_path: /ansible-awx
   ingress_path_type: Prefix
   
