@@ -1,0 +1,29 @@
+---
+- name: Demo variable pulling from Conjur
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+  - name: display variable 1
+    debug:
+      var: variable_1
+
+  - name: display variable 2
+    debug:
+      var: variable_2
+
+  - name: display variable 3
+    debug:
+      var: variable_3
+
+  - name: echo variable 1 on shell
+    shell: "echo {{ variable_1 }}"
+    no_log: True
+
+  - name: echo variable 2 on shell
+    shell: "echo {{ variable_2 }}"
+    no_log: True
+
+  - name: echo variable 3 on shell
+    shell: "echo {{ variable_3 }}"
+    no_log: True
