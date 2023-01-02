@@ -1,0 +1,51 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define sanity branch, create users, hosts, groups, layers, variables
+- !policy
+  id: sanity
+  owner: !group admins
+
+# sanity/managers group will admin everything under sanity branch
+- !group
+  id: sanity/managers
+  owner: !group admins
+
+- !permit
+  role: !group sanity/managers
+  privileges: [read,update,create]
+  resource: !policy sanity
+
+- !permit
+  role: !group sanity/managers
+  privileges: [read,update,create]
+  resource: !group sanity/managers
+
+- !user
+  id: sanity-manager01
+  owner: !group sanity/managers
+
+- !grant
+  role: !group sanity/managers
+  members: 
+    - !user sanity-manager01

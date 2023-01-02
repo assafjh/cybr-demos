@@ -1,8 +1,0 @@
-Build Environment -> Use secret text(s) or file(s) -> Conjur Secret credentials
-SECRET2
-Credentials:
-secret2
-
-Build Steps -> Execute shell
-#!/bin/bash
-echo "SECRET2: $SECRET2"

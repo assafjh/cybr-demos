@@ -1,0 +1,7 @@
+---
+- name: This is a Conjur Ansible integration demo
+  hosts: all
+  tasks:
+    - name: Print a secret directly from Conjur
+      debug:
+        msg: "Secret 5: {{ lookup('$LOOKUP_CMD', 'vault/safe1/secret5') }}"
