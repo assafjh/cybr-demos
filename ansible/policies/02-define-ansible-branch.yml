@@ -1,0 +1,42 @@
+---
+# Load policy into ansible branch
+# This policy defines the demo branch ansible
+
+# apps is a layer that will aggregate safe permissions for ansible project1
+- !layer
+  id: apps
+  owner: !group managers
+
+# create secrets
+- !policy
+  id: apps/safe
+  owner: !group managers
+  body:
+  - &ansible-secrets
+    - !variable
+      id: secret1
+      owner: !group ../../managers
+    - !variable
+      id: secret2
+      owner: !group ../../managers
+    - !variable
+      id: secret3
+      owner: !group ../../managers
+
+ # Allow apps layer to consume the secrets we have created
+  - !permit
+    role: !layer ../../apps
+    privileges: [ read, execute ]
+    resource: *ansible-secrets
+
+# Create the Project identities that we will use to authenticate to Conjur 
+- !host
+  id: apps/conjur-demo
+  owner: !group managers
+
+# Add the hosts we have created to their respective layer
+- !grant
+  roles:
+    - !layer apps
+  members:
+    - !host apps/conjur-demo
