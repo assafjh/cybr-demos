@@ -216,7 +216,7 @@ extra_vars:
 ```
 ### 5. Click Save
 
-## 4. Configure a new AWX Organization
+## 4. Configure a new AWX/Tower Organization
 Work will be done at AWX/Tower UI under Access -> Organizations
 ### 1. Click Add 
 ### 2. Fill the form
@@ -225,7 +225,7 @@ Name: Conjur Demo
 ```
 ### 3. Click Save 
 
-## 5. Configure AWX Credentials
+## 5. Configure AWX/Tower Credentials
 Work will be done at AWX/Tower UI under Resources -> Credentials
 ### 1. Configure CyberArk Conjur Secrets Manager Lookup credential
 #### 1. Click Add 
@@ -303,7 +303,7 @@ Make Sure that Test passed
 5. Click OK
 ##### 3. Click Save
 
-## 6. Create a Project
+## 6. Create Project
 Work will be done at AWX/Tower UI under Resources -> Projects
 #### 1. Click Add
 #### 2. Fill the form
