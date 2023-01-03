@@ -1,4 +1,3 @@
-
 # Ansible integration
 This demo supports integration with Ansible version 2.8 and up.
 
