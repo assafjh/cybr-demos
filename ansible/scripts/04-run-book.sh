@@ -10,7 +10,7 @@ export CONJUR_AUTHN_LOGIN=host/ansible/apps/conjur-demo
 export CONJUR_AUTHN_API_KEY=
 # Conjur variable path
 export CONJUR_VARIABLE_PATH=ansible/apps/safe/secret1
-# Conjur public key file path
+# Conjur public key file path, in case of Conjur cloud - comment line #14
 export CONJUR_CERT_FILE="$HOME"/conjur-server.pem
 #========== Script ===============
 # Loading functions snippet
