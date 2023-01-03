@@ -15,3 +15,4 @@ Instructions for each scenario can be found in its respective folder.
 9. gitlab-ci: Integration with GitLab CI using JWT authentication via REST and Summon
 10. rest-api: Rest API call examples
 11. ansible-awx-tower: Integration with Ansible AWX/Tower
+12. ansible: Integration with Ansible

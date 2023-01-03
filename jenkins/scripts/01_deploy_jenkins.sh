@@ -16,6 +16,7 @@ JENKINS_ADMIN_ID=
 JENKINS_ADMIN_PASSWORD=
 # Conjur FQDN with port (no scheme)
 CONJUR_FQDN=$(hostname -f):8443
+# Conjur tenant
 CONJUR_ACCOUNT=demo
 #============ Script ===============
 $SUDO $CONTAINER_MGR pull assafhazan/jenkins:conjur
