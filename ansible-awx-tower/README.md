@@ -343,7 +343,7 @@ Playbook: print-variables.yml
 #### 3. Select credentials
 ##### 1. Under ```Credentials``` input box, select the ```magnifier glass``` icon
 ##### 2.  Selected Category is ```Conjur Secrets```
-#### 3. Select ```Conjur Variables```
+##### 3. Select ```Conjur Variables```
 ##### 4. Click ```Select```
 ### 4. Click Save
 ### 5. Click Launch
