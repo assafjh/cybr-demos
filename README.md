@@ -16,3 +16,4 @@ Instructions for each scenario can be found in its respective folder.
 10. rest-api: Rest API call examples
 11. ansible-awx-tower: Integration with Ansible AWX/Tower
 12. ansible: Integration with Ansible
+13. azure-devops: Integrations with Azure Devops using Azure IMDS OAuth2 authentication
