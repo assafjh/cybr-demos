@@ -7,19 +7,15 @@ pool:
  default
 
 steps:
-- bash: echo This script could use $SYSTEM_ACCESSTOKEN
-  env:
-    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-
 - script: |
         #!/bin/bash
-        token=$(curl -ks -X POST "$CONJUR_URL/authn-azure/$CONJUR_AUTHN_ID/$CONJUR_ACCOUNT/$CONJUR_IDENTITY/authenticate" -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept-Encoding: base64' --data-urlencode "jwt=$SYSTEM_ACCESSTOKEN")
-        variable_value=$(curl -ks -H "Authorization: Token token=\"$token\"" "$CONJUR_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
+        azure_token=$(curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fmanagement.azure.com%2F' -H Metadata:true -s | awk -F ':' '/access_token/ {print $2}' | awk -F ',' '{print $1}' | tr -d '"')
+        token=$(curl -k -X POST "$CONJUR_URL/authn-azure/$CONJUR_AUTHN_ID/$CONJUR_ACCOUNT/$CONJUR_IDENTITY/authenticate" -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept-Encoding: base64' --data-urlencode "jwt=$azure_token")
+        variable_value=$(curl -k -s -H "Authorization: Token token=\"$token\"" "$CONJUR_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
         echo "The Variable value from Conjur is: $variable_value"
   env:
-    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
     CONJUR_URL: 
     CONJUR_AUTHN_ID: devops
     CONJUR_ACCOUNT: demo
-    CONJUR_IDENTITY: host/azure/apps/managed-identity01
+    CONJUR_IDENTITY: host%2Fazure%2Fapps%2Fmanaged-identity01
     CONJUR_VARIABLE_PATH: azure/apps/safe/secret1

@@ -2,7 +2,7 @@
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
 SAFE_PATH=azure/apps/safe/secret
-AZURE_SUBSCRIPTION_ID=
+AZURE_TENANT_ID=
 #============ Script ===============
 
 # Checking if a user is logged-in to Conjur-CLI
@@ -20,4 +20,4 @@ do
 done
 
 # Populate authenticator values
-conjur variable set -i conjur/authn-azure/devops/provider-uri -v "https://sts.windows.net/$AZURE_SUBSCRIPTION_ID/"
+conjur variable set -i conjur/authn-azure/devops/provider-uri -v "https://sts.windows.net/$AZURE_TENANT_ID/"

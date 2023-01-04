@@ -39,7 +39,7 @@
   annotations:
         authn-azure/subscription-id: $SUBSCRIPTION_ID
         authn-azure/resource-group: $RESOURCE_GROUP
-        authn-azure/user-assigned-identity: $USER_ASSIGNED_MANAGED_IDENTITY_ID
+        authn-azure/user-assigned-identity: $USER_ASSIGNED_IDENTITY_NAME
         # authn-azure/system-assigned-identity: $OBJECT_ID
 
 # Add the hosts we have created to their respective layer
