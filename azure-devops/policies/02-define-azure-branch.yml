@@ -1,0 +1,50 @@
+---
+# Load policy into azure branch
+# This policy defines the demo branch azure
+
+# apps is a layer that will aggregate safe permissions for azure apps functions
+- !layer
+  id: apps
+  owner: !group managers
+
+# create secrets
+- !policy
+  id: apps/safe
+  owner: !group managers
+  body:
+  - &azure-secrets
+    - !variable
+      id: secret1
+      owner: !group ../../managers
+    - !variable
+      id: secret2
+      owner: !group ../../managers
+    - !variable
+      id: secret3
+      owner: !group ../../managers
+
+ # Allow apps layer to consume the secrets we have created
+  - !permit
+    role: !layer ../../apps
+    privileges: [ read, execute ]
+    resource: *azure-secrets
+
+# Create the Project identities that we will use to authenticate to Conjur 
+# To use a managed identity, uncomment the relevant host annotation in the policy.
+# In this demo I use User Assigned managed identity
+# Fill out the relevant details instead of the placeholders
+- !host
+  id: apps/managed-identity01
+  owner: !group managers
+  annotations:
+        authn-azure/subscription-id: $SUBSCRIPTION_ID
+        authn-azure/resource-group: $RESOURCE_GROUP
+        authn-azure/user-assigned-identity: $USER_ASSIGNED_MANAGED_IDENTITY_ID
+        # authn-azure/system-assigned-identity: $OBJECT_ID
+
+# Add the hosts we have created to their respective layer
+- !grant
+  roles:
+    - !layer apps
+  members:
+    - !host apps/managed-identity01

@@ -1,0 +1,25 @@
+# A minimal pipeline that uses the runner's assigned managed identity to authenticate to Conjur
+
+trigger:
+- main
+
+pool:
+ default
+
+steps:
+- bash: echo This script could use $SYSTEM_ACCESSTOKEN
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
+- script: |
+        #!/bin/bash
+        token=$(curl -ks -X POST "$CONJUR_URL/authn-azure/$CONJUR_AUTHN_ID/$CONJUR_ACCOUNT/$CONJUR_IDENTITY/authenticate" -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept-Encoding: base64' --data-urlencode "jwt=$SYSTEM_ACCESSTOKEN")
+        variable_value=$(curl -ks -H "Authorization: Token token=\"$token\"" "$CONJUR_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
+        echo "The Variable value from Conjur is: $variable_value"
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+    CONJUR_URL: 
+    CONJUR_AUTHN_ID: devops
+    CONJUR_ACCOUNT: demo
+    CONJUR_IDENTITY: host/azure/apps/managed-identity01
+    CONJUR_VARIABLE_PATH: azure/apps/safe/secret1
