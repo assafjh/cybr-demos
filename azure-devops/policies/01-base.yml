@@ -1,0 +1,51 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization that uses azure applications
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define azure branch, create users, hosts, groups, layers, variables
+- !policy
+  id: azure
+  owner: !group admins
+
+# azure/managers group will admin everything under azure branch
+- !group
+  id: azure/managers
+  owner: !group admins
+
+- !permit
+  role: !group azure/managers
+  privileges: [read,update,create]
+  resource: !policy azure
+
+- !permit
+  role: !group azure/managers
+  privileges: [read,update,create]
+  resource: !group azure/managers
+
+- !user
+  id: azure-manager01
+  owner: !group azure/managers
+
+- !grant
+  role: !group azure/managers
+  members: 
+    - !user azure-manager01
