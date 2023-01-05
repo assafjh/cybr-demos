@@ -6,16 +6,49 @@ trigger:
 pool:
  default
 
+variables:
+# Conjur URL
+- name: conjur_url
+  value: https://conjur-fqdn:8443
+# Conjur Authenticator ID
+- name: CONJUR_AUTHN_ID
+  value: devops
+# Conjur Tenant ID
+- name: conjur_account
+  value: demo
+# Conjur Identity
+- name: conjur_identity
+  value: host%2Fazure%2Fapps%2Fmanaged-identity01
+# Conjur variable path
+- name: conjur_variable_path
+  value: azure/apps/safe/secret1
+
 steps:
 - script: |
-        #!/bin/bash
-        azure_token=$(curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fmanagement.azure.com%2F' -H Metadata:true -s | awk -F ':' '/access_token/ {print $2}' | awk -F ',' '{print $1}' | tr -d '"')
-        token=$(curl -k -X POST "$CONJUR_URL/authn-azure/$CONJUR_AUTHN_ID/$CONJUR_ACCOUNT/$CONJUR_IDENTITY/authenticate" -H 'Content-Type: application/x-www-form-urlencoded' -H 'Accept-Encoding: base64' --data-urlencode "jwt=$azure_token")
-        variable_value=$(curl -k -s -H "Authorization: Token token=\"$token\"" "$CONJUR_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
-        echo "The Variable value from Conjur is: $variable_value"
-  env:
-    CONJUR_URL: 
-    CONJUR_AUTHN_ID: devops
-    CONJUR_ACCOUNT: demo
-    CONJUR_IDENTITY: host%2Fazure%2Fapps%2Fmanaged-identity01
-    CONJUR_VARIABLE_PATH: azure/apps/safe/secret1
+        # Retrieving access token from Azure IDMS
+        AZURE_TOKEN=$(curl 'http://169.254.169.254/metadata/identity/oauth2/token?api-version=2018-02-01&resource=https%3A%2F%2Fmanagement.azure.com%2F' -H Metadata:true -s | awk -F ':' '/access_token/ {print $2}' | awk -F ',' '{print $1}' | tr -d '"')
+        # Authenticating to Conjur with Azure Token
+        RESPONSE_CODE=$(curl -k -s -X POST -w "%{http_code}" -o /tmp/response.txt "${{ variables.conjur_url }}/authn-azure/$CONJUR_AUTHN_ID/${{ variables.conjur_account }}/${{ variables.conjur_identity }}/authenticate" -H 'Content-Type: application/x-www-form-urlencoded' -H "Accept-Encoding: base64" --data-urlencode "jwt=$AZURE_TOKEN")
+        # Saving token to a variable for next step usage
+        echo "##vso[task.setvariable variable=conjur_token]$(cat /tmp/response.txt)"
+        rm -rf /tmp/response.txt
+        # Check if authentication to Conjur is successful
+        if [ "$RESPONSE_CODE" != "200" ]; then
+          echo "Autentication Failed"
+          exit 1
+        fi
+  displayName: Authenticate to Conjur using agent's aquired access token
+  
+- script: |
+        # Using Conjur Token from previous step to pull a variable
+        RESPONSE_CODE=$(curl -k -s -w "%{http_code}" -o /tmp/response.txt -H "Authorization: Token token=\"$CONJUR_TOKEN\"" "${{ variables.conjur_url }}/secrets/${{ variables.conjur_account }}/variable/${{ variables.conjur_variable_path }}")
+        CONJUR_VARIABLE_VALUE=$(cat /tmp/response.txt)
+        rm -rf /tmp/response.txt
+        # Checking if pulling the variable from Conjur was successful
+        if [ "$RESPONSE_CODE" != "200" ]; then
+          echo "Cannot retrieve variable: $CONJUR_VARIABLE_VALUE"
+          exit 1
+        fi
+        # Printing the variable value
+        printf "=================\nVariable Path: %s\n\nVariable value: %s\n=================\n" "${{ variables.conjur_variable_path }}" "$CONJUR_VARIABLE_VALUE"
+  displayName: Pulling a variable from Conjur using agent's aquired access token
