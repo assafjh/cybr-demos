@@ -15,23 +15,9 @@ retrieve-variable-via-rest:
     - |
         # Using CI_JOB_JWT variable to authenticate with Conjur via REST API
         # Authenticate to Conjur
-        RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/response.txt -k --request POST "$CONJUR_APPLIANCE_URL/authn-jwt/$CONJUR_AUTHN_JWT_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CI_JOB_JWT")
-        TOKEN=$(cat /tmp/response.txt)
-        rm -rf /tmp/response.txt
-        # Check if successful
-        if [ "$RESPONSE_CODE" != "200" ]; then
-          echo "Autentication Failed"
-          exit 1
-        fi
+        TOKEN=$(curl --show-error -f -s -k --request POST "$CONJUR_APPLIANCE_URL/authn-jwt/$CONJUR_AUTHN_JWT_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CI_JOB_JWT")
         # Retrieve variable from Conjur
-        RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/response.txt -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_APPLIANCE_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
-        CONJUR_VARIABLE_VALUE=$(cat /tmp/response.txt)
-        rm -rf /tmp/response.txt
-        # Check if successful
-        if [ "$RESPONSE_CODE" != "200" ]; then
-          echo "Cannot retrieve variable: $CONJUR_VARIABLE_VALUE"
-          exit 1
-        fi
+        CONJUR_VARIABLE_VALUE=$(curl --show-error -f -s -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_APPLIANCE_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
         # Print the variable path and value
         printf "=================\nVariable Path: %s\n\nVariable value: %s\n=================\n" "$CONJUR_VARIABLE_PATH" "$CONJUR_VARIABLE_VALUE"
 
@@ -39,6 +25,7 @@ retrieve-variable-via-rest:
 retrieve-variable-via-summon:
   variables:
       CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret2
+      CONJUR_AUTHN_JWT_HOST_ID: host/gitlab/ci/gitlab-summon
       JWT_TOKEN_PATH: /tmp/ci-job.jwt 
   tags:
     - conjur-demo
