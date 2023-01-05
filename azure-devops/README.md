@@ -7,6 +7,9 @@ The method is based on Microsoft Azure AD Authentication.
 ## How does the Azure Authenticator works?
 
 ![Conjur Azure authenticator](https://github.com/assafjh/cybr-demos/blob/main/azure-devops/azure-authenticator.png?raw=true)
+
+**IMDS**: Instance Metadata Service
+
 ## 1. Loading Conjur policies
 - Policy statements are loaded into either the Conjur  root policy branch or a policy branch under root
 - Per best practices, most policies will be created in branches off of root. 
