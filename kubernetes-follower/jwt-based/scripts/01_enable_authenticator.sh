@@ -27,8 +27,3 @@ else
     [ -z "$CONJUR_AUTHENTICATORS" ] && CONJUR_AUTHENTICATORS=authn
     $SUDO $CONTAINER_MGR exec -it $CONTAINER_ID evoke variable set CONJUR_AUTHENTICATORS $CONJUR_AUTHENTICATORS,$AUTHN_TO_ENABLE
 fi
-
-echo "Issuing a self signed certificate for conjur-followers.conjur-follower-jwt.svc.cluster.local"
-$SUDO "$CONTAINER_MGR" exec "$CONTAINER_ID" evoke ca issue -f conjur-followers-k8s-cluster1 conjur-followers.conjur-follower-jwt.svc.cluster.local
-
-docker exec -it conjur_demo_12.7.0.1 evoke ca regenerate conjur-followers-k8s-cluster1 conjur-followers.conjur-follower-jwt.svc.cluster.local
