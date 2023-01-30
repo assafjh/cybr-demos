@@ -50,16 +50,33 @@ roleRef:
   kind: Role
   name: conjur-role
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conjur-follower
+  namespace: conjur-cert-follower
+  labels:
+    app: conjur-follower
+spec:
+  ports:
+  - port: 443
+    name: https
+  selector:
+    app: conjur-follower
+---
 # This will config map will hold connection details that our container will use to authenticate to Conjur
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: conjur-connect
+  name: follower-cm
   namespace: conjur-cert-follower
 data:
   CONJUR_ACCOUNT: demo
   CONJUR_APPLIANCE_URL: "https://$CONJUR_FQDN"
-  CONJUR_AUTHN_URL: "https://$CONJUR_FQDN/authn-k8s/k8s-follower1"
-  CONJUR_AUTHENTICATOR_ID: "k8s-follower1"
+  CONJUR_SEED_FILE_URL: "https://$CONJUR_FQDN/configuration/demo/seed/follower"
+  AUTHENTICATOR_ID: "k8s-follower1"
+  # Update the below with the authenticators that are relevant to your environment
+  CONJUR_AUTHENTICATORS: "authn-jwt/k8s-cluster1,authn-k8s/k8s-cluster1"
+  CONJUR_AUTHN_LOGIN: host/kubernetes/followers/cert-based-follower
   CONJUR_SSL_CERTIFICATE: |- 
 $CONJUR_PUB_KEY
