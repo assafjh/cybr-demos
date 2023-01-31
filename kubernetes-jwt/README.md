@@ -40,7 +40,7 @@ conjur login -i k8s-manager01
 ```
 ##### 2. Load kubernetes policy
 ```bash
-conjur policy update -b jenkins -f policies/02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
+conjur policy update -b kubernetes -f policies/02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
 ```
 ##### 3. Logout from Conjur CLI
 ```Bash
