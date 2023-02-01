@@ -11,6 +11,20 @@ kind: ServiceAccount
 metadata:
   name: conjur-demo-acct
   namespace: conjur-jwt-follower
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conjur-follower
+  namespace: conjur-jwt-follower
+  labels:
+    app: conjur-follower
+spec:
+  ports:
+  - port: 443
+    name: https
+  selector:
+    app: conjur-follower
 ---  
 # ConfigMap needed for Conjur configurations
 kind: ConfigMap
