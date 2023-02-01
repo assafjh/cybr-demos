@@ -5,7 +5,7 @@
 source .env
 #================ Script ==============
 cd "$SCRIPT_DIR"/../certs || exit 1
-openssl genrsa -out "$LEAF_PRIVATE_CERTIFICATE_FILE_NAME" 2048
+openssl genrsa -out "$SERVER_KEY_FILE_NAME" 2048
 cat > csr.conf <<EOF
 [ req ]
 default_bits = 2048
@@ -19,6 +19,6 @@ ST = Hamerkaz
 L = Tel-Aviv
 O = Org
 OU = DevSecOps
-CN = ${LEAF_CN}
+CN = ${SERVER_CN}
 
 EOF
