@@ -3,21 +3,21 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: conjur-follower-jwt
+  name: conjur-jwt-follower
 ---
 # This ServiceAccount provides the Kubernetes RBAC identity for the Conjur Kubernetes authenticator
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: conjur-demo-acct
-  namespace: conjur-follower-jwt
+  namespace: conjur-jwt-follower
 ---  
 # ConfigMap needed for Conjur configurations
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: conjur-follower-cm
-  namespace: conjur-follower-jwt
+  namespace: conjur-jwt-follower
 data:
   CONJUR_ACCOUNT: "demo"
   CONJUR_APPLIANCE_URL: "https://$CONJUR_FQDN"
