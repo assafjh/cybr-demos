@@ -13,10 +13,10 @@
 
 # Create the JWT identity that we will use to authenticate to Conjur 
 - !host
-  id: followers/system:serviceaccount:conjur-follower-jwt:conjur-demo-acct
+  id: followers/system:serviceaccount:conjur-jwt-follower:conjur-demo-acct
   owner: !group managers
   annotations:
-    authn-jwt/k8s-follower1/kubernetes.io/namespace: conjur-follower-jwt
+    authn-jwt/k8s-follower1/kubernetes.io/namespace: conjur-jwt-follower
     authn-jwt/k8s-follower1/kubernetes.io/serviceaccount/name: conjur-demo-acct
 
 # Add the host we have created to the layer 
@@ -24,5 +24,5 @@
   roles:
     - !layer followers/jwt
   members:
-    - !host followers/system:serviceaccount:conjur-follower-jwt:conjur-demo-acct
+    - !host followers/system:serviceaccount:conjur-jwt-follower:conjur-demo-acct
 
