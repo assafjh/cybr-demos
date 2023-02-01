@@ -5,7 +5,7 @@
 source .env
 #================ Script ==============
 cd "$SCRIPT_DIR"/../certs || exit 1
-openssl req -new -key "$LEAF_PRIVATE_CERTIFICATE_FILE_NAME" -out server.csr -config csr.conf
+openssl req -new -key "$SERVER_KEY_FILE_NAME" -out server.csr -config csr.conf
 
 cat > cert.conf <<EOF
 

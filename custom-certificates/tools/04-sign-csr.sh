@@ -7,7 +7,7 @@ source .env
 cd "$SCRIPT_DIR"/../certs || exit 1
 openssl x509 -req \
     -in server.csr \
-    -CA "$CA_PUB_FILE_NAME" -CAkey "$CA_PRIV_FILE_NAME" \
-    -CAcreateserial -out "$LEAF_PUBLIC_CERTIFICATE_FILE_NAME" \
+    -CA "$CA_CERTIFICATE_FILE_NAME" -CAkey "$CA_KEY_FILE_NAME" \
+    -CAcreateserial -out "$SERVER_CERTIFICATE_FILE_NAME" \
     -days 3650 \
     -sha256 -extfile cert.conf
