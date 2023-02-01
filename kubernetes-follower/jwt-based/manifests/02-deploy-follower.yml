@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: conjur-follower
-  namespace: conjur-follower-jwt
+  namespace: conjur-jwt-follower
 spec:
   replicas: 1
   selector:
