@@ -178,6 +178,7 @@ Y #After reading the agreement
 https://dev.azure.com/MyOrginizationName
 PAT # Press Enter for PAT
 $PAT_VALUE_FROM_STEP_3
+EOF
 ```
 If there is a need to configure the agent service on the Linux machine, use:
 ```bash
