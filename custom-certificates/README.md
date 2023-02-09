@@ -57,12 +57,12 @@ LEADER_KEY_FILE_PATH="$SCRIPT_DIR"/../certs/custom-conjur-leader.key
 # Generated Certificate filename
 LEADER_CERTIFICATE_FILE_PATH="$SCRIPT_DIR"/../certs/custom-conjur-leader.pem
 # Leader CN
-LEADER_CN="$CONJUR_LEADER_FQDN"
+LEADER_CN="conjur-leader.example.local"
 # Leader SAN
 LEADER_SUBJECT_ALT_NAMES='
 [alt_names]
 DNS.1 = localhost
-DNS.2 = example
+DNS.2 = conjur-leader
 IP.1 = 127.0.0.1
 '
 #=========== Follower certificate details ===========
