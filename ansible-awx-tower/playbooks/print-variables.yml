@@ -17,13 +17,13 @@
       var: variable_3
 
   - name: echo variable 1 on shell
-    shell: "echo {{ variable_1 }}"
+    msg: " {{ variable_1 }}"
     no_log: True
 
   - name: echo variable 2 on shell
-    shell: "echo {{ variable_2 }}"
+    msg: " {{ variable_2 }}"
     no_log: True
 
   - name: echo variable 3 on shell
-    shell: "echo {{ variable_3 }}"
+    msg: " {{ variable_3 }}"
     no_log: True
