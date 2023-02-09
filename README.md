@@ -17,3 +17,5 @@ Instructions for each scenario can be found in its respective folder.
 11. ansible-awx-tower: Integration with Ansible AWX/Tower
 12. ansible: Integration with Ansible
 13. azure-devops: Integration with Azure Devops using Azure IMDS OAuth2 authentication
+14. kubernetes-follower: Conjur Enterprise follower deployment inside Kubernetes clusters using Certificate/JWT based authentication
+15. custom-certificates: Using Conjur Enterprise with 3rd-party certificates
