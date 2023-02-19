@@ -1,0 +1,83 @@
+---
+# Deployment for Conjur Secrets Provider - push to file mode as sidecar
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: conjur-push-to-file
+  name: demo-sidecar-push-to-file-jwt
+  namespace: spring-boot-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: conjur-push-to-file
+  template:
+    metadata:
+      labels:
+        app: conjur-push-to-file
+      annotations:
+        # Secrets Provider configuration
+        conjur.org/container-mode: sidecar
+        conjur.org/secrets-destination: file
+        conjur.org/conjur-secrets-policy-path.safe1: kubernetes/applications/safe/
+        conjur.org/conjur-secrets.safe1: |
+          - username: postgres-username
+          - password: postgres-password
+        conjur.org/secret-file-template.safe1: |
+            spring.datasource.username={{ secret "username" }}
+            spring.datasource.password={{ secret "password" }}
+        conjur.org/secret-file-path.safe1: "./database-configuration.properties"
+        conjur.org/secret-file-format.safe1: "template"
+        conjur.org/secrets-refresh-interval: 10s
+        conjur.org/secrets-refresh-enabled: "true"
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      # Our demo application
+      - name: spring-boot-demo-app
+        image: docker.io/assafhazan/spring-boot-zoo-demo:v1
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: app-conf
+            mountPath: /etc/demo/config.properties
+            subPath: config.properties
+            readOnly: true
+          - name: conjur-secrets
+            mountPath: /conjur/secrets
+            readOnly: true
+      # Sidecar
+      - name: sidecar-push-to-file
+        image: 'cyberark/secrets-provider-for-k8s:latest'
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: conjur-connect
+        volumeMounts:
+          - name: podinfo
+            mountPath: /conjur/podinfo
+          - name: conjur-secrets
+            mountPath: /conjur/secrets
+      volumes:
+        - name: app-conf
+          configMap:
+            name: spring-app-config
+            defaultMode: 0755
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "annotations"
+                fieldRef:
+                  fieldPath: metadata.annotations
+        - name: conjur-secrets
+          emptyDir:
+            medium: Memory
