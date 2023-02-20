@@ -19,4 +19,4 @@ Instructions for each scenario can be found in its respective folder.
 13. azure-devops: Integration with Azure Devops using Azure IMDS OAuth2 authentication
 14. kubernetes-follower: Conjur Enterprise follower deployment inside Kubernetes clusters using Certificate/JWT based authentication
 15. custom-certificates: Using Conjur Enterprise with 3rd-party certificates
-16. kubernetes-spring-boot-application: Conjur k8s Push to file - password rotation without container restart demo
+16. kubernetes-spring-boot-application: Conjur k8s push to file demo - password rotation without container restart demo
