@@ -9,4 +9,4 @@ CONTAINER_MGR=docker
 # Postgres server port
 REMOTE_DB_PORT=5432
 #================ Script ==============
-$SUDO $CONTAINER_MGR run --name zoo-demo-db -p ${REMOTE_DB_PORT}:5432 -d docker.io/assafhazan/postgres-zoo-demo:v15.2
+$SUDO $CONTAINER_MGR run --name zoo-demo-db -p ${REMOTE_DB_PORT}:5432 -d docker.io/assafhazan/postgres-zoo-demo:v11.2

@@ -1,0 +1,53 @@
+---
+# Load policy into kubernetes branch
+# This policy defines the demo branch kubernetes
+
+- !policy
+  id: applications
+  owner: !group managers
+
+# applications/jwt is a layer that will aggregate permissions for all kubernetes applications that want to use JWT to consume Conjur secrets
+- !layer
+  id: applications/jwt
+  owner: !group managers
+
+# create secrets
+- !policy
+  id: applications/safe
+  owner: !group managers
+  body:
+  - &safe1-secrets
+    - !variable
+      id: postgres-username
+      owner: !group ../../managers
+    - !variable
+      id: postgres-password
+      owner: !group ../../managers
+    - !variable
+      id: postgres-hostname
+      owner: !group ../../managers
+    - !variable
+      id: postgres-port
+      owner: !group ../../managers
+
+ # Allow applications/jwt layer to consume the secrets we have created
+  - !permit
+    role: !layer ../jwt
+    privileges: [ read, execute ]
+    resource: *safe1-secrets
+
+# Create the JWT identity that we will use to authenticate to Conjur 
+- !host
+  id: applications/system:serviceaccount:conjur-secretless-jwt:conjur-demo-acct
+  owner: !group managers
+  annotations:
+    authn-jwt/k8s-cluster1/kubernetes.io/namespace: conjur-secretless-jwt
+    authn-jwt/k8s-cluster1/kubernetes.io/serviceaccount/name: conjur-demo-acct
+
+# Add the host we have created to the layer 
+- !grant
+  roles:
+    - !layer applications/jwt
+  members:
+    - !host applications/system:serviceaccount:conjur-secretless-jwt:conjur-demo-acct
+
