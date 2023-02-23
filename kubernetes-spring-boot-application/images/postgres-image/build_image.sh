@@ -2,6 +2,6 @@
 #=======
 CONTAINER_MGR=docker
 #=======
-"$CONTAINER_MGR" build --no-cache --tag docker.io/assafhazan/postgres-zoo-demo:v1 -f ./Dockerfile .
+"$CONTAINER_MGR" build --no-cache --tag docker.io/assafhazan/postgres-zoo-demo:v15.2 -f ./Dockerfile .
 "$CONTAINER_MGR" login docker.io -u assafhazan
-"$CONTAINER_MGR" push docker.io/assafhazan/postgres-zoo-demo:v1
+"$CONTAINER_MGR" push docker.io/assafhazan/postgres-zoo-demo:v15.2
