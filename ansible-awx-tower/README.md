@@ -171,7 +171,7 @@ conjur policy update -b ansible -f policies/02-define-ansible-branch.yml | tee -
 ```
 #### 3. Populate Conjur variables
 ```Bash
-scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
+scripts/02-populate-variables.sh | tee -a 02-populate-variables.sh
 ```
 ### 5. Logout from Conjur CLI
 ```Bash
