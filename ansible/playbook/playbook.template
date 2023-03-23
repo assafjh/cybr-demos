@@ -1,6 +1,0 @@
----
-- hosts: localhost
-  tasks:
-  - name: Lookup variable in Conjur
-    debug:
-      msg: "{{ lookup('$LOOKUP_CMD', '$CONJUR_VARIABLE_PATH') }}"
