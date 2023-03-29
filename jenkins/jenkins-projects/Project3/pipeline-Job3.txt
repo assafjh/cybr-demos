@@ -23,7 +23,13 @@ pipeline {
         stage('Print') {
             steps {
                 withCredentials([conjurSecretCredential(credentialsId: 'PROJECT3_SECRET3', variable: 'SECRET3')]) {
-                    echo "Secret3: $SECRET3"
+                    sh """
+                        echo "The value of SECRET3 is: ${SECRET3}"
+                        echo "The value of SECRET3 in octal dump:"
+                        echo ${SECRET3} | od -a
+                        echo "The value of SECRET3 in base64:"
+                        echo "$SECRET3" | base64
+                    """           
                 }
             }
         }

@@ -5,4 +5,8 @@ secret2
 
 Build Steps -> Execute shell
 #!/bin/bash
-echo "SECRET2: $SECRET2"
+echo "Secret2: $SECRET2"
+SECRET2_B64=$(echo "$SECRET2" | base64)
+echo "Secret2 Base64 encoded: $SECRET2_B64"
+SECRET2_OD=$(echo "$SECRET2" | od -a)
+echo -e "Secret2 Ocatl Dump:\n$SECRET2_OD"
