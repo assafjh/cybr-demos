@@ -1,4 +1,4 @@
-# Use case: Amazon Elastic Compute Cloud (EC2) IAM role authentication
+# Use case: Amazon Lambda function IAM role authentication
 
 It is assumed that you can create a new lambda function and that an IAM role is already associated with the lambda function.
 
