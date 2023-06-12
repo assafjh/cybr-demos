@@ -1,4 +1,4 @@
-# A basic pipeline to be used with the Conjur Secrets plugin for Azure DevOps
+# A basic pipeline to be used with the Conjur Secrets extension for Azure DevOps
 
 pool:
   name: 'default'
