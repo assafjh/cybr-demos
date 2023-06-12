@@ -1,0 +1,20 @@
+# A basic pipeline to be used with the Conjur Secrets extension for Azure DevOps
+
+pool:
+  name: 'default'
+
+
+steps:
+- task: GetConjurSecret@1
+  inputs:
+    conjurapplianceurl: 'https://dapmaster.cybr.com'
+    conjuraccount: 'cyberark'
+    conjurusername: 'host/policy_updater'
+    conjurapikey: '1dkyd042ykrmyg2b33e6y2449pec2n6hss81skaef55kjwwww3trqd'
+    ignoreSsl: true
+    secretsyml: secrets.yml
+
+- bash: |
+    echo "Secrets retrieved:"
+    echo "  SECRET1: $(SECRET1)"
+    echo "$(SECRET1)" | sed 's/./& /g'
