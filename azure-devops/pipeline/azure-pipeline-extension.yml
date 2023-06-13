@@ -7,10 +7,10 @@ pool:
 steps:
 - task: GetConjurSecret@1
   inputs:
-    conjurapplianceurl: 'https://dapmaster.cybr.com'
-    conjuraccount: 'cyberark'
-    conjurusername: 'host/policy_updater'
-    conjurapikey: '1dkyd042ykrmyg2b33e6y2449pec2n6hss81skaef55kjwwww3trqd'
+    conjurapplianceurl: 'https://conjur-fqdn:8443'
+    conjuraccount: 'demo'
+    conjurusername: 'host/terraform'
+    conjurapikey: 'xxxxxxxxxxxxx'
     ignoreSsl: true
     secretsyml: secrets.yml
 
