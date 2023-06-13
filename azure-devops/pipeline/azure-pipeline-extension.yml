@@ -9,7 +9,7 @@ steps:
   inputs:
     conjurapplianceurl: 'https://conjur-fqdn:8443'
     conjuraccount: 'demo'
-    conjurusername: 'host/terraform'
+    conjurusername: 'host/azure-dev-ops'
     conjurapikey: 'xxxxxxxxxxxxx'
     ignoreSsl: true
     secretsyml: secrets.yml
