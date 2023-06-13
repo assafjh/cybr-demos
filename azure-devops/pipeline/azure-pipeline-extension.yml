@@ -9,7 +9,7 @@ steps:
   inputs:
     conjurapplianceurl: 'https://conjur-fqdn:8443'
     conjuraccount: 'demo'
-    conjurusername: 'host/azure-devops'
+    conjurusername: 'host/azure/apps/azure-devops'
     conjurapikey: 'xxxxxxxxxxxxx'
     ignoreSsl: true
     secretsyml: secrets.yml
