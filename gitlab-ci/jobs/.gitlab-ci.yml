@@ -1,7 +1,7 @@
 # Global Variables
 variables:
   CONJUR_APPLIANCE_URL: https://$CONJUR_FQDN:$CONJUR_PORT
-  CONJUR_ACCOUNT: demo
+  CONJUR_ACCOUNT: conjur
   CONJUR_AUTHN_JWT_SERVICE_ID: gitlab1
 
 # Job: Retrieve variable from Conjur via REST using JWT Authentication

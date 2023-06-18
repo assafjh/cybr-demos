@@ -15,7 +15,7 @@ variables:
   value: devops
 # Conjur Tenant ID
 - name: conjur_account
-  value: demo
+  value: conjur
 # Conjur Identity
 - name: conjur_identity
   value: host%2Fazure%2Fapps%2Fmanaged-identity01

@@ -8,7 +8,7 @@ steps:
 - task: GetConjurSecret@1
   inputs:
     conjurapplianceurl: 'https://conjur-fqdn:8443'
-    conjuraccount: 'demo'
+    conjuraccount: 'conjur'
     conjurusername: 'host/azure/apps/azure-devops'
     conjurapikey: 'xxxxxxxxxxxxx'
     ignoreSsl: true
