@@ -33,18 +33,22 @@
 # To use a managed identity, uncomment the relevant host annotation in the policy.
 # In this demo I use User Assigned managed identity
 # Fill out the relevant details instead of the placeholders
-- !host
-  id: apps/managed-identity01
-  owner: !group managers
-  annotations:
-        authn-azure/subscription-id: $SUBSCRIPTION_ID
-        authn-azure/resource-group: $RESOURCE_GROUP
-        authn-azure/user-assigned-identity: $USER_ASSIGNED_IDENTITY_NAME
-        # authn-azure/system-assigned-identity: $OBJECT_ID
+
+- &hosts
+  - !host
+    id: apps/managed-identity01
+    owner: !group managers
+    annotations:
+          authn-azure/subscription-id: $SUBSCRIPTION_ID
+          authn-azure/resource-group: $RESOURCE_GROUP
+          authn-azure/user-assigned-identity: $USER_ASSIGNED_IDENTITY_NAME
+          # authn-azure/system-assigned-identity: $OBJECT_ID
+          
+  - !host apps/azure-devops
 
 # Add the hosts we have created to their respective layer
 - !grant
   roles:
     - !layer apps
   members:
-    - !host apps/managed-identity01
+    - *hosts
