@@ -7,10 +7,12 @@
 
 #======== Variables ===========
 conjur_url=
-conjur_account=demo
+conjur_account=conjur
 username=
 password=
-conjur_variable_path=path/to/safe/secret1
+# Slashes should be url encoded - / = %2F 
+# Example: root/app/safe/secret1 -> root%2Fapp%2Fsafe%2Fsecret1
+conjur_variable_path=
 
 #======== Script ===========
 

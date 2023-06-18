@@ -240,7 +240,7 @@ Credential Type: CyberArk Conjur Secrets Manager Lookup
 Conjur URL: https://conjur-host:8433 #Conjur FQDN with scheme and port
 API Key: 123456 #Use the API key as a password from the 02-define-ansible-branch.log file for the identity: host/ansible/apps/conjur-demo
 Credential Type: CyberArk Conjur Secrets Manager Lookup
-Account: demo
+Account: conjur
 Username: host/ansible/apps/conjur-demo
 Public Key Certificate: # Copy the contents of your Conjur public key
 ```

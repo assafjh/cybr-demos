@@ -10,6 +10,8 @@ identity_tenant_name=
 conjur_tenant_name=
 username=
 password=
+# Slashes should be url encoded - / = %2F 
+# Example: data/app/safe/secret1 -> data%2Fapp%2Fsafe%2Fsecret1
 conjur_variable_path=
 
 #========= Script ===========

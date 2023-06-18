@@ -38,7 +38,7 @@ spec:
       containers:
       # Demo container - summon
       - name: summon-demo-app
-        image: docker.io/assafhazan/summon:v1
+        image: docker.io/assafhazan/summon:latest
         imagePullPolicy: IfNotPresent
         env:
           - name: CONJUR_AUTHN_TOKEN_FILE

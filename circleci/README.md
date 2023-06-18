@@ -94,7 +94,7 @@ conjur logout
 #### 3. Add the following environment variables:
 - `CONJUR_AUTHN_ID`- For this demo, the Conjur authenticator ID is: **circleci1**
 - `CONJUR_FQDN` - Add Conjur FQDN with scheme and port
-- `CONJUR_ORG` - or this demo, the Conjur organization ID is: **demo**
+- `CONJUR_ORG` - or this demo, the Conjur organization ID is: **conjur**
 
 ### 6. Run the workflow
 #### 1. Modify the file dummy-file and commit

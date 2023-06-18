@@ -33,9 +33,9 @@ metadata:
   name: conjur-follower-cm
   namespace: conjur-jwt-follower
 data:
-  CONJUR_ACCOUNT: "demo"
+  CONJUR_ACCOUNT: "conjur"
   CONJUR_APPLIANCE_URL: "https://$CONJUR_FQDN"
-  CONJUR_SEED_FILE_URL: "https://$CONJUR_FQDN/configuration/demo/seed/follower"
+  CONJUR_SEED_FILE_URL: "https://$CONJUR_FQDN/configuration/$CONJUR_ACCOUNT/seed/follower"
   AUTHENTICATOR_ID: "k8s-follower1"
   # Update the below with the authenticators that are relevant to your environment
   CONJUR_AUTHENTICATORS: "authn-jwt/k8s-cluster1,authn-k8s/k8s-cluster1"
