@@ -78,7 +78,7 @@ provider  "conjur" {
 	# Path to Conjur public key file
 	ssl_cert_path =  "/home/user/conjur-server.pem"
 	# Conjur Account
-	account =  "demo"
+	account =  "conjur"
 	# Conjur identity
 	login =  "host/identity"
 	# Conjur identity api key
@@ -102,7 +102,7 @@ vi scripts/.env
 # Conjur FQDN including scheme and port
 export CONJUR_APPLIANCE_URL=https://conjur:8443
 # Conjur Account
-export CONJUR_ACCOUNT=demo
+export CONJUR_ACCOUNT=conjur
 # Path to Conjur public key file
 export CONJUR_CERT_FILE="$HOME"/conjur-server.pem
 ...

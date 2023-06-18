@@ -20,7 +20,7 @@ function-source-code/conjur-lambda-package.zip
 ### Configure the following Environment variables:
 ```properties
 AUTHN_IAM_SERVICE_ID=demo
-CONJUR_ACCOUNT=demo
+CONJUR_ACCOUNT=conjur
 # Conjur FQDN with scheme and port
 CONJUR_APPLIANCE_URL=https://$CONJUR_FQDN:$PORT
 # Conjur host ID

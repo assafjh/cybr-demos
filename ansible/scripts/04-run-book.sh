@@ -1,7 +1,7 @@
 #!/bin/bash
 #============ Variables ===============
 # Conjur tenant
-export CONJUR_ACCOUNT=demo
+export CONJUR_ACCOUNT=conjur
 # Conjur FQDN with schem and port
 export CONJUR_APPLIANCE_URL=
 # Conjur host identity

@@ -57,7 +57,7 @@ metadata:
   name: conjur-connect
   namespace: conjur-jwt
 data:
-  CONJUR_ACCOUNT: demo
+  CONJUR_ACCOUNT: conjur
   CONJUR_APPLIANCE_URL: "https://$CONJUR_FQDN"
   CONJUR_AUTHN_URL: "https://$CONJUR_FQDN/authn-jwt/k8s-cluster1"
   CONJUR_AUTHENTICATOR_ID: "k8s-cluster1"

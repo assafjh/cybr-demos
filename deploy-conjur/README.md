@@ -22,8 +22,8 @@ CONTAINER_TAG=
 CONTAINER_VOLUME_PATH="$HOME"/conjur
 # Conjur Admin password
 CONJUR_ADM_PWD=SomePass123@
-# Conjur account - default is demo
-CONJUR_ORG=demo
+# Conjur account - default is conjur
+CONJUR_ORG=conjur
 # If using podman, should the script enable a systemd service
 IS_CREATE_AUTO_START=false
 # Standby1 hostname
