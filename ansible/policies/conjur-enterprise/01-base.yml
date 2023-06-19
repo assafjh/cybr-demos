@@ -21,31 +21,36 @@
   members: 
     - !user admin01
 
-# Define ansible branch, create users, hosts, groups, layers, variables
+# Define data branch
 - !policy
-  id: ansible
+  id: data
+  owner: !group admins
+  
+# Define data/ansible branch, create users, hosts, groups, layers, variables
+- !policy
+  id: data/ansible
   owner: !group admins
 
-# ansible/managers group will admin everything under ansible branch
+# data/ansible/admins group will admin everything under data/ansible branch
 - !group
-  id: ansible/managers
+  id: data/ansible/admins
   owner: !group admins
 
 - !permit
-  role: !group ansible/managers
+  role: !group data/ansible/admins
   privileges: [read,update,create]
-  resource: !policy ansible
+  resource: !policy data/ansible
 
 - !permit
-  role: !group ansible/managers
+  role: !group data/ansible/admins
   privileges: [read,update,create]
-  resource: !group ansible/managers
+  resource: !group data/ansible/admins
 
-- !user
-  id: ansible-manager01
-  owner: !group ansible/managers
+- &users
+  - !user
+    id: ansible-admin01
+    owner: !group data/ansible/admins
 
 - !grant
-  role: !group ansible/managers
-  members: 
-    - !user ansible-manager01
+  role: !group data/ansible/admins
+  members: *users

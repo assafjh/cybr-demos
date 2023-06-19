@@ -1,0 +1,22 @@
+---
+# Load policy into conjur/authn-iam branch
+# This policy defines an AWS IAM authenticator
+# policy id needs to match the naming convension `conjur/authn-iam/<service ID>`
+- !policy
+  id: demo
+  owner: !group ../../../data/aws/admins
+  body:
+  - !webservice
+  
+  - !permit
+    role: !layer ../../../data/aws/lambda
+    privilege: [ read, authenticate ]
+    resource: !webservice
+
+  - !webservice
+        id: status
+ 
+  - !permit
+      role: !group ../../../data/aws/admins
+      privilege: [ read ]
+      resource: !webservice status

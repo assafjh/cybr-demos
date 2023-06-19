@@ -1,7 +1,7 @@
 #!/bin/bash
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
-SAFE_PATH=aws/elastic/safe/secret
+SAFE_PATH=data/aws/elastic/safe/secret
 #============ Script ===============
 
 # Checking if a user is logged-in to Conjur-CLI
