@@ -14,7 +14,7 @@ def lambda_handler(event, context):
     
     # Use gathered token with env to request secret value
     conjur_client = create_conjur_iam_client_from_env(iam_role_name, access_key, secret_key, token, ssl_verify=ssl_verify)
-    show_variable = conjur_client.get("aws/lambda/safe/secret2").decode('utf-8')
+    show_variable = conjur_client.get("data/aws/lambda/safe/secret2").decode('utf-8')
     return {
         "Secret2": show_variable
     }

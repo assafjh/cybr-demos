@@ -1,0 +1,22 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define azure branch, create users, hosts, groups, layers, variables
+- !policy
+  id: azure
+
+# azure/admins group will admin everything under azure branch
+- !group
+  id: azure/admins
+
+- !permit
+  role: !group azure/admins
+  privileges: [read,update,create]
+  resource: !policy azure
+
+- !permit
+  role: !group azure/admins
+  privileges: [read,update,create]
+  resource: !group azure/admins
+

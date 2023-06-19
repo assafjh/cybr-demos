@@ -21,7 +21,7 @@ jobs:
       - run:
           name: "Consuming secret from Conjur"
           command: |
-             RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/secret.txt -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/circleci/apps/safe/secret1")
+             RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/secret.txt -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/data/circleci/apps/safe/secret1")
              SECRET=$(cat /tmp/secret.txt)
              if [ "$RESPONSE_CODE" != "200" ]; then
               echo "Secret retrieval failed"
