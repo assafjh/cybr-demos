@@ -1,6 +1,0 @@
----
-- hosts: localhost
-  tasks:
-  - name: Lookup variable in Conjur
-    debug:
-      msg: "{{ lookup('cyberark.conjur.conjur_variable', 'ansible/apps/safe/secret1') }}"
