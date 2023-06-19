@@ -1,7 +1,7 @@
 #!/bin/bash
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
-SAFE_PATH=azure/apps/safe/secret
+SAFE_PATH=data/azure/apps/safe/secret
 AZURE_TENANT_ID=
 #============ Script ===============
 

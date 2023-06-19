@@ -1,0 +1,56 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define data branch
+- !policy
+  id: data
+  owner: !group admins
+  
+# Define data/azure branch, create users, hosts, groups, layers, variables
+- !policy
+  id: data/azure
+  owner: !group admins
+
+# data/azure/admins group will admin everything under data/azure branch
+- !group
+  id: data/azure/admins
+  owner: !group admins
+
+- !permit
+  role: !group data/azure/admins
+  privileges: [read,update,create]
+  resource: !policy data/azure
+
+- !permit
+  role: !group data/azure/admins
+  privileges: [read,update,create]
+  resource: !group data/azure/admins
+
+- &users
+  - !user
+    id: azure-admin01
+    owner: !group data/azure/admins
+
+- !grant
+  role: !group data/azure/admins
+  members: *users

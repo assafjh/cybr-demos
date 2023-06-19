@@ -1,7 +1,7 @@
 #!/bin/bash
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
-SAFE_PATH=aws/lambda/safe/secret
+SAFE_PATH=data/aws/lambda/safe/secret
 #============ Script ===============
 
 # Checking if a user is logged-in to Conjur-CLI

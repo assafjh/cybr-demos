@@ -1,0 +1,22 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define ansible branch, create users, hosts, groups, layers, variables
+- !policy
+  id: ansible
+
+# ansible/admins group will admin everything under ansible branch
+- !group
+  id: ansible/admins
+
+- !permit
+  role: !group ansible/admins
+  privileges: [read,update,create]
+  resource: !policy ansible
+
+- !permit
+  role: !group ansible/admins
+  privileges: [read,update,create]
+  resource: !group ansible/admins
+

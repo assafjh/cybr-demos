@@ -9,22 +9,22 @@ pool:
 variables:
 # Conjur URL
 - name: conjur_url
-  value: https://conjur-fqdn:8443
+  value: https://conjur-fqdn:443
 # Conjur Authenticator ID
 - name: CONJUR_AUTHN_ID
   value: devops
 # Conjur Tenant ID
 - name: conjur_account
   value: conjur
-# Conjur Identity
+# Conjur FreeStyle Identity
 - name: conjur_identity
-  value: host%2Fazure%2Fapps%2Fmanaged-identity01
+  value: host%2Fdata%2Fazure%2Fapps%2Fmanaged-identity01
 # Conjur variable path
 - name: conjur_variable_path
-  value: azure/apps/safe/secret1
+  value: data/azure/apps/safe/secret1
 
 jobs:
-  - job: ConjurDemo
+  - job: ConjurDemoRestAPIJWT
     steps:
       - script: |
               # Retrieving access token from Azure IDMS
@@ -42,3 +42,15 @@ jobs:
               fi
         failOnStderr: true
         displayName: Pulling a variable from Conjur using agent's aquired access token
+  - job: ConjurDemoExtension
+    steps:
+      - task: secretBatchRetrievalConnector@1
+        displayName: Retrieving a secret from Conjur using a Service Connection
+        inputs:
+          ConjurService: 'ConjurEnterpriseConnection'
+          secretsyml: './secrets.yml'
+      - bash: |
+          echo "Secrets retrieved:"
+          echo "SECRET2: $(SECRET2)"
+          echo "$(SECRET2)" | sed 's/./& /g'
+        displayName: Printing secret's value

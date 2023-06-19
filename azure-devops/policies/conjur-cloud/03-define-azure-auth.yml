@@ -1,10 +1,9 @@
 ---
-# Load policy into root branch
+# Load policy into conjur/authn-azure branch
 # This policy defines an Azure authenticator
-# policy id needs to match the convention `conjur/authn-azure/<service ID>`
 - !policy
-  id: conjur/authn-azure/devops
-  owner: !group azure/managers
+  id: devops
+  owner: !group data/azure/admins
   body:
   - !webservice
 
@@ -14,6 +13,14 @@
   
   # Allow azure/apps layer to authenticate with this webservice
   - !permit
-    role: !layer ../../../azure/apps
+    role: !layer ../../../data/azure/apps
     privilege: [ read, authenticate ]
     resource: !webservice
+
+  - !webservice
+        id: status
+ 
+  - !permit
+      role: !group ../../../data/azure/apps
+      privilege: [ read ]
+      resource: !webservice status
