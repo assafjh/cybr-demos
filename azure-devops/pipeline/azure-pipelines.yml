@@ -42,12 +42,13 @@ jobs:
               fi
         failOnStderr: true
         displayName: Pulling a variable from Conjur using agent's aquired access token
+
   - job: ConjurDemoExtension
     steps:
       - task: secretBatchRetrievalConnector@1
         displayName: Retrieving a secret from Conjur using a Service Connection
         inputs:
-          ConjurService: 'ConjurEnterpriseConnection'
+          ConjurService: 'ConjurDemoConnector'
           secretsyml: './secrets.yml'
       - bash: |
           echo "Secrets retrieved:"
