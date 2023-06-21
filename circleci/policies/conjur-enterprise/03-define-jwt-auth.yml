@@ -3,7 +3,7 @@
 # This policy defines a JWT authenticator to be used with Kubernetis cluster
 - !policy
   id: conjur/authn-jwt/circleci1
-  owner: !group circleci/managers
+  owner: !group data/circleci/admins
   body:
   - !webservice
 
@@ -42,6 +42,16 @@
   #  id: enforced-claims
   
   - !permit
-    role: !layer ../../../circleci/apps/jwt
+    role: !layer ../../../data/circleci/apps/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
+
+  # Health check end-point
+  - !webservice
+        id: status
+
+  # Permit circleci admins group to query the health check end-point
+  - !permit
+      role: !group ../../../data/circleci/admins
+      privilege: [ read ]
+      resource: !webservice status
