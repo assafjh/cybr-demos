@@ -238,14 +238,14 @@ Credential Type: CyberArk Conjur Secrets Manager Lookup
 #### 3. Fill the type details form
 ```properties
 Conjur URL: https://conjur-host:8433 #Conjur FQDN with scheme and port
-API Key: 123456 #Use the API key as a password from the 02-define-ansible-branch.log file for the identity: host/ansible/apps/conjur-demo
+API Key: 123456 #Use the API key as a password from the 02-define-ansible-branch.log file for the identity: host/data/ansible/apps/conjur-demo
 Credential Type: CyberArk Conjur Secrets Manager Lookup
 Account: conjur
-Username: host/ansible/apps/conjur-demo
+Username: host/data/ansible/apps/conjur-demo
 Public Key Certificate: # Copy the contents of your Conjur public key
 ```
 #### 4. Click Test
-##### 1. Fill in ``Secret Identifier``: ansible/apps/safe/secret1
+##### 1. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
 ##### 2. Click Run
 Make Sure that Test passed
 ##### 3. Click Cancel
@@ -263,21 +263,21 @@ Credential Type: Conjur Secrets
 ##### 1. Variable 1 Path
 1. Click on the key icon next to the Variable1 Path input box.
 2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: ansible/apps/safe/secret1
+3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
 4. Click Test
 Make Sure that Test passed
 5. Click OK
 ##### 2. Variable 2 Path
 1. Click on the key icon next to the Variable2 Path input box.
 2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: ansible/apps/safe/secret1
+3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
 4. Click Test
 Make Sure that Test passed
 5. Click OK
 ##### 3. Variable 3 Path
 1. Click on the key icon next to the Variable3 Path input box.
 2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: ansible/apps/safe/secret2
+3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret2
 4. Click Test
 Make Sure that Test passed
 5. Click OK
@@ -297,7 +297,7 @@ Credential Type: Machine
 ##### 2. Password
 1. Click on the key icon next to the Password input box.
 2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: ansible/apps/safe/secret1
+3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
 4. Click Test
 Make Sure that Test passed
 5. Click OK
