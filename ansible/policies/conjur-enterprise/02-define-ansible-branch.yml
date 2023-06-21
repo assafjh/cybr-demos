@@ -33,8 +33,6 @@
 - !host
   id: apps/conjur-demo
   owner: !group admins
-  annotations:
-    authn/api-key: true
 
 # Add the hosts we have created to their respective layer
 - !grant

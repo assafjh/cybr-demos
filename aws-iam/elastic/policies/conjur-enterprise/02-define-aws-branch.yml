@@ -38,8 +38,6 @@
   - !host
     id: elastic/$ROLE_ARN
     owner: !group admins
-    annotations:
-      authn/api-key: true
 
 # Add the hosts we have created to their respective layer
 - !grant
