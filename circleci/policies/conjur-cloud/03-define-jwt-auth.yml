@@ -1,6 +1,6 @@
 ---
 # Load policy into conjur/authn-jwt branch
-# This policy defines a JWT authenticator to be used with CircleCI
+# This policy defines a JWT authenticator
 - !policy
   id: circleci1
   owner: !group /data/circleci/admins

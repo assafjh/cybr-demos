@@ -4,7 +4,7 @@
 # For Conjur Cloud - This script Needs access to Conjur Cloud CLI.
 #============ Variables =======================
 # Name of the authn to enable, leave as is
-AUTHN_TO_ENABLE=authn-jwt/circleci1
+AUTHN_TO_ENABLE=authn-jwt/github1
 # If needed, modify the below to configure Conjur CLI location
 CONJUR_CLI=conjur
 

@@ -1,32 +1,32 @@
 ---
-# Load policy into github branch
+# Load policy into data/github branch
 # This policy defines the demo branch github
 
 # apps is a layer that will aggregate safe permissions for github project1
 - !layer
   id: apps
-  owner: !group managers
+  owner: !group admins
 
 # projects/jwt is a layer that will aggregate permissions for all github projects that want to use JWT authn to consume Conjur secrets
 - !layer
   id: apps/jwt
-  owner: !group managers
+  owner: !group admins
 
 # create secrets
 - !policy
   id: apps/safe
-  owner: !group managers
+  owner: !group admins
   body:
   - &github-secrets
     - !variable
       id: secret1
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: secret2
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: secret3
-      owner: !group ../../managers
+      owner: !group ../../admins
 
  # Allow apps layer to consume the secrets we have created
   - !permit
@@ -37,7 +37,7 @@
 # Create the Project identities that we will use to authenticate to Conjur 
 - !host
   id: apps/conjur-demo
-  owner: !group managers
+  owner: !group admins
   annotations:
       authn-jwt/github1/repository: assafjh/cybr-demos
       authn-jwt/github1/workflow: conjur-demo

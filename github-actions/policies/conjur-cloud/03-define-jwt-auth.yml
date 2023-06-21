@@ -1,9 +1,9 @@
 ---
-# Load policy into root branch
-# This policy defines a JWT authenticator to be used with GitHub Actions
+# Load policy into conjur/authn-jwt branch
+# This policy defines a JWT authenticator
 - !policy
-  id: conjur/authn-jwt/github1
-  owner: !group github/managers
+  id: github1
+  owner: !group /data/github/admins
   body:
   - !webservice
 
@@ -44,6 +44,16 @@
     id: enforced-claims
   
   - !permit
-    role: !layer ../../../github/apps/jwt
+    role: !layer ../../../data/github/apps/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
+
+ # Health check end-point
+  - !webservice
+        id: status
+
+  # Permit github admins group to query the health check end-point
+  - !permit
+      role: !group ../../../data/github/admins
+      privilege: [ read ]
+      resource: !webservice status
