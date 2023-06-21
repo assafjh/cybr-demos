@@ -3,7 +3,7 @@
 # This policy defines an Azure authenticator
 - !policy
   id: devops
-  owner: !group data/azure/admins
+  owner: !group /data/azure/admins
   body:
   - !webservice
 
@@ -21,6 +21,6 @@
         id: status
  
   - !permit
-      role: !group ../../../data/azure/apps
+      role: !group ../../../data/azure/admins
       privilege: [ read ]
       resource: !webservice status
