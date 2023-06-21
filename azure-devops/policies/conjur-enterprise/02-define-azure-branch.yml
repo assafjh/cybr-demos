@@ -39,7 +39,6 @@
     id: apps/managed-identity01
     owner: !group admins
     annotations:
-      authn/api-key: true
       authn-azure/subscription-id: $SUBSCRIPTION_ID
       authn-azure/resource-group: $RESOURCE_GROUP
       authn-azure/user-assigned-identity: $USER_ASSIGNED_IDENTITY_NAME
@@ -48,8 +47,6 @@
   - !host 
     id: apps/azure-devops
     owner: !group admins
-    annotations:
-      authn/api-key: true
 
 # Add the hosts we have created to their respective layer
 - !grant

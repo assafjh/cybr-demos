@@ -1,5 +1,5 @@
 #!/bin/bash
-# This script will enable the AWS IAM Authn in Conjur.
+# This script will enable an Authenticator in Conjur.
 # For Conjur Enterprise - This script is meant to use at the Conjur Leader VM machine.
 # For Conjur Cloud - This script Needs access to Conjur Cloud CLI.
 #============ Variables =======================

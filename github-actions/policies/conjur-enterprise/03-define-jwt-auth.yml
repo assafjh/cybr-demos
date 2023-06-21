@@ -3,8 +3,8 @@
 # This policy defines a JWT authenticator
 # policy id needs to match the naming convension `conjur/authn-jwt/<service ID>`
 - !policy
-  id: conjur/authn-jwt/circleci1
-  owner: !group data/circleci/admins
+  id: conjur/authn-jwt/github1
+  owner: !group /data/github/admins
   body:
   - !webservice
 
@@ -36,23 +36,25 @@
     id: issuer
   
   # This variable contains what "aud" is the JWT.
-  - !variable
-    id: audience
-
   # - !variable
-  #  id: enforced-claims
+  #  id: audience
+
+  #In this example, "enforced-claims" is set to "workflow,repository"
+  #Please refer to README.md for detailed policy and commands
+  - !variable
+    id: enforced-claims
   
   - !permit
-    role: !layer ../../../data/circleci/apps/jwt
+    role: !layer ../../../data/github/apps/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
 
-  # Health check end-point
+ # Health check end-point
   - !webservice
         id: status
 
-  # Permit circleci admins group to query the health check end-point
+  # Permit github admins group to query the health check end-point
   - !permit
-      role: !group ../../../data/circleci/admins
+      role: !group ../../../data/github/admins
       privilege: [ read ]
       resource: !webservice status
