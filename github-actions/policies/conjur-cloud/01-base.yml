@@ -1,0 +1,22 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define github branch, create users, hosts, groups, layers, variables
+- !policy
+  id: github
+
+# github/admins group will admin everything under github branch
+- !group
+  id: github/admins
+
+- !permit
+  role: !group github/admins
+  privileges: [read,update,create]
+  resource: !policy github
+
+- !permit
+  role: !group github/admins
+  privileges: [read,update,create]
+  resource: !group github/admins
+
