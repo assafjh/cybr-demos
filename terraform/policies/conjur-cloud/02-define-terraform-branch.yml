@@ -1,0 +1,111 @@
+---
+# Load policy into data/terraform branch
+# This policy defines the demo branch terraform
+
+- !policy
+  id: plans
+  owner: !group admins
+
+# plans/attributes is a layer that will aggregate safe permissions for plan attributes
+- !layer
+  id: plans/attributes
+  owner: !group admins
+
+# plans/envvars is a layer that will aggregate safe permissions for plan envvars
+- !layer
+  id: plans/envvars
+  owner: !group admins
+
+# plans/summon is a layer that will aggregate safe permissions for plan summon
+- !layer
+  id: plans/summon
+  owner: !group admins
+
+# create secrets
+- !policy
+  id: plans/safe
+  owner: !group admins
+  body:
+  - &attributes-secrets
+    - !variable
+      id: attributes/secret1
+      owner: !group ../../admins
+    - !variable
+      id: attributes/secret2
+      owner: !group ../../admins
+    - !variable
+      id: attributes/secret3
+      owner: !group ../../admins
+  - &envvars-secrets
+    - !variable
+      id: envvars/secret1
+      owner: !group ../../admins
+    - !variable
+      id: envvars/secret2
+      owner: !group ../../admins
+    - !variable
+      id: envvars/secret3
+      owner: !group ../../admins
+  - &summon-secrets
+    - !variable
+      id: summon/secret1
+      owner: !group ../../admins
+    - !variable
+      id: summon/secret2
+      owner: !group ../../admins
+    - !variable
+      id: summon/secret3
+      owner: !group ../../admins
+
+ # Allow plans/attributes layer to consume the secrets we have created
+  - !permit
+    role: !layer ../attributes
+    privileges: [ read, execute ]
+    resource: *attributes-secrets
+
+ # Allow plans/envvars layer to consume the secrets we have created
+  - !permit
+    role: !layer ../envvars
+    privileges: [ read, execute ]
+    resource: *envvars-secrets
+
+ # Allow plans/summon layer to consume the secrets we have created
+  - !permit
+    role: !layer ../summon
+    privileges: [ read, execute ]
+    resource: *summon-secrets
+
+# Create the Plan identities that we will use to authenticate to Conjur 
+- !host
+  id: plans/attributes/plan1
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+- !host
+  id: plans/envvars/plan1
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+- !host
+  id: plans/summon/plan1
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+
+# Add the hosts we have created to their respective layer
+- !grant
+  roles:
+    - !layer plans/attributes
+  members:
+    - !host plans/attributes/plan1
+- !grant
+  roles:
+    - !layer plans/envvars
+  members:
+    - !host plans/envvars/plan1
+- !grant
+  roles:
+    - !layer plans/summon
+  members:
+    - !host plans/summon/plan1
+
