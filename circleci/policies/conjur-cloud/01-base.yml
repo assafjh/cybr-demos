@@ -1,0 +1,22 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define circleci branch, create users, hosts, groups, layers, variables
+- !policy
+  id: circleci
+
+# circleci/admins group will admin everything under circleci branch
+- !group
+  id: circleci/admins
+
+- !permit
+  role: !group circleci/admins
+  privileges: [read,update,create]
+  resource: !policy circleci
+
+- !permit
+  role: !group circleci/admins
+  privileges: [read,update,create]
+  resource: !group circleci/admins
+

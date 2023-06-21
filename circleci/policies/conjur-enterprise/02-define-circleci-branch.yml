@@ -1,0 +1,57 @@
+---
+# Load policy into data/circleci branch
+# This policy defines the demo branch circleci
+
+# apps is a layer that will aggregate safe permissions for circleci
+- !layer
+  id: apps
+  owner: !group admins
+
+# projects/jwt is a layer that will aggregate permissions for all circleci projects that want to use JWT authn to consume Conjur secrets
+- !layer
+  id: apps/jwt
+  owner: !group admins
+
+# create secrets
+- !policy
+  id: apps/safe
+  owner: !group admins
+  body:
+  - &circleci-secrets
+    - !variable
+      id: secret1
+      owner: !group ../../admins
+    - !variable
+      id: secret2
+      owner: !group ../../admins
+    - !variable
+      id: secret3
+      owner: !group ../../admins
+
+ # Allow apps layer to consume the secrets we have created
+  - !permit
+    role: !layer ../../apps
+    privileges: [ read, execute ]
+    resource: *circleci-secrets
+
+# Create the Project identities that we will use to authenticate to Conjur 
+# before loading this, change the variables below or export and load with envsubst
+# envsubst < policies/02-define-circleci-branch.yml > 02-define-circleci-branch.yml 
+# How to get User ID: GET https://circleci.com/api/v2/me
+- &hosts
+  - !host
+    id: apps/org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
+    owner: !group admins
+    annotations:
+      authn-jwt/circleci1/sub: org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
+
+# Add the hosts we have created to their respective layer
+- !grant
+  roles:
+    - !layer apps
+  members: *hosts
+  
+- !grant
+  roles:
+    - !layer apps/jwt
+  members: *hosts
