@@ -18,11 +18,22 @@ $SUDO $CONTAINER_MGR volume create gitlab-runner-conjur-config
 $SUDO $CONTAINER_MGR run -d --name gitlab-runner-conjur --restart always \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v gitlab-runner-conjur-config:/etc/gitlab-runner \
+    # If there is a need to add custom hosts, uncomment and modify the line below
+    #--add-host custom-host:127.0.0.1 \
     "$CONTAINER_IMG"
-# Registering GitLab runner
+# Registering GitLab runners
+# CyberArk Docker Executors
 $SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-conjur-config:/etc/gitlab-runner \
     "$CONTAINER_IMG" register -u "http://$GITLAB_HOST:$GITLAB_PORT" -r "$GITLAB_REGISTRATION_TOKEN" \
-    --description "Demo Runner" -n --tag-list "conjur-demo" --executor shell
+    --description "Demo CyberArk Docker Executor" -n --tag-list "conjur-demo-docker" \
+    --executor docker \
+    # If there is a need to add custom hosts, uncomment and modify the line below
+    #--add-host custom-host:127.0.0.1 \
+    --docker-image cyberark/authn-jwt-gitlab:ubuntu-1.0.0
+# Shell Executor
+$SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-conjur-config:/etc/gitlab-runner \
+    "$CONTAINER_IMG" register -u "http://$GITLAB_HOST:$GITLAB_PORT" -r "$GITLAB_REGISTRATION_TOKEN" \
+    --description "Demo Shell Executor" -n --tag-list "conjur-demo-shell" --executor shell
 # Deploying Summon on the runner
 $SUDO $CONTAINER_MGR exec -it gitlab-runner-conjur bash -c 'curl -sSL https://raw.githubusercontent.com/cyberark/summon/main/install.sh | bash'
 $SUDO $CONTAINER_MGR exec -it gitlab-runner-conjur bash -c 'curl -sSL https://raw.githubusercontent.com/cyberark/summon-conjur/main/install.sh | bash'
