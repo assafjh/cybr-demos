@@ -3,7 +3,7 @@
 # This policy defines a JWT authenticator to be used with GitLab CI
 - !policy
   id: conjur/authn-jwt/gitlab1
-  owner: !group gitlab/managers
+  owner: !group data/gitlab/admins
   body:
   - !webservice
 
@@ -44,6 +44,16 @@
     id: enforced-claims
   
   - !permit
-    role: !layer ../../../gitlab/ci/jwt
+    role: !layer ../../../data/gitlab/ci/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
+
+  # Health check end-point
+  - !webservice
+        id: status
+
+  # Permit gitlab admins group to query the health check end-point
+  - !permit
+      role: !group ../../../data/gitlab/admins
+      privilege: [ read ]
+      resource: !webservice status
