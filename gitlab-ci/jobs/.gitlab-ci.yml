@@ -4,18 +4,42 @@ variables:
   CONJUR_ACCOUNT: conjur
   CONJUR_AUTHN_JWT_SERVICE_ID: gitlab1
 
+# Job: Retrieve variable from Conjur via CyberArks' docker executor using JWT Authentication
+retrieve-variable-via-docker-executor:
+  tags:
+    - conjur-demo-docker
+  id_tokens:
+    ID_TOKEN_1:
+      aud: https://gitlab.com
+  variables:
+      CONJUR_VARIABLE_PATH: data/gitlab/ci/safe/secret1
+      CONJUR_AUTHN_JWT_TOKEN: $ID_TOKEN_1
+  stage: build
+  image:
+    name: cyberark/authn-jwt-gitlab:ubuntu-1.0.0
+    # The below line is created to support a self-signed CA certificate, if this is not needed, comment out the line.
+    # In the case below, it is assumed that the self-signed CA certificate is commited to the project under root.
+    entrypoint: ["/bin/sh", "-c", "cp $CI_PROJECT_DIR/conjur-ca.crt /usr/local/share/ca-certificates/ && update-ca-certificates && /bin/bash"]
+  script:
+    - |
+        # Print the variable path and value
+        printf "=================\nVariable Path: %s\n\nVariable value: %s\n=================\n" "$CONJUR_VARIABLE_PATH" "$(CONJUR_SECRET_ID="$CONJUR_VARIABLE_PATH" /authn-jwt-gitlab)"
+
 # Job: Retrieve variable from Conjur via REST using JWT Authentication
 retrieve-variable-via-rest:
   tags:
-    - conjur-demo
+    - conjur-demo-shell
+  id_tokens:
+    ID_TOKEN_1:
+      aud: https://gitlab.com
   variables:
-      CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret1
+      CONJUR_VARIABLE_PATH: data/gitlab/ci/safe/secret1
   stage: build
   script:
     - |
-        # Using CI_JOB_JWT variable to authenticate with Conjur via REST API
+        # Using ID_TOKEN_1 variable to authenticate with Conjur via REST API
         # Authenticate to Conjur
-        TOKEN=$(curl --show-error -f -s -k --request POST "$CONJUR_APPLIANCE_URL/authn-jwt/$CONJUR_AUTHN_JWT_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CI_JOB_JWT")
+        TOKEN=$(curl --show-error -f -s -k --request POST "$CONJUR_APPLIANCE_URL/authn-jwt/$CONJUR_AUTHN_JWT_SERVICE_ID/$CONJUR_ACCOUNT/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$ID_TOKEN_1")
         # Retrieve variable from Conjur
         CONJUR_VARIABLE_VALUE=$(curl --show-error -f -s -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_APPLIANCE_URL/secrets/$CONJUR_ACCOUNT/variable/$CONJUR_VARIABLE_PATH")
         # Print the variable path and value
@@ -23,19 +47,22 @@ retrieve-variable-via-rest:
 
 # Job: Retrieve variable from Conjur via Summon using JWT Authentication
 retrieve-variable-via-summon:
+  id_tokens:
+    ID_TOKEN_1:
+      aud: https://gitlab.com
   variables:
-      CONJUR_VARIABLE_PATH: gitlab/ci/safe/secret2
+      CONJUR_VARIABLE_PATH: data/gitlab/ci/safe/secret2
       # Uncomment and modify the below if there is a need to bypass JWT Host ID
       #CONJUR_AUTHN_JWT_HOST_ID: host/gitlab/ci/gitlab-summon
       JWT_TOKEN_PATH: /tmp/ci-job.jwt 
   tags:
-    - conjur-demo
+    - conjur-demo-shell
   stage: build
   before_script:
     - echo "Retrieving Conjur Public Key"
     - export CONJUR_SSL_CERTIFICATE=$(openssl s_client -showcerts -connect ${CONJUR_APPLIANCE_URL:8} < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p')
-    - echo "Serializing CI_JOB_JWT"
-    - echo "$CI_JOB_JWT" > "$JWT_TOKEN_PATH"
+    - echo "Serializing ID_TOKEN_1"
+    - echo "$ID_TOKEN_1" > "$JWT_TOKEN_PATH"
     - echo "Creating mock application"
     - | 
         echo '#!/bin/bash' > /tmp/mock-app.sh
@@ -43,7 +70,7 @@ retrieve-variable-via-summon:
         chmod +x /tmp/mock-app.sh
   script:
     - |
-        # Using CI_JOB_JWT variable to authenticate with Conjur using Summon
+        # Using ID_TOKEN_1 variable to authenticate with Conjur using Summon
         echo "injecting variable to mock-app via Summon:"
         summon -p summon-conjur -D PATH=$CONJUR_VARIABLE_PATH --yaml 'SECRET2: !var $PATH' /tmp/mock-app.sh
         echo "Running mock-app without Summon:"
