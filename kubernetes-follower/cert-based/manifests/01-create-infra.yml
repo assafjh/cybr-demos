@@ -77,6 +77,6 @@ data:
   AUTHENTICATOR_ID: "k8s-follower1"
   # Update the below with the authenticators that are relevant to your environment
   CONJUR_AUTHENTICATORS: "authn-jwt/k8s-cluster1,authn-k8s/k8s-cluster1"
-  CONJUR_AUTHN_LOGIN: host/kubernetes/followers/cert-based-follower
+  CONJUR_AUTHN_LOGIN: host/data/kubernetes/followers/cert-based-follower
   CONJUR_SSL_CERTIFICATE: |- 
 $CONJUR_PUB_KEY
