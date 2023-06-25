@@ -1,20 +1,20 @@
 ---
-# Load policy into kubernetes branch
+# Load policy into data/kubernetes branch
 # This policy defines the demo branch kubernetes
 
 - !policy
   id: followers
-  owner: !group managers
+  owner: !group admins
 
 # followers/cert is a layer that will aggregate permissions for all kubernetes followers that want to use k8s cert authn to consume Conjur secrets
 - !layer
   id: followers/cert
-  owner: !group managers
+  owner: !group admins
 
 # Create the application identities that we will use to authenticate to Conjur
 - !host
   id: followers/cert-based-follower
-  owner: !group managers
+  owner: !group admins
   annotations:
     authn-k8s/namespace: conjur-cert-follower
     authn-k8s/service-account: conjur-demo-acct

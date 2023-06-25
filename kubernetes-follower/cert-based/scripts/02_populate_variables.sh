@@ -11,13 +11,13 @@ TOKEN_SECRET_NAME="$($COP_CLI get secrets -n conjur-cert-follower | grep "conjur
 SA_TOKEN=$($COP_CLI get secret $TOKEN_SECRET_NAME -n conjur-cert-follower --output='go-template={{ .data.token }}' | base64 -d)
 # Below are different methods to get the Kubernetes API certificate, comment and uncomment as needed.
 # General:
-# openssl s_client -showcerts -connect $KUBE_API_HOST:6443 < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ./kube-api-public-key.pem
+#openssl s_client -showcerts -connect $KUBE_API_HOST:6443 < /dev/null 2> /dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' > ./kube-api-public-key.pem
 # K3S:
 #$COP_CLI get secret k3s-serving -n kube-system -o json --output='jsonpath={.data.tls\.crt}'  | base64 --decode > ./kube-api-public-key.pem
 # Rancher: 
-# $COP_CLI get secret tls-rancher-internal-ca -n cattle-system -o yaml
+#$COP_CLI get secret tls-rancher-internal-ca -n cattle-system -o yaml -o json --output='jsonpath={.data.tls\.crt}' | base64 --decode > ./kube-api-public-key.pem
 # EKS, OCP:
-$COP_CLI get secret "$TOKEN_SECRET_NAME" -n conjur-cert-follower -o json --output='jsonpath={.data.ca\.crt}'  | base64 --decode > ./kube-api-public-key.pem
+$COP_CLI get secret "$TOKEN_SECRET_NAME" -n conjur-cert-follower -o json --output='jsonpath={.data.ca\.crt}' | base64 --decode > ./kube-api-public-key.pem
 #==========
 
 # Checking if a user is logged-in to Conjur-CLI
