@@ -1,17 +1,17 @@
 Create a username/password credential:
-user: host/jenkins/projects/Project3/Job1
+user: host/data/jenkins/projects/Project3/Job1
 password: <api-key>
 description: CONJUR_PROJECT_3
 
 Create a Conjur Secret Credential:
-Variable Path: jenkins/projects/safe/project3/secret3
+Variable Path: data/jenkins/projects/safe/project3/secret3
 ID: PROJECT3_SECRET3
 description: PROJECT3_SECRET3
 
 Go to pipeline configurations, configure Conjur plugin:
 
 untick Inherit from parent?
-Account - demo
+Account - conjur
 Appliance URL - Conjur FQDN
 Conjur Auth Credential - CONJUR_PROJECT_3
 
@@ -25,10 +25,8 @@ pipeline {
                 withCredentials([conjurSecretCredential(credentialsId: 'PROJECT3_SECRET3', variable: 'SECRET3')]) {
                     sh """
                         echo "The value of SECRET3 is: ${SECRET3}"
-                        echo "The value of SECRET3 in octal dump:"
-                        echo ${SECRET3} | od -a
-                        echo "The value of SECRET3 in base64:"
-                        echo "$SECRET3" | base64
+                        echo "The value of SECRET3 unmasked:"
+                        echo "$SECRET3" | sed 's/./& /g'
                     """           
                 }
             }

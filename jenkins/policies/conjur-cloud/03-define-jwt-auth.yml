@@ -1,9 +1,9 @@
 ---
-# Load policy into root branch
-# This policy defines a JWT authenticator to be used with Kubernetis cluster
+# Load policy into conjur/authn-jwt branch
+# This policy defines a JWT authenticator
 - !policy
-  id: conjur/authn-jwt/jenkins1
-  owner: !group jenkins/managers
+  id: jenkins1
+  owner: !group /data/jenkins/admins
   body:
   - !webservice
 
@@ -39,6 +39,16 @@
     id: audience
   
   - !permit
-    role: !layer ../../../jenkins/projects/jwt
+    role: !layer ../../../data/jenkins/projects/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
+
+  # Health check end-point
+  - !webservice
+        id: status
+
+  # Permit jenkins admins group to query the health check end-point
+  - !permit
+      role: !group ../../../data/jenkins/admins
+      privilege: [ read ]
+      resource: !webservice status
