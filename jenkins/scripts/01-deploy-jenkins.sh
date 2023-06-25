@@ -15,7 +15,7 @@ JENKINS_ADMIN_ID=
 # Jenkins admin user password
 JENKINS_ADMIN_PASSWORD=
 # Conjur FQDN with port (no scheme)
-CONJUR_FQDN=$(hostname -f):8443
+CONJUR_FQDN=$(hostname -f):443
 # Conjur tenant
 CONJUR_ACCOUNT=conjur
 #============ Script ===============

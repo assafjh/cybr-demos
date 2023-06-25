@@ -6,7 +6,7 @@ SUDO=
 # Using docker/podman
 CONTAINER_MGR=docker
 # Conjur FQDN and port without scheme
-CONJUR_HOST_AND_PORT="$(hostname)":8443
+CONJUR_HOST_AND_PORT="$(hostname)":443
 # Jenkins container ID
 JENKINS_CONTAINER_ID=$($CONTAINER_MGR ps --filter "name=.*jenkins.*" --format "{{.ID}}")
 #========== Functions ===============

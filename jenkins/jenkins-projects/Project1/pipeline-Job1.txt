@@ -5,13 +5,11 @@ pipeline {
     stages {
         stage('Print') {
             steps {
-                withCredentials([conjurSecretCredential(credentialsId: 'jenkins-projects-safe-project1-secret1', variable: 'SECRET1')]) {
+                withCredentials([conjurSecretCredential(credentialsId: 'data-jenkins-projects-safe-project1-secret1', variable: 'SECRET1')]) {
                     sh """
                         echo "The value of SECRET1 is: ${SECRET1}"
-                        echo "The value of SECRET1 in octal dump:"
-                        echo ${SECRET1} | od -a
-                        echo "The value of SECRET1 in base64:"
-                        echo "$SECRET1" | base64
+                        echo "The value of SECRET1 unmasked:"
+                        echo "$SECRET1" | sed 's/./& /g'
                     """                
                 }
             }

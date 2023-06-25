@@ -1,0 +1,54 @@
+---
+# Load policy into conjur/authn-jwt branch
+# This policy defines a JWT authenticator
+- !policy
+  id: conjur/authn-jwt/jenkins1
+  owner: !group /data/jenkins/admins
+  body:
+  - !webservice
+
+  # Uncomment one of following variables depending on the public availability
+  # If the service is publicly available, uncomment 'jwks-uri'.
+  # If the service is not available, uncomment 'public-keys'
+
+  - !variable
+    id: jwks-uri
+
+  # - !variable
+  #  id: public-keys
+
+  # This variable tells Conjur which claim in the JWT to use to determine the conjur host identity.
+  - !variable
+    id: token-app-property
+
+  # This variable is used with token-app-property. This variable will hold the conjur policy path that contains the conjur host identity found by looking at the claim entered in token-app-property.
+  - !variable
+    id: identity-path
+
+  # Uncomment ca-cert if the JWKS website cert isn't trusted by conjur
+
+  # - !variable
+  #   id: ca-cert
+
+  # This variable contains what "iss" in the JWT.
+  - !variable
+    id: issuer
+  
+  # This variable contains what "aud" is the JWT.
+  - !variable
+    id: audience
+  
+  - !permit
+    role: !layer ../../../data/jenkins/projects/jwt
+    privilege: [ read, authenticate ]
+    resource: !webservice
+
+  # Health check end-point
+  - !webservice
+        id: status
+
+  # Permit jenkins admins group to query the health check end-point
+  - !permit
+      role: !group ../../../data/jenkins/admins
+      privilege: [ read ]
+      resource: !webservice status
