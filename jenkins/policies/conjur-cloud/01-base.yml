@@ -1,0 +1,21 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define gitlab branch, create users, hosts, groups, layers, variables
+- !policy
+  id: gitlab
+
+# gitlab/admins group will admin everything under gitlab branch
+- !group
+  id: gitlab/admins
+
+- !permit
+  role: !group gitlab/admins
+  privileges: [read,update,create]
+  resource: !policy gitlab
+
+- !permit
+  role: !group gitlab/admins
+  privileges: [read,update,create]
+  resource: !group gitlab/admins
