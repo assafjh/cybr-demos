@@ -1,0 +1,56 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define data branch
+- !policy
+  id: data
+  owner: !group admins
+  
+# Define data/kubernetes branch, create users, hosts, groups, layers, variables
+- !policy
+  id: data/kubernetes
+  owner: !group admins
+
+# data/kubernetes/admins group will admin everything under data/kubernetes branch
+- !group
+  id: data/kubernetes/admins
+  owner: !group admins
+
+- !permit
+  role: !group data/kubernetes/admins
+  privileges: [read,update,create]
+  resource: !policy data/kubernetes
+
+- !permit
+  role: !group data/kubernetes/admins
+  privileges: [read,update,create]
+  resource: !group data/kubernetes/admins
+
+- &users
+  - !user
+    id: kubernetes-admin01
+    owner: !group data/kubernetes/admins
+
+- !grant
+  role: !group data/kubernetes/admins
+  members: *users
