@@ -1,6 +1,7 @@
 ---
 # Load policy into root branch
-# This policy defines a k8s-cert authenticator to be used with Kubernetis cluster
+# This policy defines a Kubernetes certificate based authenticator
+# policy id needs to match the naming convension `conjur/authn-k8s/<service ID>`
 - !policy
   id: conjur/authn-k8s/k8s-follower1
   owner: !group /data/kubernetes/admins

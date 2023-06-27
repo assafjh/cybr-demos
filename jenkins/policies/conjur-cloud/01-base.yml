@@ -2,20 +2,20 @@
 # Load policy into data branch
 # This policy defines a demo organization for testing basic capabilities
 
-# Define gitlab branch, create users, hosts, groups, layers, variables
+# Define jenkins branch, create users, hosts, groups, layers, variables
 - !policy
-  id: gitlab
+  id: jenkins
 
-# gitlab/admins group will admin everything under gitlab branch
+# jenkins/admins group will admin everything under jenkins branch
 - !group
-  id: gitlab/admins
+  id: jenkins/admins
 
 - !permit
-  role: !group gitlab/admins
+  role: !group jenkins/admins
   privileges: [read,update,create]
-  resource: !policy gitlab
+  resource: !policy jenkins
 
 - !permit
-  role: !group gitlab/admins
+  role: !group jenkins/admins
   privileges: [read,update,create]
-  resource: !group gitlab/admins
+  resource: !group jenkins/admins
