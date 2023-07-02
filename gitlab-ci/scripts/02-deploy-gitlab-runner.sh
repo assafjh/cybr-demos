@@ -15,20 +15,22 @@ GITLAB_REGISTRATION_TOKEN=
 #============ Script ===============
 #Deploying GitLab Runner
 $SUDO $CONTAINER_MGR volume create gitlab-runner-conjur-config
+    # If there is a need to add custom hosts, add to the command the add-host flag - example below
+    #--add-host custom-host:127.0.0.1 \
 $SUDO $CONTAINER_MGR run -d --name gitlab-runner-conjur --restart always \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v gitlab-runner-conjur-config:/etc/gitlab-runner \
-    # If there is a need to add custom hosts, uncomment and modify the line below
-    #--add-host custom-host:127.0.0.1 \
     "$CONTAINER_IMG"
 # Registering GitLab runners
 # CyberArk Docker Executors
+    # If there is a need to add custom hosts, add to the command the add-host flag - example below
+    #--add-host custom-host:127.0.0.1 \
+    # If there is a need to add custom hosts, add to the register command the docker-extra-hosts flag - example below
+    #--docker-extra-hosts custom-host:127.0.0.1 \
 $SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-conjur-config:/etc/gitlab-runner \
     "$CONTAINER_IMG" register -u "http://$GITLAB_HOST:$GITLAB_PORT" -r "$GITLAB_REGISTRATION_TOKEN" \
     --description "Demo CyberArk Docker Executor" -n --tag-list "conjur-demo-docker" \
     --executor docker \
-    # If there is a need to add custom hosts, uncomment and modify the line below
-    #--add-host custom-host:127.0.0.1 \
     --docker-image cyberark/authn-jwt-gitlab:ubuntu-1.0.0
 # Shell Executor
 $SUDO $CONTAINER_MGR run --rm -it -v gitlab-runner-conjur-config:/etc/gitlab-runner \
