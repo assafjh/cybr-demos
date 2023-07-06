@@ -1,10 +1,10 @@
 ---
 # Load policy into root branch
-# This policy defines a demo organization that uses kubernetes applications
+# This policy defines a demo organization for testing basic capabilities
 
 # Define Admins, create admins group, create admin01 user
 - !group
-  id: admins
+  id: admins 
   owner: !user admin
 
 - !user
@@ -21,31 +21,36 @@
   members: 
     - !user admin01
 
-# Define Kuebenetes branch, create users, hosts, groups, layers, variables
+# Define data branch
 - !policy
-  id: kubernetes
+  id: data
+  owner: !group admins
+  
+# Define data/kubernetes branch, create users, hosts, groups, layers, variables
+- !policy
+  id: data/kubernetes
   owner: !group admins
 
-# kubernetes/managers group will admin everything under kubernetes branch
+# data/kubernetes/admins group will admin everything under data/kubernetes branch
 - !group
-  id: kubernetes/managers
+  id: data/kubernetes/admins
   owner: !group admins
 
 - !permit
-  role: !group kubernetes/managers
+  role: !group data/kubernetes/admins
   privileges: [read,update,create]
-  resource: !policy kubernetes
+  resource: !policy data/kubernetes
 
 - !permit
-  role: !group kubernetes/managers
+  role: !group data/kubernetes/admins
   privileges: [read,update,create]
-  resource: !group kubernetes/managers
+  resource: !group data/kubernetes/admins
 
-- !user
-  id: k8s-manager01
-  owner: !group kubernetes/managers
+- &users
+  - !user
+    id: kubernetes-admin01
+    owner: !group data/kubernetes/admins
 
 - !grant
-  role: !group kubernetes/managers
-  members: 
-    - !user k8s-manager01
+  role: !group data/kubernetes/admins
+  members: *users

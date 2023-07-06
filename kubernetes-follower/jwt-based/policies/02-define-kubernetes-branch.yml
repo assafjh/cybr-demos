@@ -1,20 +1,20 @@
 ---
-# Load policy into kubernetes branch
+# Load policy into data/kubernetes branch
 # This policy defines the demo branch kubernetes
 
 - !policy
   id: followers
-  owner: !group managers
+  owner: !group admins
 
 # followers/jwt is a layer that will aggregate permissions for all kubernetes followers that want to use JWT
 - !layer
   id: followers/jwt
-  owner: !group managers
+  owner: !group admins
 
 # Create the JWT identity that we will use to authenticate to Conjur 
 - !host
   id: followers/system:serviceaccount:conjur-jwt-follower:conjur-demo-acct
-  owner: !group managers
+  owner: !group admins
   annotations:
     authn-jwt/k8s-follower1/kubernetes.io/namespace: conjur-jwt-follower
     authn-jwt/k8s-follower1/kubernetes.io/serviceaccount/name: conjur-demo-acct

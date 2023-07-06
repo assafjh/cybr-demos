@@ -8,7 +8,7 @@ COP_CLI=kubectl
 conjur whoami
 
 # Populate authenticator values
-conjur variable set -i conjur/authn-jwt/k8s-follower1/identity-path -v "/kubernetes/followers"
+conjur variable set -i conjur/authn-jwt/k8s-follower1/identity-path -v "/data/kubernetes/followers"
 conjur variable set -i conjur/authn-jwt/k8s-follower1/issuer -v "$(echo $($COP_CLI get --raw /.well-known/openid-configuration | awk -F "," '{print $1}' | tr -d '",' | sed 's#{issuer:##g'))"
 conjur variable set -i conjur/authn-jwt/k8s-follower1/token-app-property -v "sub"
 

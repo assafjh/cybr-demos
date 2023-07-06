@@ -7,11 +7,11 @@ SUDO=
 # Using docker/podman
 CONTAINER_MGR=docker
 # Conjur Leader port
-CONJUR_LEADER_PORT=8443
+CONJUR_LEADER_PORT=443
 # Conjur Leader container ID
 CONTAINER_ID=$(curl -s -k "https://127.0.0.1:$CONJUR_LEADER_PORT/info" | awk '/container/ {print $2}' | tr -d '",')
 # Name of the authn to enable, leave as is
-AUTHN_TO_ENABLE=authn-jwt/k8s-cluster1
+AUTHN_TO_ENABLE=authn-jwt/k8s-follower1
 #============ Script ===============
 echo "Enabling $AUTHN_TO_ENABLE authn for Conjur"
 CONJUR_AUTHENTICATORS=$($SUDO $CONTAINER_MGR exec $CONTAINER_ID evoke variable list | grep CONJUR_AUTHENTICATORS)
