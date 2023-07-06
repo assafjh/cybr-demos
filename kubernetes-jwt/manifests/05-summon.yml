@@ -7,14 +7,14 @@ metadata:
   namespace: conjur-jwt
 data:
   secrets.yml: |
-    SECRET2: !var kubernetes/applications/safe/secret2
+    SECRET2: !var data/kubernetes/applications/safe/secret2
   demo_consumer.sh: |
     #!/bin/sh
     echo "=================="
     echo "SECRET2: $SECRET2"
     echo "=================="
     # Adding the below to keep the container alive
-    while true; do sleep 36000; done
+    sleep infinity
 ---
 # Summon deployment manifest with empty centos application to consume the secrets
 apiVersion: apps/v1
@@ -39,7 +39,8 @@ spec:
       # Demo container - summon
       - name: summon-demo-app
         image: docker.io/assafhazan/summon:latest
-        imagePullPolicy: IfNotPresent
+        workingDir: /etc/summon/demo_app
+        imagePullPolicy: Always
         env:
           - name: CONJUR_AUTHN_JWT_SERVICE_ID
             valueFrom:

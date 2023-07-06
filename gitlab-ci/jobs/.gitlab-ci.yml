@@ -14,12 +14,13 @@ retrieve-variable-via-docker-executor:
   variables:
       CONJUR_VARIABLE_PATH: data/gitlab/ci/safe/secret1
       CONJUR_AUTHN_JWT_TOKEN: $ID_TOKEN_1
+      # The line below is created to support a self-signed CA certificate, if this is not needed, comment out the line.
+      # In the case below, it is assumed that the self-signed CA certificate is commited to the project under root.
+      # There is also an option to use CONJUR_SSL_CERTIFICATE and paste the certificate contents.
+      CONJUR_CERT_FILE: $CI_PROJECT_DIR/conjur-ca.crt
   stage: build
   image:
     name: cyberark/authn-jwt-gitlab:ubuntu-1.0.0
-    # The below line is created to support a self-signed CA certificate, if this is not needed, comment out the line.
-    # In the case below, it is assumed that the self-signed CA certificate is commited to the project under root.
-    entrypoint: ["/bin/sh", "-c", "cp $CI_PROJECT_DIR/conjur-ca.crt /usr/local/share/ca-certificates/ && update-ca-certificates && /bin/bash"]
   script:
     - |
         # Print the variable path and value

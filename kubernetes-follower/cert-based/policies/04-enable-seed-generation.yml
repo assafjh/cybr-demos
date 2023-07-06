@@ -8,8 +8,8 @@
   # This webservice represents the Seed service API
   - !webservice
 
-  # Authorize `kubernetes/followers/cert` to request seeds
+  # Authorize `data/kubernetes/followers/cert` to request seeds
   - !permit
-    role: !layer ../../kubernetes/followers/cert
+    role: !layer ../../data/kubernetes/followers/cert
     privilege: [ execute ]
     resource: !webservice
