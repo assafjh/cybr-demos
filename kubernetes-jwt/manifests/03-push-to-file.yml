@@ -18,6 +18,10 @@ data:
       echo "======================"
       echo "printing /opt/secrets/conjur/credentials.properties"
       cat /opt/secrets/conjur/credentials.properties
+      echo "======================"
+      echo "running /opt/secrets/conjur/messenger"
+      chmod +x /opt/secrets/conjur/messenger
+      /opt/secrets/conjur/messenger
       sleep infinity
 ---
 # Deployment for Conjur Secrets Provider - push to file mode as sidecar
@@ -61,7 +65,14 @@ spec:
             property.safe.secret5={{ secret "secret5" }}
             property.safe.secret7={{ secret "secret7" }}
         conjur.org/secret-file-path.template1: "./credentials.properties"
-        conjur.org/secret-file-format.template1: "template"
+        # template - binary file
+        conjur.org/conjur-secrets-policy-path.messenger-app: data/kubernetes/applications/safe/
+        conjur.org/conjur-secrets.messenger-app: |
+          - b64data: messenger
+        conjur.org/secret-file-template.messenger-app: |
+            {{ secret "b64data" | b64dec }}
+        conjur.org/secret-file-path.messenger-app: "./messenger"
+        conjur.org/secret-file-format.messenger-app: "template"
     spec:
       serviceAccountName: conjur-demo-acct
       containers:
@@ -75,7 +86,6 @@ spec:
         # Path to the file with the secrets 
           - name: conjur-secrets
             mountPath: /opt/secrets/conjur
-            readOnly: true
         # Path to the entrypoint
           - name: scripts
             mountPath: /scripts
