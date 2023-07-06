@@ -8,10 +8,10 @@
 # Script path
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) 
 
-conjur_url=https://aws-pub-lab
+conjur_url=
 conjur_account=conjur
 username=kubernetes-admin01
-password=3bqzw8b167qpyqf9ab72rah52res62nb1p8q8gf3e83n0838v3521
+password=
 # Slashes should be url encoded - / = %2F 
 # Example: root/app/safe/secret1 -> root%2Fapp%2Fsafe%2Fsecret1
 conjur_variable_path=data%2Fkubernetes%2Fapplications%2Fsafe%2Fmessenger
