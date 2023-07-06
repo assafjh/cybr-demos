@@ -2,7 +2,7 @@ FROM alpine:latest
 LABEL maintainer=AssafHazan
 
 RUN  apk update \
-  && apk add curl tar \
+  && apk add curl tar dumb-init \
   && mkdir -p /usr/local/lib/summon \
   && mkdir -p /etc/summon/config \
   && mkdir -p /etc/summon/demo_app \
@@ -21,4 +21,4 @@ RUN  mkdir -p /lib64 \
 #COPY config /etc/summon/config
 #COPY demo_app /etc/summon/demo_app
 
-ENTRYPOINT [ "summon", "--provider", "summon-conjur", "-f", "/etc/summon/config/secrets.yml", "/etc/summon/demo_app/demo_consumer.sh" ]
+ENTRYPOINT [ "dumb-init", "summon", "--provider", "summon-conjur", "-f", "/etc/summon/config/secrets.yml", "/etc/summon/demo_app/demo_consumer.sh" ]

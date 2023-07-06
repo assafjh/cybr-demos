@@ -3,7 +3,7 @@
 # This policy defines a JWT authenticator
 # policy id needs to match the naming convension `conjur/authn-jwt/<service ID>`
 - !policy
-  id: conjur/authn-jwt/k8s-follower1
+  id: conjur/authn-jwt/k8s-cluster1
   owner: !group /data/kubernetes/admins
   body:
   - !webservice
@@ -41,7 +41,7 @@
   #   id: audience
   
   - !permit
-    role: !layer ../../../data/kubernetes/followers/jwt
+    role: !layer ../../../data/kubernetes/applications/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
 
