@@ -1,3 +1,3 @@
-module messanger
+module messenger
 
 go 1.19
