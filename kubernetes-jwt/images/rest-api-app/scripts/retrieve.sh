@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Using Service Account JWT
 JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 # Authenticating to Conjur using above JWT
