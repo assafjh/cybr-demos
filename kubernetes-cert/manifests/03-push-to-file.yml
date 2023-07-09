@@ -1,29 +1,4 @@
 ---
-# This will config map will hold our scripts
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: push-to-file
-  namespace: conjur-cert
-data:
-  entry-point.sh: |
-      #!/bin/bash
-      sleep 1
-      echo "======================"
-      echo "Files were injected by sidecar:"
-      ls -ltr /opt/secrets/conjur/
-      echo "======================"
-      echo "printing /opt/secrets/conjur/credentials.yaml"
-      cat /opt/secrets/conjur/credentials.properties
-      echo "======================"
-      echo "printing /opt/secrets/conjur/credentials.properties"
-      cat /opt/secrets/conjur/credentials.properties
-      echo "======================"
-      echo "running /opt/secrets/conjur/messenger"
-      chmod +x /opt/secrets/conjur/messenger
-      /opt/secrets/conjur/messenger
-      sleep infinity
----
 # Deployment for Conjur Secrets Provider - push to file mode as sidecar
 apiVersion: apps/v1
 kind: Deployment
@@ -78,17 +53,13 @@ spec:
       containers:
       # Our demo application
       - name: demo-application
-        image: redhat/ubi8:latest
-        command: ["/scripts/entry-point.sh"]
+        image: assafhazan/push-to-file:latest
         workingDir: /opt/secrets/conjur
         imagePullPolicy: IfNotPresent
         volumeMounts:
         # Path to the file with the secrets 
           - name: conjur-secrets
             mountPath: /opt/secrets/conjur
-        # Path to the entrypoint
-          - name: scripts
-            mountPath: /scripts
       # Sidecar
       - name: conjur-secrets-provider-push-to-file
         image: 'cyberark/secrets-provider-for-k8s:latest'
@@ -123,8 +94,3 @@ spec:
         - name: conjur-secrets
           emptyDir:
             medium: Memory
-        # Volume for entrypoint
-        - name: scripts
-          configMap:
-            name: push-to-file
-            defaultMode: 0755

@@ -4,8 +4,7 @@ LABEL maintainer=AssafHazan
 RUN  apk update \
   && apk add curl tar dumb-init \
   && mkdir -p /usr/local/lib/summon \
-  && mkdir -p /etc/summon/config \
-  && mkdir -p /etc/summon/demo_app \
+  && mkdir -p /scripts \
   && cd /usr/local/bin \
   && curl -sSL https://github.com/cyberark/summon/releases/download/v0.9.6/summon-linux-amd64.tar.gz \
       | tar xz \
@@ -17,8 +16,10 @@ RUN  apk update \
 RUN  mkdir -p /lib64 \
   && ln -fs /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2;
 
-# Will be mounted - no need to add hardcoded scripts
-#COPY config /etc/summon/config
-#COPY demo_app /etc/summon/demo_app
+WORKDIR /scripts
 
-ENTRYPOINT [ "dumb-init", "summon", "--provider", "summon-conjur", "-f", "/etc/summon/config/secrets.yml", "/etc/summon/demo_app/demo_consumer.sh" ]
+COPY ./scripts/secrets.yml /scripts/
+COPY ./scripts/demo-consumer.sh /scripts/
+COPY ./scripts/entry-point.sh /scripts/
+
+ENTRYPOINT [ "dumb-init", "summon", "--provider", "summon-conjur", "-f", "/scripts/secrets.yml", "/scripts/entry-point.sh" ]
