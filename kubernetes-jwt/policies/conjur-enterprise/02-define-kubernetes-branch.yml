@@ -41,6 +41,9 @@
     - !variable
       id: secret8
       owner: !group ../../admins
+    - !variable
+      id: messenger
+      owner: !group ../../admins
 
  # Allow applications/jwt layer to consume the secrets we have created
   - !permit
