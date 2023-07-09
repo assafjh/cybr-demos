@@ -18,8 +18,8 @@ RUN  mkdir -p /lib64 \
 
 WORKDIR /scripts
 
-COPY ./secrets.yml /scripts/
-COPY ./demo-consumer.sh /scripts/
-COPY ./entry-point.sh /scripts/
+COPY ./scripts/secrets.yml /scripts/
+COPY ./scripts/demo-consumer.sh /scripts/
+COPY ./scripts/entry-point.sh /scripts/
 
 ENTRYPOINT [ "dumb-init", "summon", "--provider", "summon-conjur", "-f", "/scripts/secrets.yml", "/scripts/entry-point.sh" ]
