@@ -1,30 +1,4 @@
 ---
-# This will config map will hold our scripts
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: jwt-retrieve
-  namespace: conjur-jwt
-data:
-  entry-point.sh: |
-      #!/bin/bash
-      echo "======================"
-      echo "Using Service Account JWT - taken from file:"
-      ls -ltr /var/run/secrets/kubernetes.io/serviceaccount/token
-      echo "======================"
-      ./retrieve.sh
-      sleep infinity
-  retrieve.sh: |
-    #!/bin/bash
-    # Using Service Account JWT
-    JWT=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-    # Authenticating to Conjur using above JWT
-    token=$(curl -k -s --request POST "$CONJUR_AUTHN_URL/$CONJUR_ACCOUNT/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$JWT")
-    # Retrieving secret using short lived access token revcieved from Conjur
-    secret=$(curl -k -s -X GET -H "Authorization: Token token=\"$token\"" "$CONJUR_APPLIANCE_URL/secrets/$CONJUR_ACCOUNT/variable/data/kubernetes/applications/safe/secret1")
-    # Printing the secret   
-    echo "SECRET1 value: $secret"
----
 # Deployment for an application that consumes Conjur secrets using REST API bash script
 apiVersion: apps/v1
 kind: Deployment
@@ -48,18 +22,9 @@ spec:
       serviceAccountName: conjur-demo-acct
       containers:
       - name: k8s-jwt-app
-        image: redhat/ubi8:latest
-        command: ["/scripts/entry-point.sh"]
-        workingDir: /scripts
+        image: assafhazan/rest-api-jwt-consumer:latest
         imagePullPolicy: IfNotPresent
         envFrom:
         - configMapRef:
             name: conjur-connect
-        volumeMounts:
-          - name: scripts
-            mountPath: /scripts
-      volumes:
-      - name: scripts
-        configMap:
-          name: jwt-retrieve 
-          defaultMode: 0755
+
