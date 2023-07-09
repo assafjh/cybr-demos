@@ -7,14 +7,14 @@ metadata:
   namespace: conjur-cert
 data:
   secrets.yml: |
-    SECRET2: !var kubernetes/applications/safe/secret2
+    SECRET2: !var data/kubernetes/applications/safe/secret2
   demo_consumer.sh: |
     #!/bin/sh
     echo "=================="
     echo "SECRET2: $SECRET2"
     echo "=================="
     # Adding the below to keep the container alive
-    while true; do sleep 36000; done
+    sleep infinity
 ---
 # Summon deployment manifest with empty centos application to consume the secrets
 apiVersion: apps/v1
@@ -39,6 +39,7 @@ spec:
       # Demo container - summon
       - name: summon-demo-app
         image: docker.io/assafhazan/summon:latest
+        workingDir: /etc/summon/demo_app
         imagePullPolicy: IfNotPresent
         env:
           - name: CONJUR_AUTHN_TOKEN_FILE
@@ -61,7 +62,7 @@ spec:
         name: cyberark-authn-k8s-for-summon
         env:
           - name: CONJUR_AUTHN_LOGIN
-            value: host/kubernetes/applications/demo-application-summon
+            value: host/data/kubernetes/applications/demo-application-summon
           - name: CONTAINER_MODE
             value: init
           - name: MY_POD_NAME
