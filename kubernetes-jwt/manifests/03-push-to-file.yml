@@ -54,6 +54,7 @@ spec:
       # Our demo application
       - name: demo-application
         image: assafhazan/push-to-file:latest
+        workingDir: /opt/secrets/conjur
         imagePullPolicy: IfNotPresent
         volumeMounts:
         # Path to the file with the secrets 
