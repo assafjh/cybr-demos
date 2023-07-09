@@ -1,9 +1,11 @@
 #!/bin/bash
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
-SAFE_PATH=kubernetes/applications/safe/secret
+SAFE_PATH=data/kubernetes/applications/safe/secret
 # Using kubectl/oc
 COP_CLI=kubectl
+# If needed, modify the below to configure Conjur CLI location
+CONJUR_CLI=conjur
 #============ Script ===============
 # Retrieving Kubernetes API URL
 COP_API_URL="$($COP_CLI config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.server}')"
@@ -23,16 +25,16 @@ $COP_CLI get secret "$TOKEN_SECRET_NAME" -n conjur-cert -o json --output='jsonpa
 #==========
 
 # Checking if a user is logged-in to Conjur-CLI
-conjur whoami
+"$CONJUR_CLI" whoami
 
 # Populate safe secrets with values
 for i in {1..8}
 do
    if command -p md5sum  /dev/null >/dev/null 2>&1
     then
-        conjur variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5sum | head -c 20; echo;)"
+        "$CONJUR_CLI" variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5sum | head -c 20; echo;)"
     else
-        conjur variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5 | head -c 20; echo;)"
+        "$CONJUR_CLI" variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5 | head -c 20; echo;)"
     fi
 done
 
@@ -54,8 +56,8 @@ openssl req -x509 -new -nodes -key ./authn-generated-ca.key -sha1 -days 3650 -se
 openssl x509 -in ./authn-generated-ca.cert -text -noout
 
 # Populate authenticator values
-conjur variable set -i "conjur/authn-k8s/k8s-cluster1/ca/key" -v "$(cat ./authn-generated-ca.key)"
-conjur variable set -i "conjur/authn-k8s/k8s-cluster1/ca/cert" -v "$(cat ./authn-generated-ca.cert)"
-conjur variable set -i "conjur/authn-k8s/k8s-cluster1/kubernetes/service-account-token" -v "$SA_TOKEN"
-conjur variable set -i "conjur/authn-k8s/k8s-cluster1/kubernetes/ca-cert" -v "$(cat ./kube-api-public-key.pem)"
-conjur variable set -i "conjur/authn-k8s/k8s-cluster1/kubernetes/api-url" -v "$COP_API_URL"
+"$CONJUR_CLI" variable set -i "conjur/authn-k8s/k8s-cluster1/ca/key" -v "$(cat ./authn-generated-ca.key)"
+"$CONJUR_CLI" variable set -i "conjur/authn-k8s/k8s-cluster1/ca/cert" -v "$(cat ./authn-generated-ca.cert)"
+"$CONJUR_CLI" variable set -i "conjur/authn-k8s/k8s-cluster1/kubernetes/service-account-token" -v "$SA_TOKEN"
+"$CONJUR_CLI" variable set -i "conjur/authn-k8s/k8s-cluster1/kubernetes/ca-cert" -v "$(cat ./kube-api-public-key.pem)"
+"$CONJUR_CLI" variable set -i "conjur/authn-k8s/k8s-cluster1/kubernetes/api-url" -v "$COP_API_URL"

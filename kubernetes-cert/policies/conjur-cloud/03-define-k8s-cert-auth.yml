@@ -1,0 +1,28 @@
+---
+# Load policy into conjur/authn-k8s branch
+# This policy defines a Kubernetes authenticator
+- !policy
+  id: k8s-cluster1
+  owner: !group /data/kubernetes/admins
+  annotations:
+    description: K8s Authenticator policy definitions
+
+  body:
+  # vars for ocp/k8s api url & access creds
+  - !variable kubernetes/service-account-token
+  - !variable kubernetes/ca-cert
+  - !variable kubernetes/api-url
+
+  # vars for CA for this service ID
+  - !variable ca/cert
+  - !variable ca/key
+
+  - !webservice
+    annotations:
+      description: Authenticator service for K8s cluster demo-cluster
+
+  # Grant kubernetes/applications/cert layer authentication privileges
+  - !permit
+    role: !layer ../../../data/kubernetes/applications/cert
+    privilege: [ read, authenticate ]
+    resource: !webservice
