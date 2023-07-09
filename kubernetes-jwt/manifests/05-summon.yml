@@ -40,7 +40,7 @@ spec:
       - name: summon-demo-app
         image: docker.io/assafhazan/summon:latest
         workingDir: /etc/summon/demo_app
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         env:
           - name: CONJUR_AUTHN_JWT_SERVICE_ID
             valueFrom:

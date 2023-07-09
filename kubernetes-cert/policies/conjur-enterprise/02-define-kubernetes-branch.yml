@@ -1,0 +1,83 @@
+---
+# Load policy into data/kubernetes branch
+# This policy defines the demo branch kubernetes
+
+- !policy
+  id: applications
+  owner: !group admins
+
+# applications/cert is a layer that will aggregate permissions for all kubernetes applications that want to use k8s cert authn to consume Conjur secrets
+- !layer
+  id: applications/cert
+  owner: !group admins
+
+# create secrets
+- !policy
+  id: applications/safe
+  owner: !group admins
+  body:
+  - &safe1-secrets
+    - !variable
+      id: secret1
+      owner: !group ../../admins
+    - !variable
+      id: secret2
+      owner: !group ../../admins
+    - !variable
+      id: secret3
+      owner: !group ../../admins
+    - !variable
+      id: secret4
+      owner: !group ../../admins
+    - !variable
+      id: secret5
+      owner: !group ../../admins
+    - !variable
+      id: secret6
+      owner: !group ../../admins
+    - !variable
+      id: secret7
+      owner: !group ../../admins
+    - !variable
+      id: secret8
+      owner: !group ../../admins
+    - !variable
+      id: messenger
+      owner: !group ../../admins
+
+ # Allow applications/certs layer to consume the secrets we have created
+  - !permit
+    role: !layer ../cert
+    privileges: [ read, execute ]
+    resource: *safe1-secrets
+
+# Create the application identities: that we will use to authenticate to Conjur
+- &hosts
+  - !host
+    id: applications/demo-application-push-to-file
+    owner: !group admins
+    annotations:
+      authn-k8s/namespace: conjur-cert
+      authn-k8s/service-account: conjur-demo-acct
+      authn-k8s/authentication-container-name: conjur-secrets-provider-push-to-file
+  - !host
+    id: applications/demo-application-push-to-secrets
+    owner: !group admins
+    annotations:
+      authn-k8s/namespace: conjur-cert
+      authn-k8s/service-account: conjur-demo-acct
+      authn-k8s/authentication-container-name: conjur-secrets-provider-push-to-secrets
+  - !host
+    id: applications/demo-application-summon
+    owner: !group admins
+    annotations:
+      authn-k8s/namespace: conjur-cert
+      authn-k8s/service-account: conjur-demo-acct
+      authn-k8s/authentication-container-name: cyberark-authn-k8s-for-summon
+    
+# Add the hosts we have created to the layer 
+- !grant
+  roles:
+    - !layer applications/cert
+  members: *hosts
+

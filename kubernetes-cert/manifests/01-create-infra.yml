@@ -45,6 +45,10 @@ subjects:
 - kind: ServiceAccount
   name: conjur-demo-acct
   namespace: conjur-cert
+# If using a follower, the follower service account will also need permissions to the pods, uncomment the below.
+#- kind: ServiceAccount
+#  name: conjur-demo-acct
+#  namespace: conjur-cert-follower
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
