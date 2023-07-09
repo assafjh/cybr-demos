@@ -1,21 +1,4 @@
 ---
-# This will config map will hold our summon configuration
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: summon-config
-  namespace: conjur-cert
-data:
-  secrets.yml: |
-    SECRET2: !var data/kubernetes/applications/safe/secret2
-  demo_consumer.sh: |
-    #!/bin/sh
-    echo "=================="
-    echo "SECRET2: $SECRET2"
-    echo "=================="
-    # Adding the below to keep the container alive
-    sleep infinity
----
 # Summon deployment manifest with empty centos application to consume the secrets
 apiVersion: apps/v1
 kind: Deployment
@@ -39,7 +22,6 @@ spec:
       # Demo container - summon
       - name: summon-demo-app
         image: docker.io/assafhazan/summon:latest
-        workingDir: /etc/summon/demo_app
         imagePullPolicy: IfNotPresent
         env:
           - name: CONJUR_AUTHN_TOKEN_FILE
@@ -48,10 +30,6 @@ spec:
           - configMapRef:
               name: conjur-connect
         volumeMounts:
-          - name: summon-conf
-            mountPath: /etc/summon/config
-          - name: summon-conf
-            mountPath: /etc/summon/demo_app
           - mountPath: /run/conjur
             name: conjur-access-token
             readOnly: true
