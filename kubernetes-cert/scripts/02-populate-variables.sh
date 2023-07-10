@@ -1,11 +1,16 @@
 #!/bin/bash
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
-SAFE_PATH=data/kubernetes/applications/safe/secret
+SAFE_PATH=data/kubernetes/applications/safe/
 # Using kubectl/oc
 COP_CLI=kubectl
 # If needed, modify the below to configure Conjur CLI location
 CONJUR_CLI=conjur
+# Postgres username and password details
+APPLICATION_DB_USER=reception
+APPLICATION_DB_PASSWORD=vet_123456
+APPLICATION_DB_HOST=$DB_HOSTNAME
+APPLICATION_DB_PORT=5432
 #============ Script ===============
 # Retrieving Kubernetes API URL
 COP_API_URL="$($COP_CLI config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.server}')"
@@ -32,11 +37,15 @@ for i in {1..8}
 do
    if command -p md5sum  /dev/null >/dev/null 2>&1
     then
-        "$CONJUR_CLI" variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5sum | head -c 20; echo;)"
+        "$CONJUR_CLI" variable set -i "${SAFE_PATH}secret$i" -v "$(echo $RANDOM | md5sum | head -c 20; echo;)"
     else
-        "$CONJUR_CLI" variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5 | head -c 20; echo;)"
+        "$CONJUR_CLI" variable set -i "${SAFE_PATH}secret$i" -v "$(echo $RANDOM | md5 | head -c 20; echo;)"
     fi
 done
+conjur variable set -i "${SAFE_PATH}postgres-username" -v "$APPLICATION_DB_USER"
+conjur variable set -i "${SAFE_PATH}postgres-password" -v "$APPLICATION_DB_PASSWORD"
+conjur variable set -i "${SAFE_PATH}postgres-hostname" -v "$APPLICATION_DB_HOST"
+conjur variable set -i "${SAFE_PATH}postgres-port" -v "$APPLICATION_DB_PORT"
 
 # Generating certificates for the authenticator
 CONFIG="
