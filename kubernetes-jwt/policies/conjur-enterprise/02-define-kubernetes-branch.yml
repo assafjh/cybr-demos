@@ -44,7 +44,19 @@
     - !variable
       id: messenger
       owner: !group ../../admins
-
+    - !variable
+      id: postgres-username
+      owner: !group ../../admins
+    - !variable
+      id: postgres-password
+      owner: !group ../../admins
+    - !variable
+      id: postgres-hostname
+      owner: !group ../../admins
+    - !variable
+      id: postgres-port
+      owner: !group ../../admins
+      
  # Allow applications/jwt layer to consume the secrets we have created
   - !permit
     role: !layer ../jwt
