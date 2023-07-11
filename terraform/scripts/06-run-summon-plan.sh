@@ -4,7 +4,7 @@
 #============ Variables ===============
 source .env
 # Conjur identity
-export CONJUR_AUTHN_LOGIN=$CONJUR_IDENTITY
+export CONJUR_AUTHN_LOGIN=host/data/terraform/plans/summon/plan1
 # Conjur identity api key
 export CONJUR_AUTHN_API_KEY=$CONJUR_API_KEY
 #============ Script ===============
