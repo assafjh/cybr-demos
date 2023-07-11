@@ -1,61 +1,61 @@
 ---
-# Load policy into terraform branch
+# Load policy into data/terraform branch
 # This policy defines the demo branch terraform
 
 - !policy
   id: plans
-  owner: !group managers
+  owner: !group admins
 
 # plans/attributes is a layer that will aggregate safe permissions for plan attributes
 - !layer
   id: plans/attributes
-  owner: !group managers
+  owner: !group admins
 
 # plans/envvars is a layer that will aggregate safe permissions for plan envvars
 - !layer
   id: plans/envvars
-  owner: !group managers
+  owner: !group admins
 
 # plans/summon is a layer that will aggregate safe permissions for plan summon
 - !layer
   id: plans/summon
-  owner: !group managers
+  owner: !group admins
 
 # create secrets
 - !policy
   id: plans/safe
-  owner: !group managers
+  owner: !group admins
   body:
   - &attributes-secrets
     - !variable
       id: attributes/secret1
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: attributes/secret2
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: attributes/secret3
-      owner: !group ../../managers
+      owner: !group ../../admins
   - &envvars-secrets
     - !variable
       id: envvars/secret1
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: envvars/secret2
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: envvars/secret3
-      owner: !group ../../managers
+      owner: !group ../../admins
   - &summon-secrets
     - !variable
       id: summon/secret1
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: summon/secret2
-      owner: !group ../../managers
+      owner: !group ../../admins
     - !variable
       id: summon/secret3
-      owner: !group ../../managers
+      owner: !group ../../admins
 
  # Allow plans/attributes layer to consume the secrets we have created
   - !permit
@@ -78,13 +78,13 @@
 # Create the Plan identities that we will use to authenticate to Conjur 
 - !host
   id: plans/attributes/plan1
-  owner: !group managers
+  owner: !group admins
 - !host
   id: plans/envvars/plan1
-  owner: !group managers
+  owner: !group admins
 - !host
   id: plans/summon/plan1
-  owner: !group managers
+  owner: !group admins
 
 # Add the hosts we have created to their respective layer
 - !grant
