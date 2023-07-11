@@ -12,15 +12,15 @@ provider "conjur" {
     # Path to Conjur public key file
     ssl_cert_path = "$CONJUR_CERT_FILE"
     # Conjur Account
-    account = "$CONJUR_ACCOUNT"
+    account = "conjur"
     # Conjur identity
-    login = "$CONJUR_AUTHN_LOGIN"
+    login = "host/data/terraform/plans/attributes/plan1"
     # Conjur identity api key
     api_key = "$CONJUR_AUTHN_API_KEY"
 }
 
 data "conjur_secret" "secretvar" {  
-    name = "terraform/plans/safe/attributes/secret1"
+    name = "data/terraform/plans/safe/attributes/secret1"
 }  
 
 output "attributes_output" {  
