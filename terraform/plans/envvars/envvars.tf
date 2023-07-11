@@ -10,7 +10,7 @@ provider "conjur" {
 }
 
 data "conjur_secret" "secretvar" {  
- name = "terraform/plans/safe/envvars/secret2"
+ name = "data/terraform/plans/safe/envvars/secret2"
 }  
 
 output "envvars_output" {  
