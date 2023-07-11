@@ -1,12 +1,22 @@
 ---
+# This will config map will hold our spring application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-app-config
+  namespace: conjur-jwt
+data:
+  config.properties: |
+    spring.datasource.url=jdbc:postgresql://$POSTGRES_HOSTNAME:$POSTGRES_PORT/vet
+---
 # Deployment for Conjur Secrets Provider - push to file mode as sidecar
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: conjur-push-to-file
-  name: demo-sidecar-push-to-file-jwt
-  namespace: spring-boot-demo
+  name: demo-sidecar-springboot-push-to-file
+  namespace: conjur-jwt
 spec:
   replicas: 1
   selector:
@@ -20,7 +30,7 @@ spec:
         # Secrets Provider configuration
         conjur.org/container-mode: sidecar
         conjur.org/secrets-destination: file
-        conjur.org/conjur-secrets-policy-path.safe1: kubernetes/applications/safe/
+        conjur.org/conjur-secrets-policy-path.safe1: data/kubernetes/applications/safe/
         conjur.org/conjur-secrets.safe1: |
           - username: postgres-username
           - password: postgres-password
@@ -38,6 +48,11 @@ spec:
       - name: spring-boot-demo-app
         image: docker.io/assafhazan/spring-boot-zoo-demo:v1
         imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "100Mi"
+          limits:
+            memory: "200Mi"
         volumeMounts:
           - name: app-conf
             mountPath: /etc/demo/config.properties
