@@ -6,7 +6,7 @@
 COP_CLI=kubectl
 
 #============ Script ===============
-# Assuming the secret name is "secret1", this will show the value
+# Printing secret1-8
 echo secret1: "$($COP_CLI get secret -n conjur-external-secrets conjur -o jsonpath="{.data.secret1}"  | base64 --decode && echo)"
 echo secret2: "$($COP_CLI get secret -n conjur-external-secrets conjur -o jsonpath="{.data.secret2}"  | base64 --decode && echo)"
 echo secret3: "$($COP_CLI get secret -n conjur-external-secrets conjur -o jsonpath="{.data.secret3}"  | base64 --decode && echo)"
