@@ -3,10 +3,65 @@ This demo shows how to consume secrets from Conjur in GitLab CI.
 
 This demo will authenticate to Conjur using GitLab's auto generated JWT  defined under `id_tokens` .
 
-#### Use cases:
+#### Use cases
 1. Job that uses REST API to consume a secret.
 2. Job that uses Summon to consume a secret.
 3. Job that uses Docker executor to consume a secret.
+
+# Table of Contents
+<!-- TOC -->
+
+- [GitLab CI integration](#gitlab-ci-integration)
+            - [Use cases](#use-cases)
+    - [How does the JWT Authenticator works?](#how-does-the-jwt-authenticator-works)
+    - [Deploy GitLab Server](#deploy-gitlab-server)
+    - [Deploy GitLab Runner](#deploy-gitlab-runner)
+    - [Loading Conjur policies](#loading-conjur-policies)
+        - [Conjur Enterprise](#conjur-enterprise)
+            - [Root branch](#root-branch)
+                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
+                - [Update root policy](#update-root-policy)
+                - [Logout from Conjur](#logout-from-conjur)
+            - [GitLab branch](#gitlab-branch)
+                - [Login as user gitlab-admin01](#login-as-user-gitlab-admin01)
+            - [Load gitlab policy](#load-gitlab-policy)
+                - [Logout from Conjur CLI](#logout-from-conjur-cli)
+            - [JWT Authenticator](#jwt-authenticator)
+                - [Login as user admin01](#login-as-user-admin01)
+                - [Load the authenticator policy](#load-the-authenticator-policy)
+                - [Enable the authenticator](#enable-the-authenticator)
+                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
+                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
+            - [Logout from Conjur CLI](#logout-from-conjur-cli)
+        - [Conjur Enterprise](#conjur-enterprise)
+            - [Data branch](#data-branch)
+                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
+                - [Update data policy](#update-data-policy)
+                - [Logout from Conjur](#logout-from-conjur)
+            - [GitLab branch](#gitlab-branch)
+                - [Login as user gitlab-admin01](#login-as-user-gitlab-admin01)
+            - [Load gitlab policy](#load-gitlab-policy)
+                - [Logout from Conjur CLI](#logout-from-conjur-cli)
+            - [JWT Authenticator](#jwt-authenticator)
+                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
+                - [Load the authenticator policy](#load-the-authenticator-policy)
+                - [Enable the authenticator](#enable-the-authenticator)
+                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
+                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
+            - [Logout from Conjur CLI](#logout-from-conjur-cli)
+    - [Create a demo project at GitLab instance](#create-a-demo-project-at-gitlab-instance)
+            - [At Instance Dashboard screen, click "New Project"](#at-instance-dashboard-screen-click-new-project)
+            - [Select "Create Blank Project"](#select-create-blank-project)
+            - [Fill in a project name I have used "Demo"](#fill-in-a-project-name-i-have-used-demo)
+            - [Click Create Project.](#click-create-project)
+    - [Upload .gitlab-ci.yml to the project](#upload-gitlab-ciyml-to-the-project)
+        - [Modify line #3 with the correct Conjur URL](#modify-line-3-with-the-correct-conjur-url)
+        - [Upload the file jobs/.gitlab-ci.yml to the project root](#upload-the-file-jobsgitlab-ciyml-to-the-project-root)
+    - [Check the project's job results](#check-the-projects-job-results)
+        - [At GitLab UI, click CI/CD -> Jobs](#at-gitlab-ui-click-cicd---jobs)
+        - [Take a look at the jobs:](#take-a-look-at-the-jobs)
+
+<!-- /TOC -->
 
 ## How does the JWT Authenticator works?
 ![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)

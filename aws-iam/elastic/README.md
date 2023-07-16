@@ -2,6 +2,50 @@
 
 It is assumed an IAM role is already associated with the ec2 instance. 
 
+# Table of Contents
+<!-- TOC -->
+
+- [Use case: Amazon Elastic Compute Cloud EC2 IAM role authentication](#use-case-amazon-elastic-compute-cloud-ec2-iam-role-authentication)
+    - [Loading Conjur policies](#loading-conjur-policies)
+        - [Conjur Enterprise](#conjur-enterprise)
+            - [Root branch](#root-branch)
+                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
+                - [Update root policy](#update-root-policy)
+                - [Logout from Conjur](#logout-from-conjur)
+            - [AWS branch](#aws-branch)
+                - [Login as user aws-admin01](#login-as-user-aws-admin01)
+                - [Load aws policy](#load-aws-policy)
+                - [Logout from Conjur CLI](#logout-from-conjur-cli)
+            - [IAM Authenticator](#iam-authenticator)
+                - [Login as user admin01](#login-as-user-admin01)
+                - [Load the authenticator policy](#load-the-authenticator-policy)
+                - [Enable the authenticator](#enable-the-authenticator)
+            - [Populate safe variables](#populate-safe-variables)
+            - [Logout from Conjur CLI](#logout-from-conjur-cli)
+        - [Conjur Cloud](#conjur-cloud)
+            - [Data branch](#data-branch)
+                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
+                - [Update data policy](#update-data-policy)
+                - [Logout from Conjur](#logout-from-conjur)
+            - [AWS branch](#aws-branch)
+                - [Login as user aws-admin01](#login-as-user-aws-admin01)
+                - [Load aws policy](#load-aws-policy)
+                - [Logout from Conjur CLI](#logout-from-conjur-cli)
+            - [IAM Authenticator](#iam-authenticator)
+                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
+                - [Load the authenticator policy](#load-the-authenticator-policy)
+                - [Enable the authenticator](#enable-the-authenticator)
+            - [Populate safe variables](#populate-safe-variables)
+            - [Logout from Conjur CLI](#logout-from-conjur-cli)
+    - [Run the use case](#run-the-use-case)
+        - [Build the python environment](#build-the-python-environment)
+        - [Modify .env with relevant environment details](#modify-env-with-relevant-environment-details)
+        - [Load .env](#load-env)
+        - [Run python shell script: ec2](#run-python-shell-script-ec2)
+        - [Validate that the output is correct](#validate-that-the-output-is-correct)
+
+<!-- /TOC -->
+
 ## 1. Loading Conjur policies
 - Policy statements are loaded into either the Conjur root/data policy branch or a policy branch under root/data.
 - Per best practices, most policies will be created in branches off of root/data.
