@@ -1,4 +1,4 @@
-# Deploy Conjur
+# Deploy Conjur Enterprise
 These scripts will quickly deploy Conjur containers.
 
 ### Uses

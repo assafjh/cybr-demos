@@ -15,38 +15,71 @@ scripts/01-install-ansible﻿.sh
 scripts/02-install-plugin.sh.sh
 ```
 ## 3. Loading Conjur policies
-- Policy statements are loaded into either the Conjur root policy branch or a policy branch under root
-- Per best practices, most policies will be created in branches off of root. 
+- Policy statements are loaded into either the Conjur root/data policy branch or a policy branch under root/data.
+- Per best practices, most policies will be created in branches off of root/data.
 - Branches have the following advantages: better organizing, help policy isolation for least privilege assignments, enforce RBAC, allowing relevant users to manage their own policy.
 - The demo uses an organizational structure that can be found under the folder ***policies***.
-### 1. Root branch
-#### 1. Login to Conjur as admin using the CLI
+### Conjur Enterprise
+#### Root branch
+##### 1. Login to Conjur as admin using the CLI
 ```bash
 conjur login -i admin
 ```
-#### 2. Load root policy
+##### 2. Update root policy
 ```bash
-conjur policy update -b root -f policies/01-base.yml | tee -a 01-base.log
+conjur policy update -b root -f policies/conjur-enterprise/01-base.yml | tee -a 01-base.log
 ```
-#### 3. Logout from Conjur
+##### 3. Logout from Conjur
 ```Bash
 conjur logout
 ```
-### 2. Ansible branch
-#### 1. Login as user ansible-manager01
-- Use the API key as a password from the 01-base.log file for the user ansible-manager01
+#### Ansible branch
+##### 1. Login as user ansible-admin01
+- Use the API key as a password from the 01-base.log file for the user ansible-admin01
 ```bash
-conjur login -i ansible-manager01
+conjur login -i ansible-admin01
 ```
-#### 2. Load ansible policy
+##### 2. Load ansible policy
 ```bash
-conjur policy update -b ansible -f policies/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
+conjur policy update -b data/ansible -f policies/conjur-enterprise/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
 ```
-#### 3. Populate Conjur variables
+##### 3. Populate Conjur variables
 ```Bash
 scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
 ```
-### 5. Logout from Conjur CLI
+##### 4. Logout from Conjur CLI
+```Bash
+conjur logout
+```
+### Conjur Cloud
+#### Data branch
+##### 1. Login to Conjur as admin using the CLI
+```bash
+conjur login -i <username>
+```
+##### 2. Update data policy
+```bash
+conjur policy update -b data -f policies/conjur-cloud/01-base.yml | tee -a 01-base.log
+```
+##### 3. Logout from Conjur
+```Bash
+conjur logout
+```
+#### Ansible branch
+##### 1. Login as user ansible-admin01
+- Use the API key as a password from the 01-base.log file for the user ansible-admin01
+```bash
+conjur login -i ansible-admin01
+```
+##### 2. Load ansible policy
+```bash
+conjur policy update -b data/ansible -f policies/conjur-cloud/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
+```
+##### 3. Populate Conjur variables
+```Bash
+scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
+```
+##### 4. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
@@ -62,15 +95,15 @@ For example:
 ...
 #============ Variables ===============
 # Conjur tenant
-export CONJUR_ACCOUNT=demo
-# Conjur FQDN with schem and port
-export CONJUR_APPLIANCE_URL=https://conjur:8443
+export CONJUR_ACCOUNT=conjur
+# Conjur FQDN with scheme and port
+export CONJUR_APPLIANCE_URL=https://conjur:443
 # Conjur host identity
-export CONJUR_AUTHN_LOGIN=host/ansible/apps/conjur-demo
+export CONJUR_AUTHN_LOGIN=data/host/ansible/apps/conjur-demo
 # Conjur host identity API key
 export CONJUR_AUTHN_API_KEY=1234
 # Conjur variable path
-export CONJUR_VARIABLE_PATH=ansible/apps/safe/secret1
+export CONJUR_VARIABLE_PATH=data/ansible/apps/safe/secret1
 # Conjur public key file path, in case of Conjur cloud - comment line #14
 export CONJUR_CERT_FILE="$HOME"/conjur-server.pem
 ...
