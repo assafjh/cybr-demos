@@ -2,6 +2,11 @@
 
 This guide will demonstrate a pipeline authenticating via a Self-Hosted Linux Agent with a user/system assigned identity. 
 
+Two ways to consume a secret will be demoed
+- Rest API
+- CyberArk Conjur Service Connector
+	- Can be added to ADO via this link: [CyberArk Conjur Service Connector](https://marketplace.visualstudio.com/items?itemName=CyberArk.cyberark-conjur-credentials)
+
 It is assumed you have access to an Azure Linux VM that can be used as an ADO Agent.
 
 It is assumed that you need to assign a user identity to the VM - Instructions are provided and can be skipped in case you already have an identity assigned to your machine.
@@ -43,31 +48,32 @@ User assigned managed identities: conjur-managed-acct01 # Select here the identi
 5. Click *Add*
 
 ## 3. Loading Conjur policies
-- Policy statements are loaded into either the Conjur  root policy branch or a policy branch under root
-- Per best practices, most policies will be created in branches off of root. 
+- Policy statements are loaded into either the Conjur root/data policy branch or a policy branch under root/data.
+- Per best practices, most policies will be created in branches off of root/data.
 - Branches have the following advantages: better organizing, help policy isolation for least privilege assignments, enforce RBAC, allowing relevant users to manage their own policy.
 - The demo uses an organizational structure that can be found under the folder ***policies***.
-### 1. Root branch
-#### 1. Login to Conjur as admin using the CLI
+### Conjur Enterprise
+#### Root branch
+##### 1. Login to Conjur as admin using the CLI
 ```bash
 conjur login -i admin
 ```
-#### 2. Load root policy
+##### 2. Update root policy
 ```bash
-conjur policy update -b root -f policies/01-base.yml | tee -a 01-base.log
+conjur policy update -b root -f policies/conjur-enterprise/01-base.yml | tee -a 01-base.log
 ```
-#### 3. Logout from Conjur
+##### 3. Logout from Conjur
 ```Bash
 conjur logout
 ```
-### 2. Azure branch
-#### 1. Login as user azure-manager01
-- Use the API key as a password from the 01-base.log file for the user azure-manager01
+#### Azure branch
+##### 1. Login as user azure-manager01
+- Use the API key as a password from the 01-base.log file for the user azure-admin01
 ```bash
-conjur login -i azure-manager01
+conjur login -i azure-admin01
 ```
-#### 2. Load azure policy
-- Before running the export commands below, modify them with the correct values, if a *system assigned identity* is going to be used, comment line #42 and uncomment line #43 at the file *policies/02-define-azure-branch.yml*
+##### 2. Load azure policy
+- Before running the export commands below, modify them with the correct values, if a *system assigned identity* is going to be used, comment line #42 and uncomment line #43 at the file *policies/conjur-enterprise/02-define-azure-branch.yml*
 ```bash
 export SUBSCRIPTION_ID=<MY_AZURE_SUBSCRIPTION_ID>
 export RESOURCE_GROUP=<MY_AZURE_RESOURCE_GROUP>
@@ -75,24 +81,24 @@ export RESOURCE_GROUP=<MY_AZURE_RESOURCE_GROUP>
 export USER_ASSIGNED_IDENTITY_NAME=<USER_ASSIGNED_IDENTITY_NAME>
 # export the line below only if system assigned identity is going to be used
 export OBJECT_ID=<MY_AZURE_SYSTEM_ASSIGNED_IDENTITY_OBJECT_ID>
-envsubst < policies/02-define-azure-branch.yml > 02-define-azure-branch.yml
-conjur policy update -b azure -f 02-define-azure-branch.yml | tee -a 02-define-azure-branch.log
+envsubst < conjur-enterprise/policies/02-define-azure-branch.yml > 02-define-azure-branch.yml
+conjur policy update -b data/azure -f 02-define-azure-branch.yml | tee -a 02-define-azure-branch.log
 ```
-#### 3. Logout from Conjur CLI
+##### 3. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
-### 3. Azure Authenticator
-#### 1. Login as user admin01
+#### Azure Authenticator
+##### 1. Login as user admin01
  - Use the API key as a password from the 01-base.log file for the user admin01
 ```bash
 conjur login -i admin01
 ```
-#### 2. Load the authenticator policy
+##### 2. Load the authenticator policy
 ```Bash
-conjur policy update -b root -f policies/03-define-azure-auth.yml | tee -a 03-define-azure-auth.log
+conjur policy update -b root -f policies/conjur-enterprise/03-define-azure-auth.yml | tee -a 03-define-azure-auth.log
 ```
-#### 3. Enable the authenticator
+##### 3. Enable the authenticator
 - This step will work from the Conjur Leader VM only.
 1. Modify the variables at enable authenticator script:
 ```bash 
@@ -102,7 +108,7 @@ vi scripts/01-enable-authenticator.sh
 ```bash
 scripts/01-enable-authenticator.sh
 ```
-#### 5. Populate the secrets and Azure authenticator variables
+#### Populate secrets and Azure authenticator variables
 1. Modify the variables at populate variables script:
 ```bash 
 vi scripts/02-populate-variables.sh
@@ -110,11 +116,76 @@ vi scripts/02-populate-variables.sh
 ```Bash
 scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```
-### 5. Logout from Conjur CLI
+#### Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
-
+### Conjur Cloud
+#### Data branch
+##### 1. Login to Conjur as admin using the CLI
+```bash
+conjur login -i <username>
+```
+##### 2. Update data policy
+```bash
+conjur policy update -b data -f policies/conjur-cloud/01-base.yml | tee -a 01-base.log
+```
+##### 3. Logout from Conjur
+```Bash
+conjur logout
+```
+#### Azure branch
+##### 1. Login as user azure-manager01
+- Use the API key as a password from the 01-base.log file for the user azure-admin01
+```bash
+conjur login -i azure-admin01
+```
+##### 2. Load azure policy
+- Before running the export commands below, modify them with the correct values, if a *system assigned identity* is going to be used, comment line #42 and uncomment line #43 at the file *policies/conjur-cloud/02-define-azure-branch.yml*
+```bash
+export SUBSCRIPTION_ID=<MY_AZURE_SUBSCRIPTION_ID>
+export RESOURCE_GROUP=<MY_AZURE_RESOURCE_GROUP>
+# export the line below only if user assigned identity is going to be used
+export USER_ASSIGNED_IDENTITY_NAME=<USER_ASSIGNED_IDENTITY_NAME>
+# export the line below only if system assigned identity is going to be used
+export OBJECT_ID=<MY_AZURE_SYSTEM_ASSIGNED_IDENTITY_OBJECT_ID>
+envsubst < policies/conjur-cloud/02-define-azure-branch.yml > 02-define-azure-branch.yml
+conjur policy update -b data/azure -f 02-define-azure-branch.yml | tee -a 02-define-azure-branch.log
+```
+##### 3. Logout from Conjur CLI
+```Bash
+conjur logout
+```
+#### Azure Authenticator
+##### 1. Login to Conjur as admin using the CLI
+```bash
+conjur login -i <username>
+```
+##### 2. Load the authenticator policy
+```Bash
+conjur policy update -b conjur/authn-azure -f policies/conjur-cloud/03-define-azure-auth.yml | tee -a 03-define-azure-auth.log
+```
+##### 3. Enable the authenticator
+1. Modify the variables at enable authenticator script:
+```bash 
+vi scripts/01-enable-authenticator.sh
+```
+2. Run the script:
+```bash
+scripts/01-enable-authenticator.sh
+```
+#### Populate secrets and Azure authenticator variables
+1. Modify the variables at populate variables script:
+```bash 
+vi scripts/02-populate-variables.sh
+```
+```Bash
+scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
+```
+#### Logout from Conjur CLI
+```Bash
+conjur logout
+```
 ## 4. Create a demo project at Azure DevOps
 ### 1. Create a new project
 1. Connect to your ADO organization.
@@ -195,19 +266,19 @@ variables:
 # Lines #9 - #24
 # Conjur URL
 - name: conjur_url
-  value: https://conjur-leader.example.local:8443
+  value: https://conjur-leader.example.local:443
 # Conjur Authenticator ID
 - name: CONJUR_AUTHN_ID
   value: devops
 # Conjur Tenant ID
 - name: conjur_account
-  value: demo
+  value: conjur
 # Conjur Identity (Default value is configured below)
 - name: conjur_identity
-  value: host%2Fazure%2Fapps%2Fmanaged-identity01
+  value: host%2Fdata%2Fazure%2Fapps%2Fmanaged-identity01
 # Conjur variable path (Default value is configured below)
 - name: conjur_variable_path
-  value: azure/apps/safe/secret1
+  value: data/azure/apps/safe/secret1
 ```
 2. Go to the project *Conjur Demo*
 3. Select *Pipelines*
