@@ -124,7 +124,7 @@ scripts/01-enable-authenticator.sh
 scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```
 ##### 6. Check that the authenticator is working properly
- 1. Modify the variables at enable authenticator script:
+ 1. Modify the variables at check authenticator script:
 ```bash 
 vi scripts/03-check-authenticator.sh
 ```
@@ -187,7 +187,7 @@ scripts/01-enable-authenticator.sh
 scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```
 ##### 6. Check that the authenticator is working properly
- 1. Modify the variables at enable authenticator script:
+ 1. Modify the variables at check authenticator script:
 ```bash 
 vi scripts/03-check-authenticator.sh
 ```
