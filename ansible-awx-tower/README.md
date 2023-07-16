@@ -12,7 +12,7 @@ If needed, instructions are supplied for deploying an AWX instance on your Kuber
 - If needed, install Ansible AWX
 - Installation based on instructions from: [AWX Operator GitHub](https://github.com/ansible/awx-operator) and modified based on version 1.1.3
 - All work will be done under the ***manifests*** folder
-### 1. Modify kustomization.yml
+### Modify kustomization.yml
 #### 1. If needed, use a custom certificate
 **Note**: You will need to provide a private and public key and save it to the manifests folder.
 Uncomment lines #9 - #13
@@ -57,8 +57,8 @@ Modify line #46
 namespace: awx
 ...
 ```
-### 2. Modify pv.yml
-#### 1. If there is a need for a persistent Postgres volume
+### Modify pv.yml
+#### If there is a need for a persistent Postgres volume
 **Note**: you will need to create a directory for the volume mount on your node.
 Uncomment and modify lines #3 - #15
 ```yaml
@@ -79,7 +79,7 @@ spec:
      path: /awx-data/postgres-13 # Path to your directory on the node
 ...
 ```
-#### 2. Modify the folder path for persistent projects volume
+#### Modify the folder path for persistent projects volume
 ##### 1. Create the projects folder on the node
 ```bash
 AWX_PROJECTS_PARENT_PATH=$HOME # Modify to desired path
@@ -89,26 +89,26 @@ mkdir -p "$AWX_PROJECTS_PARENT_PATH"/awx-data/projects
 ```yaml
     path: /home/ec2-user/awx-data/projects
 ```
-### 3. Modify awx.yml
-#### 1.  If using a custom certificate
+### Modify awx.yml
+#### If using a custom certificate
 Uncomment line #11
 ```yaml
 ...
   ingress_tls_secret: awx-secret-tls
 ...
 ```
-#### 2.  Fill in external hostname or machine FQDN at line #14
+#### Fill in external hostname or machine FQDN at line #14
 ```yaml
   hostname: awx-machine #That will be the address we will access AWX UI - https://awx-machine
 ```
-#### 2.  If using custom Postgres configuration
+#### If using custom Postgres configuration
 Uncomment line #23
 ```yaml
 ...
   postgres_configuration_secret: awx-postgres-configuration
 ...
 ```
-#### 3. If using a persistent volume for Postgres
+#### If using a persistent volume for Postgres
 Uncomment lines #26 - #29
 ```yaml
 ...
@@ -118,7 +118,7 @@ Uncomment lines #26 - #29
      storage: 8Gi
 ...
 ```
-#### 4. If custom operator resource requirements are needed
+#### If custom operator resource requirements are needed
 Uncomment and modify lines #35 - #39
 ```yaml
 ...
@@ -129,7 +129,7 @@ Uncomment and modify lines #35 - #39
   ee_resource_requirements: {}
 ...
 ```
-#### 5. To open Ansible censored logs
+#### To open Ansible censored logs
 Uncomment line #42
 ```
 ...
@@ -142,38 +142,72 @@ scripts/01-deploy-axw-operator-and-instance.sh
 ```
 
 ## 2. Loading Conjur policies
-- Policy statements are loaded into either the Conjur root policy branch or a policy branch under root
-- Per best practices, most policies will be created in branches off of root. 
+- Policy statements are loaded into either the Conjur root/data policy branch or a policy branch under root/data.
+- Per best practices, most policies will be created in branches off of root/data.
 - Branches have the following advantages: better organizing, help policy isolation for least privilege assignments, enforce RBAC, allowing relevant users to manage their own policy.
 - The demo uses an organizational structure that can be found under the folder ***policies***.
-### 1. Root branch
-#### 1. Login to Conjur as admin using the CLI
+
+### Conjur Enterprise
+#### Root branch
+##### 1. Login to Conjur as admin using the CLI
 ```bash
 conjur login -i admin
 ```
-#### 2. Load root policy
+##### 2. Update root policy
 ```bash
-conjur policy update -b root -f policies/01-base.yml | tee -a 01-base.log
+conjur policy update -b root -f policies/conjur-enterprise/01-base.yml | tee -a 01-base.log
 ```
-#### 3. Logout from Conjur
+##### 3. Logout from Conjur
 ```Bash
 conjur logout
 ```
-### 2. Ansible branch
-#### 1. Login as user ansible-manager01
-- Use the API key as a password from the 01-base.log file for the user ansible-manager01
+#### Ansible branch
+##### 1. Login as user ansible-admin01
+- Use the API key as a password from the 01-base.log file for the user ansible-admin01
 ```bash
-conjur login -i ansible-manager01
+conjur login -i ansible-admin01
 ```
-#### 2. Load ansible policy
+##### 2. Load ansible policy
 ```bash
-conjur policy update -b ansible -f policies/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
+conjur policy update -b data/ansible -f policies/conjur-enterprise/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
 ```
-#### 3. Populate Conjur variables
+##### 3. Populate Conjur variables
 ```Bash
-scripts/02-populate-variables.sh | tee -a 02-populate-variables.sh
+scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
 ```
-### 5. Logout from Conjur CLI
+##### 4. Logout from Conjur CLI
+```Bash
+conjur logout
+```
+### Conjur Cloud
+#### Data branch
+##### 1. Login to Conjur as admin using the CLI
+```bash
+conjur login -i <username>
+```
+##### 2. Update data policy
+```bash
+conjur policy update -b data -f policies/conjur-cloud/01-base.yml | tee -a 01-base.log
+```
+##### 3. Logout from Conjur
+```Bash
+conjur logout
+```
+#### Ansible branch
+##### 1. Login as user ansible-admin01
+- Use the API key as a password from the 01-base.log file for the user ansible-admin01
+```bash
+conjur login -i ansible-admin01
+```
+##### 2. Load ansible policy
+```bash
+conjur policy update -b data/ansible -f policies/conjur-cloud/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
+```
+##### 3. Populate Conjur variables
+```Bash
+scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
+```
+##### 4. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
@@ -237,11 +271,11 @@ Credential Type: CyberArk Conjur Secrets Manager Lookup
 ```
 #### 3. Fill the type details form
 ```properties
-Conjur URL: https://conjur-host:8433 #Conjur FQDN with scheme and port
-API Key: 123456 #Use the API key as a password from the 02-define-ansible-branch.log file for the identity: host/data/ansible/apps/conjur-demo
+Conjur URL: https://conjur-host:433 #Conjur FQDN with scheme and port
+API Key: 123456 #Use the API key as a password from the 02-define-ansible-branch.log file for the identity: host/ansible/apps/conjur-demo
 Credential Type: CyberArk Conjur Secrets Manager Lookup
 Account: conjur
-Username: host/data/ansible/apps/conjur-demo
+Username: data/host/ansible/apps/conjur-demo
 Public Key Certificate: # Copy the contents of your Conjur public key
 ```
 #### 4. Click Test

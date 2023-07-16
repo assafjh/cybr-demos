@@ -9,65 +9,138 @@ This demo will use JWT authentication.
 ## How does the JWT Authenticator works?
 ![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
 
-For more details on action, take a look at [CyberArk Conjur Secret Fetcher](https://github.com/marketplace/actions/cyberark-conjur-secret-fetcher-action)
+For more details on action, take a look at [CyberArk Conjur Secret Fetcher Action](https://github.com/marketplace/actions/cyberark-conjur-secret-fetcher-action)
 
 ## 1. Loading Conjur policies
-- Policy statements are loaded into either the Conjur  root policy branch or a policy branch under root
-- Per best practices, most policies will be created in branches off of root. 
+- Policy statements are loaded into either the Conjur root/data policy branch or a policy branch under root/data.
+- Per best practices, most policies will be created in branches off of root/data.
 - Branches have the following advantages: better organizing, help policy isolation for least privilege assignments, enforce RBAC, allowing relevant users to manage their own policy.
 - The demo uses an organizational structure that can be found under the folder ***policies***.
-### 1. Root branch
-#### 1. Login to Conjur as admin using the CLI
+### Conjur Enterprise
+#### Root branch
+##### 1. Login to Conjur as admin using the CLI
 ```bash
 conjur login -i admin
 ```
-#### 2. Load root policy
+##### 2. Update root policy
 ```bash
-conjur policy update -b root -f policies/01-base.yml | tee -a 01-base.log
+conjur policy update -b root -f policies/conjur-enterprise/01-base.yml | tee -a 01-base.log
 ```
-#### 3. Logout from Conjur
+##### 3. Logout from Conjur
 ```Bash
 conjur logout
 ```
-### 2. Github branch
-#### 1. Login as user github-manager01
-- Use the API key as a password from the 01-base.log file for the user jenkins-manager01
+#### Github branch
+##### 1. Login as user github-admin01
+- Use the API key as a password from the 01-base.log file for the user jenkins-admin01
 ```bash
-conjur login -i github-manager01
+conjur login -i github-admin01
 ```
-#### 2. Load github policy
+##### 2. Load github policy
 ```bash
-conjur policy update -b github -f policies/02-define-github-branch.yml | tee -a 02-define-github-branch.log
+conjur policy update -b data/github -f policies/conjur-enterprise/02-define-github-branch.yml | tee -a 02-define-github-branch.log
 ```
-#### 3. Logout from Conjur CLI
+##### 3. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
-### 3. JWT Authenticator
-#### 1. Login as user admin01
+#### JWT Authenticator
+##### 1. Login as user admin01
  - Use the API key as a password from the 01-base.log file for the user admin01
 ```bash
 conjur login -i admin01
 ```
-#### 2. Load the authenticator policy
+##### 2. Load the authenticator policy
 ```Bash
-conjur policy update -b root -f policies/03-define-jwt-auth.yml | tee -a 03-define-jwt-auth.log
+conjur policy update -b root -f policies/conjur-enterprise/03-define-jwt-auth.yml | tee -a 03-define-jwt-auth.log
 ```
-#### 4. Enable the authenticator
+##### 4. Enable the authenticator
 - This step will work from the Conjur Leader VM only.
 1. Modify the variables at enable authenticator script:
 ```bash 
-vi scripts/01_enable_authenticator.sh
+vi scripts/01-enable-authenticator.sh
 ```
 2. Run the script:
 ```bash
-scripts/01_enable_authenticator.sh
+scripts/01-enable-authenticator.sh
 ```
-#### 5. Populate the secrets and JWT authenticator variables
+##### 5. Populate secrets and JWT authenticator variables
 ```Bash
-scripts/02_populate_variables.sh | tee -a 02_populate_variables.log
+scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```
-### 5. Logout from Conjur CLI
+##### 6. Check that the authenticator is working properly
+ 1. Modify the variables at enable authenticator script:
+```bash 
+vi scripts/03-check-authenticator.sh
+```
+2. Run the script:
+```bash
+scripts/03-check-authenticator.sh
+```
+#### Logout from Conjur CLI
+```Bash
+conjur logout
+```
+### Conjur Cloud
+#### Data branch
+##### 1. Login to Conjur as admin using the CLI
+```bash
+conjur login -i <username>
+```
+##### 2. Update data policy
+```bash
+conjur policy update -b data -f policies/conjur-cloud/01-base.yml | tee -a 01-base.log
+```
+##### 3. Logout from Conjur
+```Bash
+conjur logout
+```
+#### Github branch
+##### 1. Login as user github-admin01
+- Use the API key as a password from the 01-base.log file for the user jenkins-admin01
+```bash
+conjur login -i github-admin01
+```
+##### 2. Load github policy
+```bash
+conjur policy update -b data/github -f policies/conjur-cloud/02-define-github-branch.yml | tee -a 02-define-github-branch.log
+```
+##### 3. Logout from Conjur CLI
+```Bash
+conjur logout
+```
+#### JWT Authenticator
+##### 1. Login to Conjur as admin using the CLI
+```bash
+conjur login -i <username>
+```
+##### 2. Load the authenticator policy
+```Bash
+conjur policy update -b conjur/authn-jwt -f policies/conjur-cloud/03-define-jwt-auth.yml | tee -a 03-define-jwt-auth.log
+```
+##### 4. Enable the authenticator
+1. Modify the variables at enable authenticator script:
+```bash 
+vi scripts/01-enable-authenticator.sh
+```
+2. Run the script:
+```bash
+scripts/01-enable-authenticator.sh
+```
+##### 5. Populate secrets and JWT authenticator variables
+```Bash
+scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
+```
+##### 6. Check that the authenticator is working properly
+ 1. Modify the variables at enable authenticator script:
+```bash 
+vi scripts/03-check-authenticator.sh
+```
+2. Run the script:
+```bash
+scripts/03-check-authenticator.sh
+```
+#### Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
