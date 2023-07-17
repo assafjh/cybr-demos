@@ -30,7 +30,7 @@ This demo can also use any other Jenkins instance, take note that additional ste
                 - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
                 - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
                 - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Enterprise](#conjur-enterprise)
+        - [Conjur Cloud](#conjur-cloud)
             - [Root branch](#root-branch)
                 - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
                 - [Update data policy](#update-data-policy)
@@ -140,7 +140,7 @@ scripts/05-check-authenticator.sh
 ```Bash
 conjur logout
 ```
-### Conjur Enterprise
+### Conjur Cloud
 #### Root branch
 ##### 1. Login to Conjur as admin using the CLI
 ```bash
