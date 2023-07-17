@@ -196,7 +196,7 @@ vi  scripts/03-populate-go-app-variable.sh
 ```bash
 scripts/03-populate-go-app-variable.sh
 ```
-##### 6. Check that the authenticator is working properly
+##### 7. Check that the authenticator is working properly
 1. Modify the variables at check authenticator script:
 ```bash
 vi  scripts/04-check-authenticator.sh
@@ -205,7 +205,7 @@ vi  scripts/04-check-authenticator.sh
 ```bash
 scripts/04-check-authenticator.sh
 ```
-##### 6. Logout from Conjur CLI
+##### 8. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
@@ -270,7 +270,7 @@ vi  scripts/03-populate-go-app-variable.sh
 ```bash
 scripts/03-populate-go-app-variable.sh
 ```
-##### 6. Check that the authenticator is working properly
+##### 7. Check that the authenticator is working properly
 1. Modify the variables at check authenticator script:
 ```bash
 vi  scripts/04-check-authenticator.sh
@@ -279,7 +279,7 @@ vi  scripts/04-check-authenticator.sh
 ```bash
 scripts/04-check-authenticator.sh
 ```
-##### 6. Logout from Conjur CLI
+##### 8. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
