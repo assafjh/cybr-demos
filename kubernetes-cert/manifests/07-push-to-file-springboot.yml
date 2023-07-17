@@ -14,18 +14,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: conjur-push-to-file
+    app: conjur-push-to-file-springboot
   name: demo-sidecar-springboot-push-to-file
   namespace: conjur-cert
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: conjur-push-to-file
+      app: conjur-push-to-file-springboot
   template:
     metadata:
       labels:
-        app: conjur-push-to-file
+        app: conjur-push-to-file-springboot
       annotations:
         # Secrets Provider configuration
         conjur.org/container-mode: sidecar
