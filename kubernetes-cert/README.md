@@ -182,6 +182,11 @@ scripts/01-enable-authenticator.sh
 ```
 ##### 5. Populate secrets and k8s cert authenticator variables
 - This step will need you to be logged-in to kubectl/oc CLI with admin permissions.
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/02-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```
@@ -252,6 +257,11 @@ scripts/01-enable-authenticator.sh
 ```
 ##### 5. Populate secrets and JWT authenticator variables
 - This step will need you to be logged-in to kubectl/oc CLI with admin permissions.
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/02-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```

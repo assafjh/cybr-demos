@@ -34,7 +34,7 @@ This demo uses Conjur Provider from Terrafrom registry and Summon in order to pu
             - [Populate secret variables](#populate-secret-variables)
             - [Logout from Conjur CLI](#logout-from-conjur-cli)
         - [Conjur Cloud](#conjur-cloud)
-            - [Root branch](#root-branch)
+            - [Data branch](#data-branch)
                 - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
                 - [Update data policy](#update-data-policy)
                 - [Logout from Conjur](#logout-from-conjur)
@@ -95,6 +95,11 @@ conjur login -i terraform-admin01
 conjur policy update -b data/terraform -f policies/conjur-enterprise/02-define-terraform-branch.yml | tee -a 02-define-terraform-branch.log
 ```
 #### 3. Populate secret variables
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/03-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/03-populate-variables | tee -a 03-populate-variables.log
 ```
@@ -103,7 +108,7 @@ scripts/03-populate-variables | tee -a 03-populate-variables.log
 conjur logout
 ```
 ### Conjur Cloud
-#### Root branch
+#### Data branch
 ##### 1. Login to Conjur as admin using the CLI
 ```bash
 conjur login -i <username>
@@ -127,6 +132,11 @@ conjur login -i terraform-admin01
 conjur policy update -b data/terraform -f policies/conjur-cloud/02-define-terraform-branch.yml | tee -a 02-define-terraform-branch.log
 ```
 #### 3. Populate secret variables
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/03-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/03-populate-variables | tee -a 03-populate-variables.log
 ```

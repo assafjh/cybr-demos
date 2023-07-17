@@ -124,6 +124,11 @@ vi scripts/03-enable-authenticator.sh
 scripts/03-enable-authenticator.sh
 ```
 ##### 4. Populate secrets and JWT authenticator variables
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/04-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/04-populate-variables.sh | tee -a 04-populate-variables.log
 ```
@@ -187,6 +192,11 @@ vi scripts/03-enable-authenticator.sh
 scripts/03-enable-authenticator.sh
 ```
 ##### 4. Populate secrets and JWT authenticator variables
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/04-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/04-populate-variables.sh | tee -a 04-populate-variables.log
 ```
