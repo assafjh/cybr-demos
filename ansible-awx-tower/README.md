@@ -285,6 +285,11 @@ conjur login -i ansible-admin01
 conjur policy update -b data/ansible -f policies/conjur-enterprise/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
 ```
 ##### 3. Populate Conjur variables
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/03-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
 ```
@@ -317,6 +322,11 @@ conjur login -i ansible-admin01
 conjur policy update -b data/ansible -f policies/conjur-cloud/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
 ```
 ##### 3. Populate Conjur variables
+1. Modify the variables at populate variables script:
+```bash
+vi  scripts/03-populate-variables.sh
+```
+2. Run the script:
 ```Bash
 scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
 ```
