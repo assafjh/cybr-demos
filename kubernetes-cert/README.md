@@ -154,7 +154,7 @@ conjur login -i k8s-admin01
 ```
 ##### 2. Load kubernetes policy
 ```bash
-conjur policy update -b data/jenkins -f policies/conjur-enterprise/02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
+conjur policy update -b data/kubernetes -f policies/conjur-enterprise/02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
 ```
 ##### 3. Logout from Conjur CLI
 ```Bash
@@ -230,7 +230,7 @@ conjur login -i k8s-admin01
 ```
 ##### 2. Load kubernetes policy
 ```bash
-conjur policy update -b data/jenkins -f policies/conjur-cloud/02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
+conjur policy update -b data/kubernetes -f policies/conjur-cloud/02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
 ```
 ##### 3. Logout from Conjur CLI
 ```Bash
