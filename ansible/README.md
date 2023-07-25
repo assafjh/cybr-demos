@@ -48,13 +48,13 @@ This demo supports integration with Ansible version 2.8 and up.
 ## Install Ansible
 If needed, install Ansible
 ```bash
-scripts/01-install-ansible﻿.sh
+scripts/01-install-ansible.sh
 ```
 
 ## Install Conjur plugin for Ansible
 **Note**: The script will decide and install the appropriate plugin, according to your Ansible version.
 ```bash
-scripts/02-install-plugin.sh.sh
+scripts/02-install-plugin.sh
 ```
 
 ## Loading Conjur policies
