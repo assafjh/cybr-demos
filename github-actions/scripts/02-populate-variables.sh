@@ -25,4 +25,4 @@ done
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/github1/jwks-uri -v "https://token.actions.githubusercontent.com/.well-known/jwks"
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/github1/token-app-property -v "workflow"
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/github1/enforced-claims -v "workflow,repository"
-"$CONJUR_CLI" variable set -i conjur/authn-jwt/github1/identity-path -v "/github/apps"
+"$CONJUR_CLI" variable set -i conjur/authn-jwt/github1/identity-path -v "/data/github/apps"
