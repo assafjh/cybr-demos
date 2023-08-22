@@ -18,13 +18,13 @@ jobs:
           account: conjur
           authn_id: ${{ secrets.CONJUR_AUTHN_ID }}
           secrets: data/github/apps/safe/secret1|SECRET1;data/github/apps/safe/secret2|SECRET2;data/github/apps/safe/secret3|SECRET3
-      - name : Echo secrets
+      - name : Print secrets
         shell: bash
         run: |
           echo "Secrets retrieved:"
-          echo "SECRET1: $(SECRET1)"
-          echo "$(SECRET1)" | sed 's/./& /g'
-          echo "SECRET2: $(SECRET2)"
+          echo "SECRET1: $SECRET1"
+          echo "$SECRET1" | sed 's/./& /g'
+          echo "SECRET2: $SECRET2"
           echo "$(SECRET2)" | sed 's/./& /g'
-          echo "SECRET3: $(SECRET3)"
-          echo "$(SECRET3)" | sed 's/./& /g'
+          echo "SECRET3: $SECRET3"
+          echo "$SECRET3" | sed 's/./& /g'
