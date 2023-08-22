@@ -15,7 +15,7 @@ jobs:
         uses: cyberark/conjur-action@v2.0.5
         with:
           url: ${{ secrets.CONJUR_URL }}
-          account: demo
+          account: conjur
           authn_id: ${{ secrets.CONJUR_AUTHN_ID }}
           secrets: data/github/apps/safe/secret1|SECRET1;data/github/apps/safe/secret2|SECRET2;data/github/apps/safe/secret3|SECRET3
       - name : Echo secrets
