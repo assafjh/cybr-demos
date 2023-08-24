@@ -11,54 +11,6 @@ It is assumed you have access to an Azure Linux VM that can be used as an ADO Ag
 
 It is assumed that you need to assign a user identity to the VM - Instructions are provided and can be skipped in case you already have an identity assigned to your machine.
 
-# Table of Contents
-<!-- TOC -->
-
-- [Azure DevOps Integration](#azure-devops-integration)
-    - [Azure Authenticator](#azure-authenticator)
-    - [How does the Azure Authenticator works?](#how-does-the-azure-authenticator-works)
-    - [Create a managed identity](#create-a-managed-identity)
-    - [Assign the managed identity to your VM](#assign-the-managed-identity-to-your-vm)
-    - [Loading Conjur policies](#loading-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Azure branch](#azure-branch)
-                - [Login as user azure-manager01](#login-as-user-azure-manager01)
-                - [Load azure policy](#load-azure-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [Azure Authenticator](#azure-authenticator)
-                - [Login as user admin01](#login-as-user-admin01)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-            - [Populate secrets and Azure authenticator variables](#populate-secrets-and-azure-authenticator-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Data branch](#data-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update data policy](#update-data-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Azure branch](#azure-branch)
-                - [Login as user azure-manager01](#login-as-user-azure-manager01)
-                - [Load azure policy](#load-azure-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [Azure Authenticator](#azure-authenticator)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-            - [Populate secrets and Azure authenticator variables](#populate-secrets-and-azure-authenticator-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-    - [Create a demo project at Azure DevOps](#create-a-demo-project-at-azure-devops)
-        - [Create a new project](#create-a-new-project)
-        - [Create a new repository](#create-a-new-repository)
-        - [Create a Personal Access Token PAT](#create-a-personal-access-token-pat)
-        - [Create a self-hosted Linux agent](#create-a-self-hosted-linux-agent)
-        - [Create a pipeline](#create-a-pipeline)
-
-<!-- /TOC -->
-
 ## Azure Authenticator
 
 The Conjur Azure Authenticator is a highly secure method for authenticating Azure workloads to Conjur using their underlying Microsoft Azure attributes. A Conjur identity can be established at varying granularity, allowing for a collection of resources to be identified to Conjur as one, or for individual workloads to be uniquely identified. 

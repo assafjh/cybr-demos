@@ -6,61 +6,6 @@ The action supports authenticating with CyberArk Conjur using host identity and 
 
 This demo will use JWT authentication.
 
-# Table of Contents
-<!-- TOC -->
-
-- [GitHub Actions integration](#github-actions-integration)
-    - [How does the JWT Authenticator works?](#how-does-the-jwt-authenticator-works)
-    - [Loading Conjur policies](#loading-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Github branch](#github-branch)
-                - [Login as user github-admin01](#login-as-user-github-admin01)
-                - [Load github policy](#load-github-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [JWT Authenticator](#jwt-authenticator)
-                - [Login as user admin01](#login-as-user-admin01)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
-                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Data branch](#data-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update data policy](#update-data-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Github branch](#github-branch)
-                - [Login as user github-admin01](#login-as-user-github-admin01)
-                - [Load github policy](#load-github-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [JWT Authenticator](#jwt-authenticator)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
-                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-    - [Add conjur-demo workflow to the GitHub repository action](#add-conjur-demo-workflow-to-the-github-repository-action)
-        - [Add action secrets to the repository](#add-action-secrets-to-the-repository)
-            - [In your repository web page, click on Settings -> Secrets -> Actions](#in-your-repository-web-page-click-on-settings---secrets---actions)
-            - [Add the following secrets:](#add-the-following-secrets)
-        - [Add the workflow to actions](#add-the-workflow-to-actions)
-            - [Go to the repository folder *workflows*](#go-to-the-repository-folder-workflows)
-            - [Modify conjur-demo.yml](#modify-conjur-demoyml)
-        - [Add conjur-demo.yml to actions](#add-conjur-demoyml-to-actions)
-            - [In your repository web page, click on Actions -> New Workflow ->  set up a workflow yourself](#in-your-repository-web-page-click-on-actions---new-workflow----set-up-a-workflow-yourself)
-            - [Paste the contents of workflows/conjur-demo.yml](#paste-the-contents-of-workflowsconjur-demoyml)
-            - [Commit the file](#commit-the-file)
-        - [Run the workflow](#run-the-workflow)
-            - [Modify the file dummy-file and commit](#modify-the-file-dummy-file-and-commit)
-            - [In your repository web page, click on Actions and make sure the workflow ran](#in-your-repository-web-page-click-on-actions-and-make-sure-the-workflow-ran)
-
-<!-- /TOC -->
-
 ## How does the JWT Authenticator works?
 ![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
 

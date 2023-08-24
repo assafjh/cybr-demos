@@ -7,49 +7,6 @@ For more details on the configuration and the image, take a look at the the fold
 
 This demo can also use any other Jenkins instance, take note that additional steps will need to be taken, such as, installing the Conjur plugin.
 
-# Table of Contents
-<!-- TOC -->
-
-- [Jenkins integration](#jenkins-integration)
-    - [Deploy Jenkins](#deploy-jenkins)
-    - [Import Conjur public key to Jenkins' trust store](#import-conjur-public-key-to-jenkins-trust-store)
-    - [Loading Conjur policies](#loading-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Load root policy](#load-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Jenkins branch](#jenkins-branch)
-                - [Login as user jenkins-admin01](#login-as-user-jenkins-admin01)
-                - [Load jenkins policy](#load-jenkins-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [JWT Authenticator](#jwt-authenticator)
-                - [Login as user admin01](#login-as-user-admin01)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
-                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update data policy](#update-data-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Jenkins branch](#jenkins-branch)
-                - [Login as user jenkins-admin01](#login-as-user-jenkins-admin01)
-                - [Load jenkins policy](#load-jenkins-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [JWT Authenticator](#jwt-authenticator)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
-                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Jenkins projects](#jenkins-projects)
-
-<!-- /TOC -->
-
 ## 1. Deploy Jenkins
 If needed, deploy the custom Jenkins instance:
 1. Modify the variables at the deployment script:
