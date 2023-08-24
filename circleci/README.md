@@ -2,60 +2,6 @@
 
 The workflow authenticates to Conjur using JWT authentication.
 
-# Table of Contents
-<!-- TOC -->
-
-- [CircleCI integration](#circleci-integration)
-    - [How does the JWT Authenticator works?](#how-does-the-jwt-authenticator-works)
-    - [Loading Conjur policies](#loading-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [CircleCI branch](#circleci-branch)
-                - [Login as user circleci-admin01](#login-as-user-circleci-admin01)
-                - [Load circleci policy](#load-circleci-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [JWT Authenticator](#jwt-authenticator)
-                - [Login as user admin01](#login-as-user-admin01)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
-                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Data branch](#data-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [CircleCI branch](#circleci-branch)
-                - [Login as user circleci-admin01](#login-as-user-circleci-admin01)
-                - [Load circleci policy](#load-circleci-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [JWT Authenticator](#jwt-authenticator)
-                - [Login as user admin01](#login-as-user-admin01)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-                - [Populate secrets and JWT authenticator variables](#populate-secrets-and-jwt-authenticator-variables)
-                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-    - [Connect CircleCI to GitHub](#connect-circleci-to-github)
-    - [In GitHub, commit and push the file workflows/config.yml to .circleci/config.yml](#in-github-commit-and-push-the-file-workflowsconfigyml-to-circleciconfigyml)
-    - [Enable the Project at CircleCI](#enable-the-project-at-circleci)
-        - [In CircleCI Projects page, select your repository and click "Set Up Project"](#in-circleci-projects-page-select-your-repository-and-click-set-up-project)
-        - [In the form that was opened, select "Fastest", Click Set Up Project](#in-the-form-that-was-opened-select-fastest-click-set-up-project)
-    - [Add the context "Conjur" to your project.](#add-the-context-conjur-to-your-project)
-            - [In CircleCI, click on "*organization settings*" -> "*Contexts*" -> "*Create Context*"](#in-circleci-click-on-organization-settings---contexts---create-context)
-            - [Name the context "*Conjur*"](#name-the-context-conjur)
-            - [Add the following environment variables:](#add-the-following-environment-variables)
-        - [Run the workflow](#run-the-workflow)
-            - [Modify the file dummy-file and commit](#modify-the-file-dummy-file-and-commit)
-            - [In CircleCI look at your dashboard and make sure the workflow ran](#in-circleci-look-at-your-dashboard-and-make-sure-the-workflow-ran)
-            - [Examine the steps, see that the secret has been printed.](#examine-the-steps-see-that-the-secret-has-been-printed)
-
-<!-- /TOC -->
-
 ## How does the JWT Authenticator works?
 ![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
 For more details on CircleCI OIDC, please refer to:

@@ -97,7 +97,15 @@
       authn-k8s/namespace: conjur-cert
       authn-k8s/service-account: conjur-demo-acct
       authn-k8s/authentication-container-name: secretless-broker
-    
+  - !host
+    id: applications/demo-application-rest-api
+    owner: !group admins
+    annotations:
+      authn/api-key: true
+      authn-k8s/namespace: conjur-cert
+      authn-k8s/service-account: conjur-demo-acct
+      authn-k8s/authentication-container-name: cyberark-authn-k8s-for-rest-api-app 
+
 # Add the hosts we have created to the layer 
 - !grant
   roles:

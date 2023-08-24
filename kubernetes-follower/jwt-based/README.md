@@ -1,41 +1,6 @@
 # JWT authentication based follower
 Instructions for deploying a demo JWT authentication based follower inside a Kubernetes cluster.
 
-# Table of Contents
-<!-- TOC -->
-
-- [JWT authentication based follower](#jwt-authentication-based-follower)
-    - [How does the JWT Authenticator works?](#how-does-the-jwt-authenticator-works)
-    - [Follower deployment flow](#follower-deployment-flow)
-    - [Instructions](#instructions)
-        - [Loading Conjur policies](#loading-conjur-policies)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Kubernetes branch](#kubernetes-branch)
-                - [Login as user k8s-admin01](#login-as-user-k8s-admin01)
-                - [Load kubernetes policy](#load-kubernetes-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [JWT Authenticator](#jwt-authenticator)
-                - [Login as user admin01](#login-as-user-admin01)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-                - [Populate the  JWT authenticator variables](#populate-the--jwt-authenticator-variables)
-                - [Check that the authenticator is working properly](#check-that-the-authenticator-is-working-properly)
-            - [Seed Generator service](#seed-generator-service)
-                - [Enable seed generation policy](#enable-seed-generation-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Kubernetes](#kubernetes)
-            - [Prepare infrastructure for the deployments](#prepare-infrastructure-for-the-deployments)
-                - [Review and modify the manifest](#review-and-modify-the-manifest)
-                - [Deploy the create infra manifest](#deploy-the-create-infra-manifest)
-            - [Deploy the follower](#deploy-the-follower)
-                - [Update the manifest at line #22 with the conjur appliance image location](#update-the-manifest-at-line-22-with-the-conjur-appliance-image-location)
-                - [Deploy Manifest](#deploy-manifest)
-
-<!-- /TOC -->
-
 ## How does the JWT Authenticator works?
 
 ![Conjur k8s cert authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-follower/jwt-based/jwt-authenticator.png?raw=true)

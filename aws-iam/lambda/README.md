@@ -4,52 +4,6 @@ It is assumed that you can create a new lambda function and that an IAM role is 
 
 For more information on lambda functions: [AWS Docs - lambda](https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html)
 
-# Table of Contents
-<!-- TOC -->
-
-- [Use case: Amazon Lambda function IAM role authentication](#use-case-amazon-lambda-function-iam-role-authentication)
-    - [Configure Lambda function](#configure-lambda-function)
-        - [Create a new lambda function with runtime Python v3.10](#create-a-new-lambda-function-with-runtime-python-v310)
-        - [Package the function](#package-the-function)
-        - [Upload the zip file to you lambda function](#upload-the-zip-file-to-you-lambda-function)
-        - [Configure the following Environment variables:](#configure-the-following-environment-variables)
-    - [Loading Conjur policies](#loading-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [AWS branch](#aws-branch)
-                - [Login as user aws-admin01](#login-as-user-aws-admin01)
-                - [Load aws policy](#load-aws-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [IAM Authenticator](#iam-authenticator)
-                - [Login as user admin01](#login-as-user-admin01)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-            - [Populate safe variables](#populate-safe-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Data branch](#data-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update data policy](#update-data-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [AWS branch](#aws-branch)
-                - [Login as user aws-admin01](#login-as-user-aws-admin01)
-                - [Load aws policy](#load-aws-policy)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-            - [IAM Authenticator](#iam-authenticator)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Load the authenticator policy](#load-the-authenticator-policy)
-                - [Enable the authenticator](#enable-the-authenticator)
-            - [Populate safe variables](#populate-safe-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-    - [Test your function](#test-your-function)
-        - [From AWS console, go to the lambda function and click Test](#from-aws-console-go-to-the-lambda-function-and-click-test)
-        - [Validate that the output is correct](#validate-that-the-output-is-correct)
-
-<!-- /TOC -->
-
 ## 1. Configure Lambda function
 ### Create a new lambda function with runtime Python v3.10
 **Note**: The packaging script supports the latest lambda python runtime env, currently it is v3.10
