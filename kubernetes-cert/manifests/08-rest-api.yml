@@ -1,0 +1,72 @@
+---
+# Deployment for an application that consumes Conjur secrets using REST API bash script
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-conjur-via-rest
+  namespace: conjur-cert
+  labels:
+    app: restsecrets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: demo
+      app: restsecrets
+  template:
+    metadata:
+      labels:
+        role: demo
+        app: restsecrets
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      - name: k8s-rest-api-app
+        image: assafhazan/rest-api-conjur-auth-client-consumer:latest
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: conjur-connect
+        volumeMounts:
+          - mountPath: /run/conjur
+            name: conjur-access-token
+            readOnly: true
+      initContainers:
+      - image: cyberark/conjur-authn-k8s-client:latest
+        imagePullPolicy: IfNotPresent
+        name: cyberark-authn-k8s-for-rest-api-app
+        env:
+          - name: CONJUR_AUTHN_LOGIN
+            value: host/data/kubernetes/applications/demo-application-rest-api
+          - name: CONTAINER_MODE
+            value: init
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+        envFrom:
+          - configMapRef:
+              name: conjur-connect
+        volumeMounts:
+          - mountPath: /run/conjur
+            name: conjur-access-token
+      volumes:
+      - emptyDir:
+          medium: Memory
+        name: conjur-access-token
+      - downwardAPI:
+          defaultMode: 420
+          items:
+          - fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.annotations
+            path: annotations
+        name: podinfo

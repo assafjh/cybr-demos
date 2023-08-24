@@ -20,23 +20,6 @@ tools/05-read-cert.sh <CERTIFICATE_FILE_PATH>
 ```
 - It is recommended to run all the scripts in the Conjur Leader VM machine.
 
-# Table of Contents
-<!-- TOC -->
-
-- [Import 3rd-party certificates](#import-3rd-party-certificates)
-    - [Generate a local CA](#generate-a-local-ca)
-    - [Import certificates to Conjur](#import-certificates-to-conjur)
-        - [Configure the scripts](#configure-the-scripts)
-        - [Generate Leader certificate](#generate-leader-certificate)
-        - [Load certificates to Leader](#load-certificates-to-leader)
-        - [Generate Follower certificate](#generate-follower-certificate)
-        - [Load certificates to Leader](#load-certificates-to-leader)
-    - [How to check that the certificates were loaded to Conjur](#how-to-check-that-the-certificates-were-loaded-to-conjur)
-            - [UI - Relevant to Leader](#ui---relevant-to-leader)
-            - [Inside Conjur leader container - Relevant to Leader and Followers](#inside-conjur-leader-container---relevant-to-leader-and-followers)
-
-<!-- /TOC -->
-
 ## 1. Generate a local CA
 **Note:** Can be skipped if a custom CA is going to be used.
 

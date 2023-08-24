@@ -15,44 +15,6 @@ This demo uses Conjur Provider from Terrafrom registry and Summon in order to pu
 2. Terraform plan that uses provider envvars to pull a secret from Conjur.
 3. Terraform plan that uses Summon to pull a secret from Conjur.
 
-# Table of Contents
-<!-- TOC -->
-
-- [Terraform integration](#terraform-integration)
-            - [Use cases:](#use-cases)
-    - [Install Terraform](#install-terraform)
-    - [Install Summon](#install-summon)
-    - [Loading Conjur policies](#loading-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Terraform branch](#terraform-branch)
-                - [Login as user terraform-admin01](#login-as-user-terraform-admin01)
-            - [Load terraform policy](#load-terraform-policy)
-            - [Populate secret variables](#populate-secret-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Data branch](#data-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update data policy](#update-data-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Terraform branch](#terraform-branch)
-                - [Login as user terraform-admin01](#login-as-user-terraform-admin01)
-            - [Load terraform policy](#load-terraform-policy)
-            - [Populate secret variables](#populate-secret-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-    - [Run Terraform Plans](#run-terraform-plans)
-        - [Plan: attributes](#plan-attributes)
-            - [Modify the provider attributes at the tf file](#modify-the-provider-attributes-at-the-tf-file)
-            - [Run plan](#run-plan)
-        - [Modify scripts/.env](#modify-scriptsenv)
-        - [Run envvars plan](#run-envvars-plan)
-        - [Run summon plan](#run-summon-plan)
-
-<!-- /TOC -->
-
 ## 1. Install Terraform
 If needed, you can run the below script to install Terraform
 ```bash

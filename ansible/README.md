@@ -4,47 +4,6 @@ This demo supports integration with Ansible version 2.8 and up.
 - For Ansible version 2.8, the demo will use the plugin: [ansible-conjur-host-identity](https://github.com/cyberark/ansible-conjur-host-identity)
 - For Ansible version 2.9 and above, the demo will use the plugin: [CyberArk Ansible Conjur Collection](https://galaxy.ansible.com/cyberark/conjur)
 
-# Table of Contents
-<!-- TOC -->
-
-- [Ansible integration](#ansible-integration)
-    - [Install Ansible](#install-ansible)
-    - [Install Conjur plugin for Ansible](#install-conjur-plugin-for-ansible)
-    - [Loading Conjur policies](#loading-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Ansible branch](#ansible-branch)
-                - [Login as user ansible-admin01](#login-as-user-ansible-admin01)
-                - [Load ansible policy](#load-ansible-policy)
-                - [Populate Conjur variables](#populate-conjur-variables)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Data branch](#data-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update data policy](#update-data-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Ansible branch](#ansible-branch)
-                - [Login as user ansible-admin01](#login-as-user-ansible-admin01)
-                - [Load ansible policy](#load-ansible-policy)
-                - [Populate Conjur variables](#populate-conjur-variables)
-                - [Logout from Conjur CLI](#logout-from-conjur-cli)
-    - [Run the playbook](#run-the-playbook)
-        - [Modify the script variables](#modify-the-script-variables)
-        - [Run the playbook](#run-the-playbook)
-    - [Troubleshooting](#troubleshooting)
-        - [On Conjur Cloud, when running the playbook, getting an error from the certificate verification](#on-conjur-cloud-when-running-the-playbook-getting-an-error-from-the-certificate-verification)
-            - [Comment out from  run book script line 14:](#comment-out-from--run-book-script-line-14)
-            - [Unset CONJUR_CERT_FILE](#unset-conjur_cert_file)
-            - [Update Python trust store](#update-python-trust-store)
-        - [When running Ansible on a Mac, getting ERROR! A worker was found in a dead state](#when-running-ansible-on-a-mac-getting-error-a-worker-was-found-in-a-dead-state)
-            - [Error details](#error-details)
-            - [Solution](#solution)
-
-<!-- /TOC -->
-
 ## Install Ansible
 If needed, install Ansible
 ```bash

@@ -8,42 +8,6 @@ The operator reads information from external APIs and automatically injects the 
 
 For more information: [External Secrets](https://external-secrets.io/)
 
-# Table of Contents
-
-<!-- TOC -->
-
-- [Kubernetes ESO Integration](#kubernetes-eso-integration)
-    - [Install ESO](#install-eso)
-    - [Load Conjur policies](#load-conjur-policies)
-        - [Conjur Enterprise](#conjur-enterprise)
-            - [Root branch](#root-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update root policy](#update-root-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Kubernetes branch](#kubernetes-branch)
-                - [Login as user kubernetes-admin01](#login-as-user-kubernetes-admin01)
-            - [Load kubernetes policy](#load-kubernetes-policy)
-            - [Populate secret variables](#populate-secret-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-        - [Conjur Cloud](#conjur-cloud)
-            - [Data branch](#data-branch)
-                - [Login to Conjur as admin using the CLI](#login-to-conjur-as-admin-using-the-cli)
-                - [Update data policy](#update-data-policy)
-                - [Logout from Conjur](#logout-from-conjur)
-            - [Kubernetes branch](#kubernetes-branch)
-                - [Login as user kubernetes-admin01](#login-as-user-kubernetes-admin01)
-            - [Load kubernetes policy](#load-kubernetes-policy)
-            - [Populate secret variables](#populate-secret-variables)
-            - [Logout from Conjur CLI](#logout-from-conjur-cli)
-    - [Kubernetes](#kubernetes)
-        - [Create external secret store](#create-external-secret-store)
-            - [Modify create store manifest](#modify-create-store-manifest)
-            - [Apply the manifest](#apply-the-manifest)
-        - [Create external secrets](#create-external-secrets)
-        - [Consume external secrets](#consume-external-secrets)
-
-<!-- /TOC -->
-
 ## 1. Install ESO
 It is assumed that helm is installed.
 ```bash
