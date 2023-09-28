@@ -46,9 +46,9 @@ def get_signature_key(key, dateStamp, regionName, serviceName):
     kSigning = sign(kService, 'aws4_request')
     return kSigning
 
-#def get_aws_region():
-    ## return requests.get(AWS_AVAILABILITY_ZONE).text[:-1]
-    #return "us-east-1"
+def get_aws_region():
+    # return requests.get(AWS_AVAILABILITY_ZONE).text[:-1]
+    return "us-east-1"
 
 def get_iam_role_name():
     r = requests.get(AWS_METADATA_URL)
@@ -111,7 +111,7 @@ def create_conjur_iam_api_key(iam_role_name=None, access_key=None, secret_key=No
     if access_key is None and secret_key is None and token is None:
         access_key, secret_key, token = get_iam_role_metadata(iam_role_name)
 
-    region = os.environ["AWS_REGION"]
+    region = get_aws_region()
 
     if access_key is None or secret_key is None:
         print('No access key is available.')
