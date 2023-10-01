@@ -28,5 +28,5 @@ api_key=$(curl -k -s -X GET -u "$username:$password" "$conjur_url/authn/$conjur_
 token=$(curl -s -k --header "Accept-Encoding: base64" --data "$api_key" "$conjur_url/authn/$conjur_account/$username/authenticate")
 
 # Using the temporary token, retriving variable from Conjur
-curl -k --header "Authorization: Token token=\"$token\"" "$conjur_url/$authn_type/$authn_id/conjur/status"
+curl -k --header "Authorization: Token token=\"$token\"" "$conjur_url/$authn_type/$authn_id/$conjur_account/status"
 
