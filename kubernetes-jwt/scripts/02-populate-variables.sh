@@ -26,10 +26,10 @@ do
         "$CONJUR_CLI" variable set -i "${SAFE_PATH}secret$i" -v "$(echo $RANDOM | md5 | head -c 20; echo;)"
     fi
 done
-conjur variable set -i "${SAFE_PATH}postgres-username" -v "$APPLICATION_DB_USER"
-conjur variable set -i "${SAFE_PATH}postgres-password" -v "$APPLICATION_DB_PASSWORD"
-conjur variable set -i "${SAFE_PATH}postgres-hostname" -v "$APPLICATION_DB_HOST"
-conjur variable set -i "${SAFE_PATH}postgres-port" -v "$APPLICATION_DB_PORT"
+"$CONJUR_CLI" variable set -i "${SAFE_PATH}postgres-username" -v "$APPLICATION_DB_USER"
+"$CONJUR_CLI" variable set -i "${SAFE_PATH}postgres-password" -v "$APPLICATION_DB_PASSWORD"
+"$CONJUR_CLI" variable set -i "${SAFE_PATH}postgres-hostname" -v "$APPLICATION_DB_HOST"
+"$CONJUR_CLI" variable set -i "${SAFE_PATH}postgres-port" -v "$APPLICATION_DB_PORT"
 
 # Populate authenticator values
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/k8s-cluster1/identity-path -v "/data/kubernetes/applications"
