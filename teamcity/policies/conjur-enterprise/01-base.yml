@@ -1,0 +1,56 @@
+---
+# Load policy into root branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define Admins, create admins group, create admin01 user
+- !group
+  id: admins 
+  owner: !user admin
+
+- !user
+  id: admin01
+  owner: !group admins
+
+- !permit
+  role: !group admins
+  privileges: [read,update,create]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  members: 
+    - !user admin01
+
+# Define data branch
+- !policy
+  id: data
+  owner: !group admins
+  
+# Define data/teamcity branch, create users, hosts, groups, layers, variables
+- !policy
+  id: data/teamcity
+  owner: !group admins
+
+# data/teamcity/admins group will admin everything under data/teamcity branch
+- !group
+  id: data/teamcity/admins
+  owner: !group admins
+
+- !permit
+  role: !group data/teamcity/admins
+  privileges: [read,update,create]
+  resource: !policy data/teamcity
+
+- !permit
+  role: !group data/teamcity/admins
+  privileges: [read,update,create]
+  resource: !group data/teamcity/admins
+
+- &users
+  - !user
+    id: teamcity-admin01
+    owner: !group data/teamcity/admins
+
+- !grant
+  role: !group data/teamcity/admins
+  members: *users
