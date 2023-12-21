@@ -2,7 +2,7 @@
 These scripts will quickly upgrade Conjur Enterprise containers.
 Scripts needs to be run from Conjur container host VM
 
-## This script is meant to demo purposes only and it is assumed that the node being upgraded is a demo server
+## These scripts are meant for demo purposes only and it is assumed that the node being upgraded is a demo server
 
 ### Uses
 Can be used to upgrade VM based Conjur Enterprise containers.
