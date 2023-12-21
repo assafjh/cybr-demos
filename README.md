@@ -21,3 +21,4 @@ Instructions for each scenario can be found in its respective folder.
 15. custom-certificates: Using Conjur Enterprise with 3rd-party certificates
 16. kubernetes-external-secrets-operator: Using Kubernetes ESO with Conjur provider
 17. upgrade-conjur-enterprise-version: Upgrade a demo Conjur Enterprise server version
+18. teamcity: Conjur Integration with TeamCity
