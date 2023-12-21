@@ -1,0 +1,21 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define teamcity branch, create users, hosts, groups, layers, variables
+- !policy
+  id: teamcity
+
+# teamcity/admins group will admin everything under teamcity branch
+- !group
+  id: teamcity/admins
+
+- !permit
+  role: !group teamcity/admins
+  privileges: [read,update,create]
+  resource: !policy teamcity
+
+- !permit
+  role: !group teamcity/admins
+  privileges: [read,update,create]
+  resource: !group teamcity/admins
