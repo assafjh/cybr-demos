@@ -2,10 +2,9 @@
 #============ Variables ===============
 # Internal
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source $SCRIPT_DIR/scripts.properties
+source "$SCRIPT_DIR"/scripts.properties
 #========== Script ===============
 mkdir -p "$CONTAINER_VOLUME_PATH"/"$CONTAINER_NAME"_"$CONTAINER_TAG"/{config,security,backups,seeds,logs,certs}
-cp -v $SCRIPT_DIR/seccomp.json $CONTAINER_VOLUME_PATH/"$CONTAINER_NAME"_"$CONTAINER_TAG"/security/
 
 if [ -z $SUDO ] && [ $(whoami) != "root" ]; then
         sudo sysctl net.ipv4.ip_unprivileged_port_start=443
@@ -16,7 +15,7 @@ $SUDO $CONTAINER_MGR run \
     --name "$CONTAINER_NAME"_"$CONTAINER_TAG" \
     --detach \
     --restart=unless-stopped \
-    --security-opt seccomp=$CONTAINER_VOLUME_PATH/"$CONTAINER_NAME"_"$CONTAINER_TAG"/security/seccomp.json \
+    --security-opt seccomp=unconfined \
     --publish "${SERVER_PORT:-443}:443" \
     --publish "${LB_VERIFICATION_PORT:-444}:444" \
     --publish "${DB_PORT:-5432}:5432" \
