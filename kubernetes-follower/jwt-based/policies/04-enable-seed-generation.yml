@@ -10,6 +10,6 @@
 
   # Authorize `kubernetes/followers/cert` to request seeds
   - !permit
-    role: !layer ../../data/kubernetes/followers/jwt
+    role: !group ../../data/kubernetes/followers/jwt
     privilege: [ execute ]
     resource: !webservice

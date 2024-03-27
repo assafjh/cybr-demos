@@ -6,8 +6,8 @@
   id: followers
   owner: !group admins
 
-# followers/cert is a layer that will aggregate permissions for all kubernetes followers that want to use k8s cert authn to consume Conjur secrets
-- !layer
+# followers/cert is a group that will aggregate permissions for all kubernetes followers that want to use k8s cert authn to consume Conjur secrets
+- !group
   id: followers/cert
   owner: !group admins
 
@@ -19,9 +19,9 @@
     authn-k8s/namespace: conjur-cert-follower
     authn-k8s/service-account: conjur-demo-acct
     
-# Add the hosts we have created to the layer 
+# Add the hosts we have created to the group 
 - !grant
   roles:
-    - !layer followers/cert
+    - !group followers/cert
   members:
     - !host followers/cert-based-follower

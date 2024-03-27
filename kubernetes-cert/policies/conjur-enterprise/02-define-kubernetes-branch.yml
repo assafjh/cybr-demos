@@ -6,8 +6,8 @@
   id: applications
   owner: !group admins
 
-# applications/cert is a layer that will aggregate permissions for all kubernetes applications that want to use k8s cert authn to consume Conjur secrets
-- !layer
+# applications/cert is a group that will aggregate permissions for all kubernetes applications that want to use k8s cert authn to consume Conjur secrets
+- !group
   id: applications/cert
   owner: !group admins
 
@@ -57,9 +57,9 @@
       id: postgres-port
       owner: !group ../../admins
 
- # Allow applications/certs layer to consume the secrets we have created
+ # Allow applications/certs group to consume the secrets we have created
   - !permit
-    role: !layer ../cert
+    role: !group ../cert
     privileges: [ read, execute ]
     resource: *safe1-secrets
 
@@ -101,9 +101,9 @@
       authn-k8s/service-account: conjur-demo-acct
       authn-k8s/authentication-container-name: cyberark-authn-k8s-for-rest-api-app 
 
-# Add the hosts we have created to the layer 
+# Add the hosts we have created to the group 
 - !grant
   roles:
-    - !layer applications/cert
+    - !group applications/cert
   members: *hosts
 

@@ -6,8 +6,8 @@
   id: followers
   owner: !group admins
 
-# followers/jwt is a layer that will aggregate permissions for all kubernetes followers that want to use JWT
-- !layer
+# followers/jwt is a group that will aggregate permissions for all kubernetes followers that want to use JWT
+- !group
   id: followers/jwt
   owner: !group admins
 
@@ -19,10 +19,10 @@
     authn-jwt/k8s-follower1/kubernetes.io/namespace: conjur-jwt-follower
     authn-jwt/k8s-follower1/kubernetes.io/serviceaccount/name: conjur-demo-acct
 
-# Add the host we have created to the layer 
+# Add the host we have created to the group 
 - !grant
   roles:
-    - !layer followers/jwt
+    - !group followers/jwt
   members:
     - !host followers/system:serviceaccount:conjur-jwt-follower:conjur-demo-acct
 

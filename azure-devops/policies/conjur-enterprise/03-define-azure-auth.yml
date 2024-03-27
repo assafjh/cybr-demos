@@ -12,8 +12,8 @@
   - !variable
     id: provider-uri
   
-  # Allow azure/apps layer to authenticate with this webservice
+  # Allow azure/apps group to authenticate with this webservice
   - !permit
-    role: !layer ../../../data/azure/apps
+    role: !group ../../../data/azure/apps
     privilege: [ read, authenticate ]
     resource: !webservice

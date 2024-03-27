@@ -43,7 +43,7 @@
   #  id: enforced-claims
   
   - !permit
-    role: !layer ../../../data/circleci/apps/jwt
+    role: !group ../../../data/circleci/apps/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
 
