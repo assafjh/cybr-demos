@@ -2,8 +2,8 @@
 # Load policy into data/aws branch
 # This policy defines the demo branch aws
 
-# elastic is a layer that will aggregate safe permissions for aws elastic functions
-- !layer
+# elastic is a group that will aggregate safe permissions for aws elastic functions
+- !group
   id: elastic
   owner: !group admins
 
@@ -23,9 +23,9 @@
       id: secret3
       owner: !group ../../admins
 
- # Allow elastic layer to consume the secrets we have created
+ # Allow elastic group to consume the secrets we have created
   - !permit
-    role: !layer ../../elastic
+    role: !group ../../elastic
     privileges: [ read, execute ]
     resource: *aws-secrets
 
@@ -39,8 +39,8 @@
     id: elastic/$ROLE_ARN
     owner: !group admins
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer elastic
+    - !group elastic
   members: *hosts

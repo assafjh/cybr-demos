@@ -22,8 +22,8 @@
     annotations:
       description: Authenticator service for K8s cluster demo-cluster
 
-  # Grant kubernetes/followers/cert layer authentication privileges
+  # Grant kubernetes/followers/cert group authentication privileges
   - !permit
-    role: !layer ../../../data/kubernetes/followers/cert
+    role: !group ../../../data/kubernetes/followers/cert
     privilege: [ read, authenticate ]
     resource: !webservice

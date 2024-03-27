@@ -9,7 +9,7 @@
   - !webservice
   
   - !permit
-    role: !layer ../../../data/aws/elastic
+    role: !group ../../../data/aws/elastic
     privilege: [ read, authenticate ]
     resource: !webservice
 

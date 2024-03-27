@@ -2,13 +2,13 @@
 # Load policy into data/circleci branch
 # This policy defines the demo branch circleci
 
-# apps is a layer that will aggregate safe permissions for circleci
-- !layer
+# apps is a group that will aggregate safe permissions for circleci
+- !group
   id: apps
   owner: !group admins
 
-# projects/jwt is a layer that will aggregate permissions for all circleci projects that want to use JWT authn to consume Conjur secrets
-- !layer
+# projects/jwt is a group that will aggregate permissions for all circleci projects that want to use JWT authn to consume Conjur secrets
+- !group
   id: apps/jwt
   owner: !group admins
 
@@ -28,9 +28,9 @@
       id: secret3
       owner: !group ../../admins
 
- # Allow apps layer to consume the secrets we have created
+ # Allow apps group to consume the secrets we have created
   - !permit
-    role: !layer ../../apps
+    role: !group ../../apps
     privileges: [ read, execute ]
     resource: *circleci-secrets
 
@@ -46,12 +46,12 @@
         authn/api-key: true
         authn-jwt/circleci1/sub: org/$CIRCLECI_ORG_ID/project/$CIRCLECI_PROJECT_ID/user/$CIRCLECI_USER_ID
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer apps
+    - !group apps
   members: *hosts
 - !grant
   roles:
-    - !layer apps/jwt
+    - !group apps/jwt
   members: *hosts

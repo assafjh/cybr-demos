@@ -39,7 +39,7 @@
     id: audience
   
   - !permit
-    role: !layer ../../../data/jenkins/projects/jwt
+    role: !group ../../../data/jenkins/projects/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
 

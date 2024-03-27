@@ -3,13 +3,13 @@
 # This policy defines the demo branch gitlab
 # Before loading this policy, Change $NAMESPACE_PATH at line #42
 
-# ci is a layer that will aggregate safe permissions for gitlab project1
-- !layer
+# ci is a group that will aggregate safe permissions for gitlab project1
+- !group
   id: ci
   owner: !group admins
 
-# projects/jwt is a layer that will aggregate permissions for all gitlab projects that want to use JWT authn to consume Conjur secrets
-- !layer
+# projects/jwt is a group that will aggregate permissions for all gitlab projects that want to use JWT authn to consume Conjur secrets
+- !group
   id: ci/jwt
   owner: !group admins
 
@@ -29,9 +29,9 @@
       id: secret3
       owner: !group ../../admins
 
- # Allow ci layer to consume the secrets we have created
+ # Allow ci group to consume the secrets we have created
   - !permit
-    role: !layer ../../ci
+    role: !group ../../ci
     privileges: [ read, execute ]
     resource: *gitlab-secrets
 
@@ -45,12 +45,12 @@
       authn-jwt/gitlab1/ref: main
       authn-jwt/gitlab1/ref_type: branch
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer ci
+    - !group ci
   members: *hosts
 - !grant
   roles:
-    - !layer ci/jwt
+    - !group ci/jwt
   members: *hosts

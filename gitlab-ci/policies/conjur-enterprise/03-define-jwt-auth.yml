@@ -44,7 +44,7 @@
     id: enforced-claims
   
   - !permit
-    role: !layer ../../../data/gitlab/ci/jwt
+    role: !group ../../../data/gitlab/ci/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
 

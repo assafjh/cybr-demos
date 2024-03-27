@@ -6,23 +6,23 @@
   id: applications
   owner: !group admins
 
-# projects/project1 is a layer that will aggregate safe permissions for jenkins project1
-- !layer
+# projects/project1 is a group that will aggregate safe permissions for jenkins project1
+- !group
   id: projects/project1
   owner: !group admins
 
-# projects/project2 is a layer that will aggregate safe permissions for jenkins project2
-- !layer
+# projects/project2 is a group that will aggregate safe permissions for jenkins project2
+- !group
   id: projects/project2
   owner: !group admins
 
-# projects/project3 is a layer that will aggregate safe permissions for jenkins project3
-- !layer
+# projects/project3 is a group that will aggregate safe permissions for jenkins project3
+- !group
   id: projects/project3
   owner: !group admins
 
-# projects/jwt is a layer that will aggregate permissions for all jenkins projects that want to use JWT authn to consume Conjur secrets
-- !layer
+# projects/jwt is a group that will aggregate permissions for all jenkins projects that want to use JWT authn to consume Conjur secrets
+- !group
   id: projects/jwt
   owner: !group admins
 
@@ -62,21 +62,21 @@
       id: project3/secret3
       owner: !group ../../admins
 
- # Allow applications/project1 layer to consume the secrets we have created
+ # Allow applications/project1 group to consume the secrets we have created
   - !permit
-    role: !layer ../project1
+    role: !group ../project1
     privileges: [ read, execute ]
     resource: *project1-secrets
 
- # Allow applications/project2 layer to consume the secrets we have created
+ # Allow applications/project2 group to consume the secrets we have created
   - !permit
-    role: !layer ../project2
+    role: !group ../project2
     privileges: [ read, execute ]
     resource: *project2-secrets
 
- # Allow applications/project3 layer to consume the secrets we have created
+ # Allow applications/project3 group to consume the secrets we have created
   - !permit
-    role: !layer ../project3
+    role: !group ../project3
     privileges: [ read, execute ]
     resource: *project3-secrets
 
@@ -97,25 +97,25 @@
   id: projects/Project3/Job1
   owner: !group admins
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer projects/project1
+    - !group projects/project1
   members:
     - !host projects/Project1/Job1
 - !grant
   roles:
-    - !layer projects/project2
+    - !group projects/project2
   members:
     - !host projects/Project2/Job1
 - !grant
   roles:
-    - !layer projects/project3
+    - !group projects/project3
   members:
     - !host projects/Project3/Job1
 - !grant
   roles:
-    - !layer projects/jwt
+    - !group projects/jwt
   members:
     - !host projects/Project1/Job1
     - !host projects/Project2/Job1

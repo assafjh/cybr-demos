@@ -9,7 +9,7 @@
   - !webservice
   
   - !permit
-    role: !layer ../../../data/aws/lambda
+    role: !group ../../../data/aws/lambda
     privilege: [ read, authenticate ]
     resource: !webservice
 

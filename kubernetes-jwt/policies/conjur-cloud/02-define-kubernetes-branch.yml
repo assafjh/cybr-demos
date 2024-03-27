@@ -6,8 +6,8 @@
   id: applications
   owner: !group admins
 
-# applications/jwt is a layer that will aggregate permissions for all kubernetes applications that want to use JWT to consume Conjur secrets
-- !layer
+# applications/jwt is a group that will aggregate permissions for all kubernetes applications that want to use JWT to consume Conjur secrets
+- !group
   id: applications/jwt
   owner: !group admins
 
@@ -57,9 +57,9 @@
       id: postgres-port
       owner: !group ../../admins
 
- # Allow applications/jwt layer to consume the secrets we have created
+ # Allow applications/jwt group to consume the secrets we have created
   - !permit
-    role: !layer ../jwt
+    role: !group ../jwt
     privileges: [ read, execute ]
     resource: *safe1-secrets
 
@@ -72,10 +72,10 @@
     authn-jwt/k8s-cluster1/kubernetes.io/namespace: conjur-jwt
     authn-jwt/k8s-cluster1/kubernetes.io/serviceaccount/name: conjur-demo-acct
 
-# Add the host we have created to the layer 
+# Add the host we have created to the group 
 - !grant
   roles:
-    - !layer applications/jwt
+    - !group applications/jwt
   members:
     - !host applications/system:serviceaccount:conjur-jwt:conjur-demo-acct
 

@@ -41,7 +41,7 @@
   #   id: audience
   
   - !permit
-    role: !layer ../../../data/kubernetes/followers/jwt
+    role: !group ../../../data/kubernetes/followers/jwt
     privilege: [ read, authenticate ]
     resource: !webservice
 
