@@ -6,8 +6,8 @@
   id: applications
   owner: !group admins
 
-# applications/eso is a layer that will aggregate permissions for all kubernetes applications that want to use eso to consume Conjur secrets
-- !layer
+# applications/eso is a group that will aggregate permissions for all kubernetes applications that want to use eso to consume Conjur secrets
+- !group
   id: applications/eso
   owner: !group admins
 
@@ -42,9 +42,9 @@
       id: secret8
       owner: !group ../../admins
       
- # Allow applications/eso layer to consume the secrets we have created
+ # Allow applications/eso group to consume the secrets we have created
   - !permit
-    role: !layer ../eso
+    role: !group ../eso
     privileges: [ read, execute ]
     resource: *safe1-secrets
 
@@ -53,9 +53,9 @@
   id: eso-consumer
   owner: !group admins
 
-# Add the host we have created to the layer 
+# Add the host we have created to the group 
 - !grant
   roles:
-    - !layer applications/eso
+    - !group applications/eso
   members:
     - !host eso-consumer

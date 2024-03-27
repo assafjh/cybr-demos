@@ -6,8 +6,8 @@
   id: applications
   owner: !group admins
 
-# projects/project1 is a layer that will aggregate safe permissions for teamcity project1
-- !layer
+# projects/project1 is a group that will aggregate safe permissions for teamcity project1
+- !group
   id: projects/project1
   owner: !group admins
 
@@ -27,9 +27,9 @@
       id: project1/secret3
       owner: !group ../../admins
 
- # Allow applications/project1 layer to consume the secrets we have created
+ # Allow applications/project1 group to consume the secrets we have created
   - !permit
-    role: !layer ../project1
+    role: !group ../project1
     privileges: [ read, execute ]
     resource: *project1-secrets
 
@@ -40,9 +40,9 @@
   annotations:
       authn/api-key: true
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer projects/project1
+    - !group projects/project1
   members:
     - !host projects/project1-consumer

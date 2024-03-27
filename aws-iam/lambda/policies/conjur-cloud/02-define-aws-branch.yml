@@ -2,8 +2,8 @@
 # Load policy into data/aws branch
 # This policy defines the demo branch aws
 
-# lambda is a layer that will aggregate safe permissions for aws lambda functions
-- !layer
+# lambda is a group that will aggregate safe permissions for aws lambda functions
+- !group
   id: lambda
   owner: !group admins
 
@@ -23,9 +23,9 @@
       id: secret3
       owner: !group ../../admins
 
- # Allow lambda layer to consume the secrets we have created
+ # Allow lambda group to consume the secrets we have created
   - !permit
-    role: !layer ../../lambda
+    role: !group ../../lambda
     privileges: [ read, execute ]
     resource: *aws-secrets
 
@@ -41,8 +41,8 @@
     annotations:
       authn/api-key: true
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer lambda
+    - !group lambda
   members: *hosts

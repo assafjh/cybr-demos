@@ -2,8 +2,8 @@
 # Load policy into data/ansible branch
 # This policy defines the demo branch ansible
 
-# apps is a layer that will aggregate safe permissions for ansible project1
-- !layer
+# apps is a group that will aggregate safe permissions for ansible project1
+- !group
   id: apps
   owner: !group admins
 
@@ -23,9 +23,9 @@
       id: secret3
       owner: !group ../../admins
 
- # Allow apps layer to consume the secrets we have created
+ # Allow apps group to consume the secrets we have created
   - !permit
-    role: !layer ../../apps
+    role: !group ../../apps
     privileges: [ read, execute ]
     resource: *ansible-secrets
 
@@ -36,9 +36,9 @@
   annotations:
     authn/api-key: true
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer apps
+    - !group apps
   members:
     - !host apps/conjur-demo

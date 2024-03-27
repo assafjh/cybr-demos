@@ -6,18 +6,18 @@
   id: plans
   owner: !group admins
 
-# plans/attributes is a layer that will aggregate safe permissions for plan attributes
-- !layer
+# plans/attributes is a group that will aggregate safe permissions for plan attributes
+- !group
   id: plans/attributes
   owner: !group admins
 
-# plans/envvars is a layer that will aggregate safe permissions for plan envvars
-- !layer
+# plans/envvars is a group that will aggregate safe permissions for plan envvars
+- !group
   id: plans/envvars
   owner: !group admins
 
-# plans/summon is a layer that will aggregate safe permissions for plan summon
-- !layer
+# plans/summon is a group that will aggregate safe permissions for plan summon
+- !group
   id: plans/summon
   owner: !group admins
 
@@ -57,21 +57,21 @@
       id: summon/secret3
       owner: !group ../../admins
 
- # Allow plans/attributes layer to consume the secrets we have created
+ # Allow plans/attributes group to consume the secrets we have created
   - !permit
-    role: !layer ../attributes
+    role: !group ../attributes
     privileges: [ read, execute ]
     resource: *attributes-secrets
 
- # Allow plans/envvars layer to consume the secrets we have created
+ # Allow plans/envvars group to consume the secrets we have created
   - !permit
-    role: !layer ../envvars
+    role: !group ../envvars
     privileges: [ read, execute ]
     resource: *envvars-secrets
 
- # Allow plans/summon layer to consume the secrets we have created
+ # Allow plans/summon group to consume the secrets we have created
   - !permit
-    role: !layer ../summon
+    role: !group ../summon
     privileges: [ read, execute ]
     resource: *summon-secrets
 
@@ -92,20 +92,20 @@
   annotations:
     authn/api-key: true
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer plans/attributes
+    - !group plans/attributes
   members:
     - !host plans/attributes/plan1
 - !grant
   roles:
-    - !layer plans/envvars
+    - !group plans/envvars
   members:
     - !host plans/envvars/plan1
 - !grant
   roles:
-    - !layer plans/summon
+    - !group plans/summon
   members:
     - !host plans/summon/plan1
 

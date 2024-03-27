@@ -2,8 +2,8 @@
 # Load policy into data/azure branch
 # This policy defines the demo branch azure
 
-# apps is a layer that will aggregate safe permissions for azure apps functions
-- !layer
+# apps is a group that will aggregate safe permissions for azure apps functions
+- !group
   id: apps
   owner: !group admins
 
@@ -23,9 +23,9 @@
       id: secret3
       owner: !group ../../admins
 
- # Allow apps layer to consume the secrets we have created
+ # Allow apps group to consume the secrets we have created
   - !permit
-    role: !layer ../../apps
+    role: !group ../../apps
     privileges: [ read, execute ]
     resource: *azure-secrets
 
@@ -48,8 +48,8 @@
     id: apps/azure-devops
     owner: !group admins
 
-# Add the hosts we have created to their respective layer
+# Add the hosts we have created to their respective group
 - !grant
   roles:
-    - !layer apps
+    - !group apps
   members: *hosts
