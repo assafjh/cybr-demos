@@ -11,19 +11,8 @@ $Object = "Misc-SampleGroup (1)"
 $Reason = "Demo"
 $ConnectionTimeout = 30
 
-function Format-XML {
-    param([string]$xml)
-
-    $doc = New-Object System.Xml.XmlDocument
-    $doc.LoadXml($xml)
-    $stringWriter = New-Object System.IO.StringWriter
-    $xmlWriter = New-Object System.Xml.XmlTextWriter $stringWriter
-    $xmlWriter.Formatting = "indented"
-    $doc.WriteContentTo($xmlWriter)
-    $xmlWriter.Flush()
-    $stringWriter.Flush()
-    return $stringWriter.ToString()
-}
+# Account property we want to extract from the response:
+$accountProperty = "Content"
 
 # Define the SOAP request XML
 $soapRequest = @"
@@ -56,5 +45,19 @@ $url = "${ccp}/AIMWebService/v1.1/AIM.asmx"
 # Make the web request
 $response = Invoke-WebRequest -Uri $url -Method Post -Headers $headers -Body $soapRequest
 
-# Output the response
-Format-XML -xml $response
+# Parse the response XML
+$xmlDoc = [xml]$response.Content
+
+# Define namespaces
+$namespaceManager = New-Object System.Xml.XmlNamespaceManager($xmlDoc.NameTable)
+$namespaceManager.AddNamespace("soap", "http://schemas.xmlsoap.org/soap/envelope/")
+$namespaceManager.AddNamespace("t", "https://tempuri.org/")
+
+# Extract the Content key
+$contentNode = $xmlDoc.SelectSingleNode("//t:GetPasswordResponse/t:GetPasswordResult/t:$accountProperty", $namespaceManager)
+
+if ($contentNode -ne $null) {
+    Write-Host "${accountProperty}: $($contentNode.InnerText)" -ForegroundColor Green
+} else {
+    Write-Host "${accountProperty} key not found in the response." -ForegroundColor Red
+}
