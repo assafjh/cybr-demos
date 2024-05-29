@@ -1,5 +1,6 @@
-import com.cyberark.passwordsdk.PasswordSDK;
-import com.cyberark.passwordsdk.exceptions.PasswordSDKException;
+import java.util.Arrays;
+import javapasswordsdk.*;
+import javapasswordsdk.exceptions.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,23 +25,46 @@ public class CyberArkCredentialProvider {
         String folder = properties.getProperty("folder");
         String objectName = properties.getProperty("objectName");
         String reason = properties.getProperty("reason");
-        String connectionTimeout = properties.getProperty("connectionTimeout");
+
+        PSDKPassword password = null;
+        char[] content = null;
 
         try {
-            // Initialize the PasswordSDK
-            PasswordSDK.init();
+            PSDKPasswordRequest passRequest = new PSDKPasswordRequest();
 
-            // Retrieve the password
-            String password = PasswordSDK.getPassword(appId, safe, folder, objectName, reason, connectionTimeout);
+            // Set request properties
+            passRequest.setAppID(appId);
+            passRequest.setQuery("Safe=" + safe + ";Folder=" + folder + ";Object=" + objectName);
+            passRequest.setReason(reason);
 
-            // Print the password
-            System.out.println("Retrieved password: " + password);
+            // Get password object
+            password = PasswordSDK.getPassword(passRequest);
 
-            // Terminate the PasswordSDK
-            PasswordSDK.terminate();
-        } catch (PasswordSDKException e) {
-            System.err.println("Error retrieving password: " + e.getMessage());
-            e.printStackTrace();
+            // Get password content
+            content = password.getSecureContent();
+
+            // Print the password (for demonstration purposes; be careful with printing sensitive information)
+            System.out.println("Retrieved password: " + new String(content));
+
+            // Use other password properties, e.g., username
+            // System.out.println("Username: " + password.getUserName());
+
+        } catch (PSDKException ex) {
+            System.err.println("Error retrieving password: " + ex.getMessage());
+            ex.printStackTrace();
+        } finally {
+            if (content != null) {
+                // Clean the returned object
+                Arrays.fill(content, (char) 0);
+            }
+            if (password != null) {
+                // Dispose of resources used by this PSDKPassword object
+                try {
+                    password.dispose();
+                } catch (PSDKException e) {
+                    System.err.println("Error disposing password object: " + e.getMessage());
+                }
+            }
         }
     }
 }
