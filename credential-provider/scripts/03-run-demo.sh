@@ -10,8 +10,8 @@ fi
 
 # Define the paths
 CYBERARK_SDK_JAR="/opt/CARKaim/sdk/javapasswordsdk.jar"
-OUTPUT_JAR="$SCRIPT_DIR/compiled/CyberArkCredentialProvider.jar"
-PROPERTIES_FILE="$SCRIPT_DIR/compiled/config.properties"
+OUTPUT_JAR="$SCRIPT_DIR/../compiled/CyberArkCredentialProvider.jar"
+PROPERTIES_FILE="$SCRIPT_DIR/../compiled/config.properties"
 
 # Check if the properties file exists
 if [ ! -f $PROPERTIES_FILE ]; then
