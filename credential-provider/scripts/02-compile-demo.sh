@@ -16,8 +16,8 @@ fi
 
 # Define the paths
 CYBERARK_SDK_JAR="/opt/CARKaim/sdk/javapasswordsdk.jar"
-JAVA_SOURCE="$SCRIPT_DIR/code/CyberArkCredentialProvider.java"
-OUTPUT_JAR="$SCRIPT_DIR/compiled/CyberArkCredentialProvider.jar"
+JAVA_SOURCE="$SCRIPT_DIR/../code/CyberArkCredentialProvider.java"
+OUTPUT_JAR="$SCRIPT_DIR/../compiled/CyberArkCredentialProvider.jar"
 
 # Compile the Java program
 javac -cp .:$CYBERARK_SDK_JAR $JAVA_SOURCE
