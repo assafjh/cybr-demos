@@ -17,13 +17,14 @@ fi
 # Define the paths
 CYBERARK_SDK_JAR="/opt/CARKaim/sdk/javapasswordsdk.jar"
 JAVA_SOURCE="$SCRIPT_DIR/../code/CyberArkCredentialProvider.java"
+MANIFEST_FILE="$SCRIPT_DIR/../code/manifest.txt"
 OUTPUT_JAR="$SCRIPT_DIR/../compiled/CyberArkCredentialProvider.jar"
 
 # Compile the Java program
 javac -cp .:$CYBERARK_SDK_JAR $JAVA_SOURCE
 
 # Create the JAR file
-jar cfm $OUTPUT_JAR manifest.txt CyberArkCredentialProvider.class
+jar cfm $OUTPUT_JAR $MANIFEST_FILE CyberArkCredentialProvider.class
 
 
 echo "Compilation successful. JAR file created: $OUTPUT_JAR"
