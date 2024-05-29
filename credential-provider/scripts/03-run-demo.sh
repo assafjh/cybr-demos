@@ -20,4 +20,4 @@ if [ ! -f $PROPERTIES_FILE ]; then
 fi
 
 # Run the JAR file
-java -cp .:$CYBERARK_SDK_JAR:$OUTPUT_JAR CyberArkCredentialProvider
+java -cp .:$CYBERARK_SDK_JAR:$OUTPUT_JAR CyberArkCredentialProvider "$PROPERTIES_FILE"
