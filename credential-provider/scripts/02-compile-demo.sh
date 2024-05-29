@@ -23,7 +23,7 @@ OUTPUT_JAR="$SCRIPT_DIR/../compiled/CyberArkCredentialProvider.jar"
 javac -cp .:"$CYBERARK_SDK_JAR" "$JAVA_SOURCE_FOLDER/CyberArkCredentialProvider.java"
 
 # Create the JAR file
-jar cfm "$OUTPUT_JAR $JAVA_SOURCE_FOLDER/manifest.txt" "CyberArkCredentialProvider.class"
+jar cfm "$OUTPUT_JAR" "$JAVA_SOURCE_FOLDER/manifest.txt" -C "$JAVA_SOURCE_FOLDER" CyberArkCredentialProvider.class
 
 
 echo "Compilation successful. JAR file created: $OUTPUT_JAR"
