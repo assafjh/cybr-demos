@@ -1,18 +1,23 @@
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import java.util.Arrays;
 import javapasswordsdk.*;
 import javapasswordsdk.exceptions.*;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 public class CyberArkCredentialProvider {
 
     public static void main(String[] args) {
+        if (args.length < 1) {
+            System.err.println("Please provide the path to the config.properties file.");
+            return;
+        }
+
+        String propertiesFilePath = args[0];
         Properties properties = new Properties();
 
         // Load properties from config file
-        try (FileInputStream input = new FileInputStream("config.properties")) {
+        try (FileInputStream input = new FileInputStream(propertiesFilePath)) {
             properties.load(input);
         } catch (IOException e) {
             System.err.println("Error loading properties file: " + e.getMessage());
@@ -46,9 +51,6 @@ public class CyberArkCredentialProvider {
             // Print the password (for demonstration purposes; be careful with printing sensitive information)
             System.out.println("Retrieved password: " + new String(content));
 
-            // Use other password properties, e.g., username
-            // System.out.println("Username: " + password.getUserName());
-
         } catch (PSDKException ex) {
             System.err.println("Error retrieving password: " + ex.getMessage());
             ex.printStackTrace();
@@ -68,3 +70,4 @@ public class CyberArkCredentialProvider {
         }
     }
 }
+
