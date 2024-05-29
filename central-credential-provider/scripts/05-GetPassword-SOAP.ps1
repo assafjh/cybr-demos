@@ -11,7 +11,7 @@ $Object = "Misc-SampleGroup (1)"
 $Reason = "Demo"
 $ConnectionTimeout = 30
 
-# Account property we want to extract from the response:
+# Account property we want to extract from the response
 $accountProperty = "Content"
 
 # Define the SOAP request XML
@@ -53,11 +53,11 @@ $namespaceManager = New-Object System.Xml.XmlNamespaceManager($xmlDoc.NameTable)
 $namespaceManager.AddNamespace("soap", "http://schemas.xmlsoap.org/soap/envelope/")
 $namespaceManager.AddNamespace("t", "https://tempuri.org/")
 
-# Extract the Content key
+# Extract the specified account property
 $contentNode = $xmlDoc.SelectSingleNode("//t:GetPasswordResponse/t:GetPasswordResult/t:$accountProperty", $namespaceManager)
 
 if ($contentNode -ne $null) {
     Write-Host "${accountProperty}: $($contentNode.InnerText)" -ForegroundColor Green
 } else {
-    Write-Host "${accountProperty} key not found in the response." -ForegroundColor Red
+    Write-Host "$accountProperty key not found in the response." -ForegroundColor Red
 }
