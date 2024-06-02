@@ -26,7 +26,10 @@ done
 
 # Populate authenticator values
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/gitlab1/issuer -v "$GITLAB_ISSUER"
-"$CONJUR_CLI" variable set -i conjur/authn-jwt/gitlab1/jwks-uri -v "$GITLAB_URL/-/jwks/"
+# New JWKS URI
+"$CONJUR_CLI" variable set -i conjur/authn-jwt/gitlab1/jwks-uri -v "$GITLAB_URL/oauth/discovery/keys"
+# Deprecated JWKS URI
+#"$CONJUR_CLI" variable set -i conjur/authn-jwt/gitlab1/jwks-uri -v "$GITLAB_URL/-/jwks/"
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/gitlab1/token-app-property -v "namespace_path"
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/gitlab1/enforced-claims -v "ref,ref_type"
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/gitlab1/identity-path -v "/data/gitlab/ci"
