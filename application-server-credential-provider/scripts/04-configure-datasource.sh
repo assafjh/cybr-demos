@@ -63,16 +63,16 @@ if grep -q "<Resource name=\"jdbc/CyberArkDS\"" "$CONTEXT_XML"; then
 else
     $SUDO sed -i "/<\/Context>/i \
     <Resource name=\"jdbc/CyberArkDS\" \
-              auth=\"Container\" \
-              type=\"javax.sql.DataSource\" \
-              driverClassName=\"com.cyberark.jdbc.ASCPDriver\" \
-              url=\"jdbc:ascp:jdbc:postgresql://$POSTGRES_DB_HOST:$POSTGRES_DB_PORT/$POSTGRES_DB_NAME\" \
-              username=\"dummy\" \
-              password=\"dummy\" \
-              connectionProperties=\" \
-              ascp_AppId=$APP_ID; \
-              ascp_Query=Safe=$SAFE,Folder=$FOLDER,Object=$OBJCET,Reason=$REASON; \
-              ascp_VendorClass=org.postgresql.Driver; >" "$CONTEXT_XML"
+          auth=\"Container\" \
+          type=\"javax.sql.DataSource\" \
+          driverClassName=\"com.cyberark.jdbc.ASCPDriver\" \
+          url=\"jdbc:ascp:jdbc:postgresql://$POSTGRES_DB_HOST:$POSTGRES_DB_PORT/$POSTGRES_DB_NAME\" \
+          username=\"dummy\" \
+          password=\"dummy\" \
+          connectionProperties=\"ascp_AppId=$APP_ID; \
+                               ascp_Query=Safe=$SAFE,Folder=$FOLDER,Object=$OBJECT,Reason=$REASON; \
+                               ascp_VendorClass=org.postgresql.Driver; \
+                               ssl=true\"/>" "$CONTEXT_XML"
     echo "CyberArk DataSource configuration added to context.xml"
 fi
 
