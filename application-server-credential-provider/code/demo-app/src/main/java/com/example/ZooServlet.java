@@ -32,14 +32,14 @@ public class ZooServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
+        out.println("<html><body>");
+        out.println("<h1>Zoo Table</h1>");
+        out.println("<table border='1'>");
+        out.println("<tr><th>ID</th><th>Name</th><th>Species</th></tr>");
+
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM zoo")) {
-
-            out.println("<html><body>");
-            out.println("<h1>Zoo Table</h1>");
-            out.println("<table border='1'>");
-            out.println("<tr><th>ID</th><th>Name</th><th>Species</th></tr>");
 
             while (rs.next()) {
                 out.println("<tr>");
@@ -49,13 +49,13 @@ public class ZooServlet extends HttpServlet {
                 out.println("</tr>");
             }
 
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.println("<tr><td colspan='3'>Error: " + e.getMessage() + "</td></tr>");
+        } finally {
             out.println("</table>");
             out.println("</body></html>");
-
-        } catch (Exception e) {
-            out.println("Error: " + e.getMessage());
-            e.printStackTrace(out);
+            out.close();
         }
     }
 }
-
