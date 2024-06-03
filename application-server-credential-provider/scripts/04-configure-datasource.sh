@@ -10,6 +10,7 @@ POSTGRES_JDBC_URL="https://jdbc.postgresql.org/download/postgresql-42.2.24.jar"
 POSTGRES_JDBC_JAR="postgresql-42.2.24.jar"
 CONTEXT_XML="$TOMCAT_HOME/conf/context.xml"
 DB_HOST=$(hostname)
+DB_PORT=5433
 
 # Ensure the script is run as root or with sudo if needed
 SUDO=
@@ -34,7 +35,7 @@ else
               username=\"reception\" \
               password=\"vet_123456\" \
               driverClassName=\"org.postgresql.Driver\" \
-              url=\"jdbc:postgresql://$DB_HOST:5432/vet\" \
+              url=\"jdbc:postgresql://$DB_HOST:$DB_PORT/vet\" \
               maxActive=\"20\" \
               maxIdle=\"10\" \
               maxWait=\"-1\"/>" "$CONTEXT_XML"
