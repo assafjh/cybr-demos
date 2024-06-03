@@ -73,6 +73,29 @@ function configure_tomcat() {
   sed -i "s/port=\"8080\"/port=\"$port\"/" $install_dir/conf/server.xml
 }
 
+# Function to configure Tomcat users for admin access
+configure_tomcat_users() {
+  local install_dir=$1
+  cat <<EOL > $install_dir/conf/tomcat-users.xml
+<tomcat-users>
+    <role rolename="manager-gui"/>
+    <role rolename="admin-gui"/>
+    <role rolename="manager-script"/>
+    <user username="admin" password="password" roles="manager-gui,admin-gui,manager-script"/>
+</tomcat-users>
+EOL
+
+  # Remove restrictions on IP addresses for accessing manager and host-manager
+  sed -i '/<Valve className="org.apache.catalina.valves.RemoteAddrValve"/d' $install_dir/webapps/manager/META-INF/context.xml
+  sed -i '/<Valve className="org.apache.catalina.valves.RemoteAddrValve"/d' $install_dir/webapps/host-manager/META-INF/context.xml
+
+  sed -i '/<\/Context>/i \
+<Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="^.*$" />' $install_dir/webapps/manager/META-INF/context.xml
+
+  sed -i '/<\/Context>/i \
+<Valve className="org.apache.catalina.valves.RemoteAddrValve" allow="^.*$" />' $install_dir/webapps/host-manager/META-INF/context.xml
+}
+
 # Main script
 if ! check_java_version; then
   echo "Java 17 or higher is required. Please install Java 17 or higher."
@@ -85,7 +108,8 @@ install_tomcat $TOMCAT_VERSION $INSTALL_DIR
 # Set JAVA_HOME dynamically and configure Tomcat
 set_java_home
 configure_tomcat $INSTALL_DIR $TOMCAT_PORT
+configure_tomcat_users $INSTALL_DIR
 
 echo "Tomcat installation completed successfully."
-echo "To start Tomcat, run ./start_tomcat.sh"
+echo "To start Tomcat, run ./07-start-tomcat.sh"
 
