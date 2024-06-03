@@ -20,7 +20,7 @@ POSTGRES_DB_PASSWORD=vet_123456
 CYBERARK_JDBC_JAR="/opt/CARKaim/sdk/javapasswordsdk.jar"
 APP_ID=AIMWebService
 SAFE=Demo-Safe-General
-OBJECT=
+OBJECT=Database-PostgreSQL-reception
 FOLDER=Root
 REASON=Demo
 
