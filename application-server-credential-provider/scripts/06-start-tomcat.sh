@@ -14,7 +14,7 @@ start_tomcat() {
 
   echo "Starting Tomcat..."
   $install_dir/bin/startup.sh
-  echo "Tomcat started. Access it at http://localhost:$TOMCAT_PORT/demo-app"
+  echo "Tomcat started. Access it at http://<host>:$TOMCAT_PORT/demo-app"
 }
 
 # Main script

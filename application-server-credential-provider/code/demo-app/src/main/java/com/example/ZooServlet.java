@@ -16,41 +16,33 @@ import javax.sql.DataSource;
 
 @WebServlet("/zoo")
 public class ZooServlet extends HttpServlet {
-    private DataSource dataSource;
-    private String dataSourceName;
+    private DataSource postgresDS;
+    private DataSource cyberArkDS;
 
     @Override
     public void init() throws ServletException {
-        // Default DataSource name
-        dataSourceName = "jdbc/PostgresDS";
+        try {
+            InitialContext ctx = new InitialContext();
+            postgresDS = (DataSource) ctx.lookup("java:comp/env/jdbc/PostgresDS");
+            cyberArkDS = (DataSource) ctx.lookup("java:comp/env/jdbc/CyberArkDS");
+        } catch (NamingException e) {
+            throw new ServletException("Unable to lookup DataSource", e);
+        }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Check for the source parameter
-        String source = request.getParameter("source");
-        if (source != null) {
-            dataSourceName = "jdbc/" + source;
-        }
-
-        try {
-            InitialContext ctx = new InitialContext();
-            dataSource = (DataSource) ctx.lookup("java:comp/env/" + dataSourceName);
-        } catch (NamingException e) {
-            throw new ServletException("Unable to lookup DataSource", e);
-        }
-
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        out.println("<html><body>");
-        out.println("<h1>Using DataSource: " + dataSourceName + "</h1>");
-        out.println("<h1>Zoo Table</h1>");
-        out.println("<table border='1'>");
-        out.println("<tr><th>ID</th><th>Type</th><th>Caregiver</th><th>Email</th></tr>");
-
+        DataSource dataSource = "cyberark".equals(request.getParameter("source")) ? cyberArkDS : postgresDS;
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM zoo")) {
+
+            out.println("<html><body>");
+            out.println("<h1>Zoo Table</h1>");
+            out.println("<table border='1'>");
+            out.println("<tr><th>ID</th><th>Name</th><th>Species</th></tr>");
 
             while (rs.next()) {
                 out.println("<tr>");
@@ -61,13 +53,13 @@ public class ZooServlet extends HttpServlet {
                 out.println("</tr>");
             }
 
+            out.println("</table>");
+            out.println("</body></html>");
+
         } catch (Exception e) {
             out.println("Error: " + e.getMessage());
             e.printStackTrace(out);
         }
-
-        out.println("</table>");
-        out.println("</body></html>");
     }
 }
 
