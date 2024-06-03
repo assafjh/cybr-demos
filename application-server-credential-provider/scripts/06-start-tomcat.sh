@@ -14,14 +14,9 @@ start_tomcat() {
 
   echo "Starting Tomcat..."
   $install_dir/bin/startup.sh
-  echo "Tomcat started. Access it at http://localhost:$TOMCAT_PORT/demo-app/zoo"
+  echo "Tomcat started. Access it at http://localhost:$TOMCAT_PORT/demo-app"
 }
 
 # Main script
 start_tomcat $INSTALL_DIR
-
-sleep 3
-
-echo "Calling demo app"
-curl "http://localhost:$TOMCAT_PORT/demo-app/zoo"
 
