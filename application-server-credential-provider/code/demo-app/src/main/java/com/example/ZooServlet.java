@@ -13,9 +13,11 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
+import java.util.logging.Logger;
 
 @WebServlet("/zoo")
 public class ZooServlet extends HttpServlet {
+    private static final Logger logger = Logger.getLogger(ZooServlet.class.getName());
     private DataSource postgresDS;
     private DataSource cyberArkDS;
 
@@ -34,15 +36,30 @@ public class ZooServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-        DataSource dataSource = "cyberark".equals(request.getParameter("source")) ? cyberArkDS : postgresDS;
+        
+        String dataSourceName;
+        DataSource dataSource;
+        
+        if ("cyberark".equals(request.getParameter("source"))) {
+            dataSource = cyberArkDS;
+            dataSourceName = "CyberArkDS";
+        } else {
+            dataSource = postgresDS;
+            dataSourceName = "PostgresDS";
+        }
+        
+        // Log the data source used
+        logger.info("Using DataSource: " + dataSourceName);
+
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM zoo")) {
 
             out.println("<html><body>");
             out.println("<h1>Zoo Table</h1>");
+            out.println("<p>Using DataSource: " + dataSourceName + "</p>");
             out.println("<table border='1'>");
-            out.println("<tr><th>ID</th><th>Name</th><th>Species</th></tr>");
+            out.println("<tr><th>ID</th><th>Type</th><th>Caregiver</th><th>Email</th></tr>");
 
             while (rs.next()) {
                 out.println("<tr>");
@@ -62,4 +79,3 @@ public class ZooServlet extends HttpServlet {
         }
     }
 }
-
