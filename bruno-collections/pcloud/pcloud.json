@@ -321,8 +321,7 @@
             "method": "GET",
             "headers": [],
             "body": {
-              "mode": "json",
-              "json": "",
+              "mode": "none",
               "formUrlEncoded": [],
               "multipartForm": []
             },
@@ -337,22 +336,7 @@
               }
             },
             "script": {},
-            "vars": {
-              "req": [
-                {
-                  "name": "accountName",
-                  "value": "Database-PostgreSQL-reception",
-                  "enabled": true,
-                  "local": false
-                },
-                {
-                  "name": "safeName",
-                  "value": "New-Safe",
-                  "enabled": true,
-                  "local": false
-                }
-              ]
-            },
+            "vars": {},
             "assertions": [],
             "tests": "function findIdByNameAndSafe(array, nameValue, safeValue) {\n  const item = array.find(item => item.name === nameValue && item.safeName === safeValue);\n  return item ? item.id : null;\n}\ntest(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive account\", function() {\n  const data = res.getBody();\n  const idResult = findIdByNameAndSafe(data.value, bru.getVar(\"accountName\"), bru.getVar(\"safeName\"));\n  expect(idResult).to.be.a('string');\n  bru.setEnvVar(\"accountID\", idResult);\n});",
             "query": []
