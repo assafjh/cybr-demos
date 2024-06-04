@@ -22,3 +22,6 @@ Instructions for each scenario can be found in its respective folder.
 16. kubernetes-external-secrets-operator: Using Kubernetes ESO with Conjur provider
 17. upgrade-conjur-enterprise-version: Upgrade a demo Conjur Enterprise server version
 18. teamcity: Conjur Integration with TeamCity
+19. credential-provider: CP agent deployed on Linux and Plain Old Java app demo
+20. central-credential-provider: CCP demo (REST,SOAP)
+21. application-server-credential-provider: CP agent deployed on Linux and Tomcat hosted Jakart servlet
