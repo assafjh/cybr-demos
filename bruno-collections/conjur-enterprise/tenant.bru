@@ -1,0 +1,11 @@
+vars {
+  conjur-url: <conjur-url>
+  conjur-account: conjur
+  username: admin
+  conjur-variable-path: data/terraform/plans/safe/summon/secret1
+}
+vars:secret [
+  password,
+  conjur-api-key,
+  conjur-token
+]

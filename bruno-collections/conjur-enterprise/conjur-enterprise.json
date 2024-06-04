@@ -1,0 +1,165 @@
+{
+  "name": "Conjur Enterprise",
+  "version": "1",
+  "items": [
+    {
+      "type": "http",
+      "name": "1 - User Login - Generate Auth Token",
+      "seq": 1,
+      "request": {
+        "url": "{{conjur-url}}/authn/{{conjur-account}}/login",
+        "method": "GET",
+        "headers": [],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "basic",
+          "basic": {
+            "username": "{{username}}",
+            "password": "{{password}}"
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n  bru.setEnvVar(\"conjur-api-key\",data);\n});",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "2 - Authenticate to Conjur",
+      "seq": 2,
+      "request": {
+        "url": "{{conjur-url}}/authn/{{conjur-account}}/{{username}}/authenticate",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept-Encoding",
+            "value": "base64",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "text",
+          "text": "{{conjur-api-key}}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n  bru.setEnvVar(\"conjur-token\",data);\n});",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "3 - Retrieve Secret",
+      "seq": 3,
+      "request": {
+        "url": "{{conjur-url}}/secrets/{{conjur-account}}/variable/{{conjur-variable-path}}",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Token token=\"{{conjur-token}}\"",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive a secret\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n});",
+        "query": []
+      }
+    }
+  ],
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "conjur-url",
+          "value": "https://ajh-pub-lab",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "conjur-account",
+          "value": "conjur",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "username",
+          "value": "admin",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "conjur-variable-path",
+          "value": "data/terraform/plans/safe/summon/secret1",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "password",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "conjur-api-key",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "conjur-token",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "Conjur Pub Lab"
+    }
+  ]
+}
