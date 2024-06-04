@@ -111,5 +111,5 @@ configure_tomcat $INSTALL_DIR $TOMCAT_PORT
 configure_tomcat_users $INSTALL_DIR
 
 echo "Tomcat installation completed successfully."
-echo "To start Tomcat, run ./07-start-tomcat.sh"
+echo "To start Tomcat, run ./06-start-tomcat.sh"
 
