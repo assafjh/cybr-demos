@@ -23,7 +23,6 @@ APP_ID=AIMWebService
 SAFE=Demo-Safe-General
 OBJECT=Database-PostgreSQL-reception
 FOLDER=Root
-REASON=Demo
 
 # Ensure the script is run as root or with sudo if needed
 SUDO=
