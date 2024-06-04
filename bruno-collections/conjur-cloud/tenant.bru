@@ -1,0 +1,12 @@
+vars {
+  clientId: myClientId
+  identityURL: <tenant>.id.cyberark.cloud
+  conjurAPIURL: <tenant-id>.secretsmgr.cyberark.cloud
+  workload: host/data/ansible/apps/conjur-demo
+}
+vars:secret [
+  identityToken,
+  clientSecret,
+  conjurAuthnJWT,
+  workloadAPIKey
+]

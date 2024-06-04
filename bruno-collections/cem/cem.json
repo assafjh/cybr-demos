@@ -1,0 +1,180 @@
+{
+  "name": "CEM",
+  "version": "1",
+  "items": [
+    {
+      "type": "http",
+      "name": "1 - Authenticate to Identity Platform",
+      "seq": 1,
+      "request": {
+        "url": "https://{{identityURL}}/oauth2/platformtoken",
+        "method": "POST",
+        "headers": [],
+        "body": {
+          "mode": "formUrlEncoded",
+          "formUrlEncoded": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials",
+              "enabled": true
+            },
+            {
+              "name": "client_id",
+              "value": "{{clientId}}",
+              "enabled": true
+            },
+            {
+              "name": "client_secret",
+              "value": "{{clientSecret}}",
+              "enabled": true
+            }
+          ],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "2 - Trigger CEM scan",
+      "seq": 2,
+      "request": {
+        "url": "https://{{cemURL}}/api/scan",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "accept",
+            "value": "*/*",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "bearer",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": "{{identityToken}}"
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [
+          {
+            "name": "res.status",
+            "value": "eq 200",
+            "enabled": true,
+            "uid": "FD1wmHM2fp1s9aFdV20X3"
+          }
+        ],
+        "tests": "",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "3 - Return scan status",
+      "seq": 3,
+      "request": {
+        "url": "https://{{cemURL}}/api/scan/status",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Accept",
+            "value": "application/json",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "bearer",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": "{{identityToken}}"
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [
+          {
+            "name": "res.status",
+            "value": "eq 200",
+            "enabled": true,
+            "uid": "oBR63xh8SL299Cv41Jl6N"
+          }
+        ],
+        "tests": "",
+        "query": []
+      }
+    }
+  ],
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "clientId",
+          "value": "assaf-sa@algosec.poc",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "identityURL",
+          "value": "abg4315.id.cyberark.cloud",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "cemURL",
+          "value": "algosec-cem.cyberark.cloud",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "identityToken",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "clientSecret",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "AlgoSec"
+    }
+  ]
+}

@@ -1,0 +1,472 @@
+{
+  "name": "Conjur Cloud",
+  "version": "1",
+  "items": [
+    {
+      "type": "http",
+      "name": "0 - Workload Authentication",
+      "seq": 1,
+      "request": {
+        "url": "https://{{conjurAPIURL}}/api/authn/conjur/{{URLEncodedWorkload}}/authenticate",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Content-Type",
+            "value": "text/plain",
+            "enabled": true
+          },
+          {
+            "name": "Accept-Encoding",
+            "value": "base64",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "text",
+          "text": "{{workloadAPIKey}}",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {
+          "req": "bru.setVar(\"URLEncodedWorkload\",encodeURIComponent(bru.getEnvVar(\"workload\")));"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n  bru.setEnvVar(\"conjurAuthnJWT\", data);\n});",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "1 - Authenticate to Identity Platform",
+      "seq": 2,
+      "request": {
+        "url": "https://{{identityURL}}/oauth2/platformtoken",
+        "method": "POST",
+        "headers": [],
+        "body": {
+          "mode": "formUrlEncoded",
+          "formUrlEncoded": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials",
+              "enabled": true
+            },
+            {
+              "name": "client_id",
+              "value": "{{clientId}}",
+              "enabled": true
+            },
+            {
+              "name": "client_secret",
+              "value": "{{clientSecret}}",
+              "enabled": true
+            }
+          ],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "2 - Authenticate to Conjur",
+      "seq": 3,
+      "request": {
+        "url": "https://{{conjurAPIURL}}/api/authn-oidc/cyberark/conjur/authenticate",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Accept-Encoding",
+            "value": "base64",
+            "enabled": true
+          },
+          {
+            "name": "Content-Type",
+            "value": "application/x-www-form-urlencoded",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "formUrlEncoded",
+          "formUrlEncoded": [
+            {
+              "name": "id_token",
+              "value": "{{identityToken}}",
+              "enabled": true
+            }
+          ],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {
+          "res": "bru.setEnvVar(\"conjurAuthnJWT\",res.getBody())"
+        },
+        "vars": {},
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n  bru.setEnvVar(\"conjurAuthnJWT\", data);\n});",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "3 - Retrieve Secret",
+      "seq": 4,
+      "request": {
+        "url": "https://{{conjurAPIURL}}/api/secrets/conjur/variable/{{variablePath}}",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Token token=\"{{conjurAuthnJWT}}\"",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {
+          "req": [
+            {
+              "name": "variablePath",
+              "value": "data/ansible/apps/safe/secret1",
+              "enabled": true,
+              "local": false
+            }
+          ]
+        },
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive a secret\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n});",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "4 - Retrieve Multiple Secrets",
+      "seq": 5,
+      "request": {
+        "url": "https://{{conjurAPIURL}}/api/secrets?variable_ids={{variablePath}}",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Token token=\"{{conjurAuthnJWT}}\"",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {
+          "req": [
+            {
+              "name": "variablePath",
+              "value": "conjur:variable:data/ansible/apps/safe/secret1,conjur:variable:data/ansible/apps/safe/secret2,conjur:variable:data/ansible/apps/safe/secret3",
+              "enabled": true,
+              "local": false
+            }
+          ]
+        },
+        "assertions": [],
+        "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive secrets\", function() {\n  const data = res.getBody();\n  expect(data.error).to.be.undefined;\n});",
+        "query": [
+          {
+            "name": "variable_ids",
+            "value": "{{variablePath}}",
+            "enabled": true
+          }
+        ]
+      }
+    },
+    {
+      "type": "http",
+      "name": "5 - List Secrets",
+      "seq": 6,
+      "request": {
+        "url": "https://{{conjurAPIURL}}/api/resources?kind=variable&account=conjur&limit=5&search=data/ansible/apps/safe",
+        "method": "GET",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Token token=\"{{conjurAuthnJWT}}\"",
+            "enabled": true
+          },
+          {
+            "name": "X-Request-Id",
+            "value": "<string>",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [
+          {
+            "name": "res.status",
+            "value": "eq 200",
+            "enabled": true,
+            "uid": "EZfHSKnktRyM5Y0OHG4yb"
+          }
+        ],
+        "tests": "",
+        "query": [
+          {
+            "name": "kind",
+            "value": "variable",
+            "enabled": true
+          },
+          {
+            "name": "account",
+            "value": "conjur",
+            "enabled": true
+          },
+          {
+            "name": "limit",
+            "value": "5",
+            "enabled": true
+          },
+          {
+            "name": "search",
+            "value": "data/ansible/apps/safe",
+            "enabled": true
+          },
+          {
+            "name": "role",
+            "value": "",
+            "enabled": false
+          },
+          {
+            "name": "count",
+            "value": "",
+            "enabled": false
+          },
+          {
+            "name": "offset",
+            "value": "",
+            "enabled": false
+          },
+          {
+            "name": "acting_as",
+            "value": "",
+            "enabled": false
+          }
+        ]
+      }
+    },
+    {
+      "type": "http",
+      "name": "6 - Create Policy",
+      "seq": 7,
+      "request": {
+        "url": "https://{{conjurAPIURL}}/api/policies/conjur/policy/data",
+        "method": "POST",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Token token=\"{{conjurAuthnJWT}}\"",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "text",
+          "text": "# applied to: data\n---\n# Append policy \n\n- !host\n  id: workloads/example.workload\n  annotations:\n    authn/api-key: true\n\n# Grants the safe access to host app identity\n- !grant\n  roles:\n    - !group  vault/safe-1/delegation/consumers\n  members:\n    - !host workloads/example.workload\n",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "query": []
+      }
+    },
+    {
+      "type": "http",
+      "name": "7 - Rotate API Key",
+      "seq": 8,
+      "request": {
+        "url": "https://{{conjurAPIURL}}/api/authn/conjur/api_key?role=host:data/workloads/example.workload",
+        "method": "PUT",
+        "headers": [
+          {
+            "name": "Authorization",
+            "value": "Token token=\"{{conjurAuthnJWT}}\"",
+            "enabled": true
+          }
+        ],
+        "body": {
+          "mode": "none",
+          "formUrlEncoded": [],
+          "multipartForm": []
+        },
+        "auth": {
+          "mode": "none",
+          "basic": {
+            "username": "",
+            "password": ""
+          },
+          "bearer": {
+            "token": ""
+          }
+        },
+        "script": {},
+        "vars": {},
+        "assertions": [],
+        "tests": "",
+        "query": [
+          {
+            "name": "role",
+            "value": "host:data/workloads/example.workload",
+            "enabled": true
+          }
+        ]
+      }
+    }
+  ],
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "clientId",
+          "value": "ajh-service-account@cyberark.cloud.8128",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "identityURL",
+          "value": "aau4939.id.cyberark.cloud",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "conjurAPIURL",
+          "value": "emeadevops.secretsmgr.cyberark.cloud",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "workload",
+          "value": "host/data/ansible/apps/conjur-demo",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "identityToken",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "clientSecret",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "conjurAuthnJWT",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "workloadAPIKey",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "Frankfort Tenant - EMEA Team"
+    }
+  ]
+}
