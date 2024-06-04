@@ -1,10 +1,10 @@
 # Filename: 04-GetAIMPassword-REST.ps1
 
 # Configuration variables
-$baseUrl = "http://ajh-vault-components-01/AIMWebService/api/Accounts"
+$baseUrl = "<ccp-url>/AIMWebService/api/Accounts"
 $appID = "AIMWebService"
-$safe = "Demo-Safe-General"
-$object = "Misc-SampleGroup"
+$safe = "Credential-Providers"
+$object = "Database-PostgreSQL-reception"
 $folder = "Root"
 $reason = "Demo"
 

@@ -1,0 +1,1029 @@
+{
+  "name": "Central Credential Providers Demo",
+  "version": "1",
+  "items": [
+    {
+      "type": "folder",
+      "name": "01 - Create Application",
+      "items": [
+        {
+          "type": "http",
+          "name": "1 - Authenticate to Identity Platform",
+          "seq": 1,
+          "request": {
+            "url": "https://{{identityURL}}/oauth2/platformtoken",
+            "method": "POST",
+            "headers": [],
+            "body": {
+              "mode": "formUrlEncoded",
+              "formUrlEncoded": [
+                {
+                  "name": "grant_type",
+                  "value": "client_credentials",
+                  "enabled": true
+                },
+                {
+                  "name": "client_id",
+                  "value": "{{clientID}}",
+                  "enabled": true
+                },
+                {
+                  "name": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "enabled": true
+                }
+              ],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "2 - Create Application",
+          "seq": 2,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/WebServices/PIMServices.svc/Applications",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"application\": {\n    \"AppID\": \"{{applicationID}}\",\n    \"Description\": \"{{description}}\",\n    \"Location\": \"\\\\Applications\"\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "description",
+                  "value": "CP Demo Application",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 201",
+                "enabled": true,
+                "uid": "hkBIaTI9otmzkkC6sERlc"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "3 - Get Applications",
+          "seq": 3,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/WebServices/PIMServices.svc/Applications",
+            "method": "GET",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"application\": {\n    \"AppID\": \"{{appID}}\",\n    \"Description\": \"{{description}}\",\n    \"Location\": \"{{location}}\"\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 200",
+                "enabled": true,
+                "uid": "xqWpFzlJ9KbtMLDG5icsM"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "02 - Create Safe",
+      "items": [
+        {
+          "type": "http",
+          "name": "1 - Authenticate to Identity Platform",
+          "seq": 1,
+          "request": {
+            "url": "https://{{identityURL}}/oauth2/platformtoken",
+            "method": "POST",
+            "headers": [],
+            "body": {
+              "mode": "formUrlEncoded",
+              "formUrlEncoded": [
+                {
+                  "name": "grant_type",
+                  "value": "client_credentials",
+                  "enabled": true
+                },
+                {
+                  "name": "client_id",
+                  "value": "{{clientID}}",
+                  "enabled": true
+                },
+                {
+                  "name": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "enabled": true
+                }
+              ],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "2 - Create Safe",
+          "seq": 2,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Safes",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"safeName\": \"{{safeName}}\",\n  \"description\": \"{{description}}\"\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "description",
+                  "value": "Demo Safe for CP",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 200",
+                "enabled": true,
+                "uid": "b8hn2nxi1z3PU2XScS41M"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "3a - Get AppProviders",
+          "seq": 3,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Users/?componentUser=true&userType=AppProvider",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 200",
+                "enabled": true,
+                "uid": "TryxrEBNa3bWZ1w9bfDfZ"
+              }
+            ],
+            "tests": "",
+            "query": [
+              {
+                "name": "componentUser",
+                "value": "true",
+                "enabled": true
+              },
+              {
+                "name": "userType",
+                "value": "AppProvider",
+                "enabled": true
+              }
+            ]
+          }
+        },
+        {
+          "type": "http",
+          "name": "3b - Add Provider to Safe Members",
+          "seq": 4,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Safes/{{safeName}}/Members",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"memberName\": \"{{providerName}}\",\n  \"memberType\": \"{{memberType}}\",\n  \"permissions\": {\n    \"RetrieveAccounts\": {{retrieveAccounts}},\n    \"ListAccounts\": {{listAccounts}},\n    \"ViewSafeMembers\": {{viewSafeMembers}}\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "memberType",
+                  "value": "User",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "retrieveAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "listAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "viewSafeMembers",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 201",
+                "enabled": true,
+                "uid": "HJISlcq3P3UUyqhCFWgyz"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "4 - Add Application to Safe Members",
+          "seq": 5,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Safes/{{safeName}}/Members",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"memberName\": \"{{applicationID}}\",\n  \"memberType\": \"{{memberType}}\",\n  \"permissions\": {\n    \"RetrieveAccounts\": {{retrieveAccounts}},\n    \"ListAccounts\": {{listAccounts}}\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "memberType",
+                  "value": "User",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "retrieveAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "listAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 201",
+                "enabled": true,
+                "uid": "bxyTErHmjPk7XN2WMkBMd"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "5 - Review Safe Permissions",
+          "seq": 6,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Safes/{{safeName}}/Members",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "Optional - Give Safe Member All Permissions",
+          "seq": 7,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Safes/{{safeName}}/Members",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"memberName\": \"{{memberName}}\",\n  \"memberType\": \"{{memberType}}\",\n  \"permissions\": {\n    \"UseAccounts\": {{useAccounts}},\n    \"RetrieveAccounts\": {{retrieveAccounts}},\n    \"ListAccounts\": {{listAccounts}},\n    \"AddAccounts\": {{addAccounts}},\n    \"UpdateAccountContent\": {{updateAccountContent}},\n    \"UpdateAccountProperties\": {{updateAccountProperties}},\n    \"InitiateCPMAccountManagementOperations\": {{initiateCPMAccountManagementOperations}},\n    \"SpecifyNextAccountContent\": {{specifyNextAccountContent}},\n    \"RenameAccounts\": {{renameAccounts}},\n    \"DeleteAccounts\": {{deleteAccounts}},\n    \"UnlockAccounts\": {{unlockAccounts}},\n    \"ManageSafe\": {{manageSafe}},\n    \"ManageSafeMembers\": {{manageSafeMembers}},\n    \"BackupSafe\": {{backupSafe}},\n    \"ViewAuditLog\": {{viewAuditLog}},\n    \"ViewSafeMembers\": {{viewSafeMembers}},\n    \"AccessWithoutConfirmation\": {{accessWithoutConfirmation}},\n    \"CreateFolders\": {{createFolders}},\n    \"DeleteFolders\": {{deleteFolders}},\n    \"MoveAccountsAndFolders\": {{moveAccountsAndFolders}}\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "memberName",
+                  "value": "assaf@assaflab",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "memberType",
+                  "value": "User",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "useAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "retrieveAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "listAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "addAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "updateAccountContent",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "updateAccountProperties",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "initiateCPMAccountManagementOperations",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "specifyNextAccountContent",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "renameAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "deleteAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "unlockAccounts",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "manageSafe",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "manageSafeMembers",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "backupSafe",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "viewAuditLog",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "viewSafeMembers",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "accessWithoutConfirmation",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "createFolders",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "deleteFolders",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "moveAccountsAndFolders",
+                  "value": "true",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 200",
+                "enabled": true,
+                "uid": "Hb19PrtQ3QqKioGJXtjeR"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "03 - Create Account",
+      "items": [
+        {
+          "type": "http",
+          "name": "1 - Authenticate to Identity Platform",
+          "seq": 1,
+          "request": {
+            "url": "https://{{identityURL}}/oauth2/platformtoken",
+            "method": "POST",
+            "headers": [],
+            "body": {
+              "mode": "formUrlEncoded",
+              "formUrlEncoded": [
+                {
+                  "name": "grant_type",
+                  "value": "client_credentials",
+                  "enabled": true
+                },
+                {
+                  "name": "client_id",
+                  "value": "{{clientID}}",
+                  "enabled": true
+                },
+                {
+                  "name": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "enabled": true
+                }
+              ],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "2 - Create Account",
+          "seq": 2,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"safeName\": \"{{safeName}}\",\n  \"platformId\": \"{{platformId}}\",\n  \"username\": \"{{username}}\",\n  \"secretType\": \"{{secretType}}\",\n  \"secret\": \"{{secret}}\"\n}\n",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "platformId",
+                  "value": "PostgreSQL",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "username",
+                  "value": "reception",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "secretType",
+                  "value": "password",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "secret",
+                  "value": "vet_123456",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 200",
+                "enabled": true,
+                "uid": "grmYHUPkqe1IsDSVyynxU"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "3 - Get Account",
+          "seq": 3,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts/?filter=safename eq {{safeName}}",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "\ntest(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive account\", function() {\n  const data = res.getBody();\n  expect(idResult).to.be.a('string');\n});",
+            "query": [
+              {
+                "name": "filter",
+                "value": "safename eq {{safeName}}",
+                "enabled": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "04 - Get Password",
+      "items": [
+        {
+          "type": "http",
+          "name": "REST - GetAIMPassword",
+          "seq": 1,
+          "request": {
+            "url": "{{cCPUrl}}/AIMWebService/api/Accounts?AppID={{applicationID}}&Safe={{safeName}}&Object={{object}}&Folder={{folder}}&Reason={{reason}}",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "object",
+                  "value": "Database-PostgreSQL-reception",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "folder",
+                  "value": "Root",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "reason",
+                  "value": "Demo",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [],
+            "tests": "",
+            "query": [
+              {
+                "name": "AppID",
+                "value": "{{applicationID}}",
+                "enabled": true
+              },
+              {
+                "name": "Safe",
+                "value": "{{safeName}}",
+                "enabled": true
+              },
+              {
+                "name": "Object",
+                "value": "{{object}}",
+                "enabled": true
+              },
+              {
+                "name": "Folder",
+                "value": "{{folder}}",
+                "enabled": true
+              },
+              {
+                "name": "Reason",
+                "value": "{{reason}}",
+                "enabled": true
+              }
+            ]
+          }
+        },
+        {
+          "type": "http",
+          "name": "SOAP - GetPassword",
+          "seq": 2,
+          "request": {
+            "url": "{{cCPUrl}}/AIMWebService/v1.1/AIM.asmx",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "SOAPAction",
+                "value": "https://tempuri.org/GetPassword",
+                "enabled": true
+              },
+              {
+                "name": "Content-Type",
+                "value": "text/xml; charset=utf-8",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "xml",
+              "xml": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <soap:Body>\n    <GetPassword xmlns=\"https://tempuri.org/\">\n      <passwordWSRequest>\n        <AppID>{{applicationID}}</AppID>\n        <Safe>{{safeName}}</Safe>\n        <Folder>{{folder}}</Folder>\n        <Object>{{object}}</Object>\n        <Reason>{{reason}}</Reason>\n        <ConnectionTimeout>30</ConnectionTimeout>\n      </passwordWSRequest>\n    </GetPassword>\n  </soap:Body>\n</soap:Envelope>\n",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "folder",
+                  "value": "Root",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "object",
+                  "value": "Database-PostgreSQL-reception",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "reason",
+                  "value": "Demo",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [],
+            "tests": "",
+            "query": []
+          }
+        }
+      ]
+    }
+  ],
+  "activeEnvironmentUid": "N5rSQOs1JrITtyUK8FdZ1",
+  "environments": [
+    {
+      "variables": [
+        {
+          "name": "identityURL",
+          "value": "assaflab.id.cyberark.cloud",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "pCloudURL",
+          "value": "assaf-lab.privilegecloud.cyberark.cloud",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "cCPUrl",
+          "value": "http://ajh-vault-components-01",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "clientID",
+          "value": "assaf-sa@assaflab",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "safeName",
+          "value": "Credential-Providers",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "providerName",
+          "value": "Prov_EC2AMAZ-O7AVQ1P",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "applicationID",
+          "value": "AIMWebService",
+          "enabled": true,
+          "secret": false,
+          "type": "text"
+        },
+        {
+          "name": "clientSecret",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        },
+        {
+          "name": "identityToken",
+          "value": "",
+          "enabled": true,
+          "secret": true,
+          "type": "text"
+        }
+      ],
+      "name": "Assaf Lab"
+    }
+  ]
+}
