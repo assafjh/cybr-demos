@@ -1,13 +1,13 @@
 ﻿# Filename: 05-GetPassword-SOAP.ps1
 
 # Define CCP URL
-$ccp = "http://ajh-vault-components-01"
+$ccp = "http://<ccp-url>"
 
 # Define SOAP request attributes as variables
-$AppID = "AIMWebService"
-$Safe = "Demo-Safe-General"
+$AppID = "AIMWebService" 
+$Safe = "Credential-Providers"
 $Folder = "Root"
-$Object = "Misc-SampleGroup (1)"
+$Object = "Database-PostgreSQL-reception"
 $Reason = "Demo"
 $ConnectionTimeout = 30
 
