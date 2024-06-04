@@ -18,6 +18,7 @@ POSTGRES_DB_USER=reception
 POSTGRES_DB_PASSWORD=vet_123456
 # -- Credential Provider --
 CYBERARK_JDBC_JAR="/opt/CARKaim/sdk/javapasswordsdk.jar"
+CYBERARK_SDK_JAR="<PATH_TO_JDBC_JAR>"
 APP_ID=AIMWebService
 SAFE=Demo-Safe-General
 OBJECT=Database-PostgreSQL-reception
@@ -35,7 +36,9 @@ wget -q $POSTGRES_JDBC_URL -O /tmp/$POSTGRES_JDBC_JAR
 echo "Copying PostgreSQL JDBC Driver to Tomcat's lib directory..."
 $SUDO cp /tmp/$POSTGRES_JDBC_JAR $TOMCAT_HOME/lib/
 
-# Copy CyberArk JDBC Driver to Tomcat's lib directory
+# Copy CyberArk JARs to Tomcat's lib directory
+echo "Copying CyberArk SDK to Tomcat's lib directory..."
+$SUDO cp $CYBERARK_SDK_JAR $TOMCAT_HOME/lib/
 echo "Copying CyberArk JDBC Driver to Tomcat's lib directory..."
 $SUDO cp $CYBERARK_JDBC_JAR $TOMCAT_HOME/lib/
 
