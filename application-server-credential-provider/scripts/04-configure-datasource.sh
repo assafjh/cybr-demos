@@ -73,9 +73,8 @@ else
           username=\"dummy\" \
           password=\"dummy\" \
           connectionProperties=\"ascp_AppId=$APP_ID; \
-                               ascp_Query=Safe=$SAFE,Folder=$FOLDER,Object=$OBJECT,Reason=$REASON; \
-                               ascp_VendorClass=org.postgresql.Driver; \
-                               ssl=true\"/>" "$CONTEXT_XML"
+                               ascp_Query=Safe=$SAFE,Folder=$FOLDER,Object=$OBJECT; \
+                               ascp_VendorClass=org.postgresql.Driver;\"/>" "$CONTEXT_XML"
     echo "CyberArk DataSource configuration added to context.xml"
 fi
 
