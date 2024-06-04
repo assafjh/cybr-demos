@@ -4,7 +4,7 @@
   "items": [
     {
       "type": "folder",
-      "name": "Retrieve Secret",
+      "name": "Generate Secret",
       "items": [
         {
           "type": "http",
@@ -113,13 +113,7 @@
             "tests": "test(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the account\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n  bru.setEnvVar(\"oldPassword\", data);\n});",
             "query": []
           }
-        }
-      ]
-    },
-    {
-      "type": "folder",
-      "name": "Generate Secret",
-      "items": [
+        },
         {
           "type": "http",
           "name": "4 - Generate Secret",
@@ -148,114 +142,6 @@
             "vars": {},
             "assertions": [],
             "tests": "test(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the account\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"newPassword\", data.Password);\n});",
-            "query": []
-          }
-        },
-        {
-          "type": "http",
-          "name": "1 - Authenticate to Identity Platform",
-          "seq": 1,
-          "request": {
-            "url": "https://{{identityURL}}/oauth2/platformtoken",
-            "method": "POST",
-            "headers": [],
-            "body": {
-              "mode": "formUrlEncoded",
-              "formUrlEncoded": [
-                {
-                  "name": "grant_type",
-                  "value": "client_credentials",
-                  "enabled": true
-                },
-                {
-                  "name": "client_id",
-                  "value": "{{clientID}}",
-                  "enabled": true
-                },
-                {
-                  "name": "client_secret",
-                  "value": "{{clientSecret}}",
-                  "enabled": true
-                }
-              ],
-              "multipartForm": []
-            },
-            "auth": {
-              "mode": "none",
-              "basic": {
-                "username": "",
-                "password": ""
-              },
-              "bearer": {
-                "token": ""
-              }
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
-            "query": []
-          }
-        },
-        {
-          "type": "http",
-          "name": "2 - Get Accounts",
-          "seq": 2,
-          "request": {
-            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts/",
-            "method": "GET",
-            "headers": [],
-            "body": {
-              "mode": "json",
-              "json": "",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "auth": {
-              "mode": "bearer",
-              "basic": {
-                "username": "",
-                "password": ""
-              },
-              "bearer": {
-                "token": "{{identityToken}}"
-              }
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "function findIdByName(array, nameValue) {\n  const item = array.find(item => item.name === nameValue);\n  return item ? item.id : null;\n}\n\ntest(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive account\", function() {\n  const data = res.getBody();\n  const idResult = findIdByName(data.value, bru.getEnvVar(\"accountName\"));\n  expect(idResult).to.be.a('string');\n  bru.setEnvVar(\"accountID\", idResult);\n});",
-            "query": []
-          }
-        },
-        {
-          "type": "http",
-          "name": "3 - Retrieve Secret",
-          "seq": 3,
-          "request": {
-            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts/{{accountID}}/Secret/Retrieve",
-            "method": "POST",
-            "headers": [],
-            "body": {
-              "mode": "json",
-              "json": "{\n  \"reason\" :\"Demo\"\n}",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "auth": {
-              "mode": "bearer",
-              "basic": {
-                "username": "",
-                "password": ""
-              },
-              "bearer": {
-                "token": "{{identityToken}}"
-              }
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "test(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the account\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n  bru.setEnvVar(\"oldPassword\", data);\n});",
             "query": []
           }
         },
@@ -290,7 +176,7 @@
                 "name": "res.status",
                 "value": "eq 200",
                 "enabled": true,
-                "uid": "3QqFqVl61Gqa8GsK0iEIl"
+                "uid": "9PsYgeoOKbtRJZLpFVG1V"
               }
             ],
             "tests": "// ",
@@ -419,7 +305,7 @@
                 "name": "res.status",
                 "value": "eq 200",
                 "enabled": true,
-                "uid": "atRmhIxCHdcpzWh6ceEqk"
+                "uid": "WpsqW6lwOJUbpB5g81kgQ"
               }
             ],
             "tests": "",
@@ -530,44 +416,7 @@
                 "name": "res.status",
                 "value": "eq 200",
                 "enabled": true,
-                "uid": "ULt26ERn91RlehwUzan6c"
-              }
-            ],
-            "tests": "",
-            "query": []
-          }
-        },
-        {
-          "type": "http",
-          "name": "4b - Delete Account",
-          "seq": 6,
-          "request": {
-            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts/{{accountID}}",
-            "method": "DELETE",
-            "headers": [],
-            "body": {
-              "mode": "none",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "auth": {
-              "mode": "bearer",
-              "basic": {
-                "username": "",
-                "password": ""
-              },
-              "bearer": {
-                "token": "{{identityToken}}"
-              }
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [
-              {
-                "name": "res.status",
-                "value": "eq 204",
-                "enabled": true,
-                "uid": "tKbXqYdPquAeY1nV7E0ia"
+                "uid": "GiQkUyj0MBRBiLyhd1NaP"
               }
             ],
             "tests": "",
@@ -619,6 +468,251 @@
             "tests": "function findIdByNameAndSafe(array, nameValue, safeValue) {\n  const item = array.find(item => item.name === nameValue && item.safeName === safeValue);\n  return item ? item.id : null;\n}\ntest(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive account\", function() {\n  const data = res.getBody();\n  const idResult = findIdByNameAndSafe(data.value, bru.getVar(\"accountName\"), bru.getVar(\"safeName\"));\n  expect(idResult).to.be.a('string');\n  bru.setEnvVar(\"accountID\", idResult);\n});",
             "query": []
           }
+        },
+        {
+          "type": "http",
+          "name": "4b - Delete Account",
+          "seq": 6,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts/{{accountID}}",
+            "method": "DELETE",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 204",
+                "enabled": true,
+                "uid": "hIEpQvE0atJCRjIWqBpzN"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Manage Application",
+      "items": [
+        {
+          "type": "http",
+          "name": "1 - Authenticate to Identity Platform",
+          "seq": 1,
+          "request": {
+            "url": "https://{{identityURL}}/oauth2/platformtoken",
+            "method": "POST",
+            "headers": [],
+            "body": {
+              "mode": "formUrlEncoded",
+              "formUrlEncoded": [
+                {
+                  "name": "grant_type",
+                  "value": "client_credentials",
+                  "enabled": true
+                },
+                {
+                  "name": "client_id",
+                  "value": "{{clientID}}",
+                  "enabled": true
+                },
+                {
+                  "name": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "enabled": true
+                }
+              ],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "2 - Create Application",
+          "seq": 2,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/WebServices/PIMServices.svc/Applications",
+            "method": "POST",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"application\": {\n    \"AppID\": \"{{appID}}\",\n    \"Description\": \"{{description}}\",\n    \"Location\": \"\\\\Applications\"\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "appID",
+                  "value": "myAppID",
+                  "enabled": true,
+                  "local": false
+                },
+                {
+                  "name": "description",
+                  "value": "Demo Application",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 201",
+                "enabled": true,
+                "uid": "J9De3X0GJVXbehbC2KqdA"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "3 - Get Applications",
+          "seq": 3,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/WebServices/PIMServices.svc/Applications",
+            "method": "GET",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"application\": {\n    \"AppID\": \"{{appID}}\",\n    \"Description\": \"{{description}}\",\n    \"Location\": \"{{location}}\"\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 200",
+                "enabled": true,
+                "uid": "mbYrEiACfCjcoTG3I2gEa"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "4 - Delete Application",
+          "seq": 4,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/WebServices/PIMServices.svc/Applications/{{appID}}",
+            "method": "DELETE",
+            "headers": [
+              {
+                "name": "Content-Type",
+                "value": "application/json",
+                "enabled": true
+              }
+            ],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"application\": {\n    \"AppID\": \"{{appID}}\",\n    \"Description\": \"{{description}}\",\n    \"Location\": \"{{location}}\"\n  }\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "appID",
+                  "value": "myAppID",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 200",
+                "enabled": true,
+                "uid": "kmhlI2XXSufYm0YgUbRFb"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
         }
       ]
     },
@@ -626,6 +720,52 @@
       "type": "folder",
       "name": "Manage Safe",
       "items": [
+        {
+          "type": "http",
+          "name": "1 - Authenticate to Identity Platform",
+          "seq": 1,
+          "request": {
+            "url": "https://{{identityURL}}/oauth2/platformtoken",
+            "method": "POST",
+            "headers": [],
+            "body": {
+              "mode": "formUrlEncoded",
+              "formUrlEncoded": [
+                {
+                  "name": "grant_type",
+                  "value": "client_credentials",
+                  "enabled": true
+                },
+                {
+                  "name": "client_id",
+                  "value": "{{clientID}}",
+                  "enabled": true
+                },
+                {
+                  "name": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "enabled": true
+                }
+              ],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+            "query": []
+          }
+        },
         {
           "type": "http",
           "name": "2 - Create Safe",
@@ -678,99 +818,7 @@
                 "name": "res.status",
                 "value": "eq 200",
                 "enabled": true,
-                "uid": "fzN1EsCmlfUfL4vQIt4W0"
-              }
-            ],
-            "tests": "",
-            "query": []
-          }
-        },
-        {
-          "type": "http",
-          "name": "1 - Authenticate to Identity Platform",
-          "seq": 1,
-          "request": {
-            "url": "https://{{identityURL}}/oauth2/platformtoken",
-            "method": "POST",
-            "headers": [],
-            "body": {
-              "mode": "formUrlEncoded",
-              "formUrlEncoded": [
-                {
-                  "name": "grant_type",
-                  "value": "client_credentials",
-                  "enabled": true
-                },
-                {
-                  "name": "client_id",
-                  "value": "{{clientID}}",
-                  "enabled": true
-                },
-                {
-                  "name": "client_secret",
-                  "value": "{{clientSecret}}",
-                  "enabled": true
-                }
-              ],
-              "multipartForm": []
-            },
-            "auth": {
-              "mode": "none",
-              "basic": {
-                "username": "",
-                "password": ""
-              },
-              "bearer": {
-                "token": ""
-              }
-            },
-            "script": {},
-            "vars": {},
-            "assertions": [],
-            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
-            "query": []
-          }
-        },
-        {
-          "type": "http",
-          "name": "7 - Delete Safe",
-          "seq": 7,
-          "request": {
-            "url": "https://{{pCloudURL}}/PasswordVault/API/Safes/{{safeName}}",
-            "method": "DELETE",
-            "headers": [],
-            "body": {
-              "mode": "none",
-              "formUrlEncoded": [],
-              "multipartForm": []
-            },
-            "auth": {
-              "mode": "bearer",
-              "basic": {
-                "username": "",
-                "password": ""
-              },
-              "bearer": {
-                "token": "{{identityToken}}"
-              }
-            },
-            "script": {},
-            "vars": {
-              "req": [
-                {
-                  "name": "safeName",
-                  "value": "New-Safe",
-                  "enabled": true,
-                  "local": false
-                }
-              ]
-            },
-            "assertions": [
-              {
-                "name": "res.status",
-                "value": "eq 204",
-                "enabled": true,
-                "uid": "Goq6PRl315TxZExSB9Fmb"
+                "uid": "2pP5K3U7ZshKiuK39iiSJ"
               }
             ],
             "tests": "",
@@ -955,7 +1003,7 @@
                 "name": "res.status",
                 "value": "eq 200",
                 "enabled": true,
-                "uid": "3VO6mnuQ59MrIwMNrpbHp"
+                "uid": "odwp5y4CqraE37C3qlKAn"
               }
             ],
             "tests": "",
@@ -1007,7 +1055,7 @@
                 "name": "res.status",
                 "value": "eq 204",
                 "enabled": true,
-                "uid": "XdGNRne8jFUfNYKAEMoNG"
+                "uid": "eRnDY4zmku4gsJ2I5aCwK"
               }
             ],
             "tests": "",
@@ -1117,7 +1165,53 @@
                 "name": "res.status",
                 "value": "eq 200",
                 "enabled": true,
-                "uid": "SAGDOwHZy8SgOqPBiSR24"
+                "uid": "xYjZ8gXPAHiAgOe6bDBHP"
+              }
+            ],
+            "tests": "",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "7 - Delete Safe",
+          "seq": 7,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Safes/{{safeName}}",
+            "method": "DELETE",
+            "headers": [],
+            "body": {
+              "mode": "none",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {
+              "req": [
+                {
+                  "name": "safeName",
+                  "value": "New-Safe",
+                  "enabled": true,
+                  "local": false
+                }
+              ]
+            },
+            "assertions": [
+              {
+                "name": "res.status",
+                "value": "eq 204",
+                "enabled": true,
+                "uid": "z6e6ZacOh3ohaLY8qcy26"
               }
             ],
             "tests": "",
@@ -1125,9 +1219,123 @@
           }
         }
       ]
+    },
+    {
+      "type": "folder",
+      "name": "Retrieve Secret",
+      "items": [
+        {
+          "type": "http",
+          "name": "1 - Authenticate to Identity Platform",
+          "seq": 1,
+          "request": {
+            "url": "https://{{identityURL}}/oauth2/platformtoken",
+            "method": "POST",
+            "headers": [],
+            "body": {
+              "mode": "formUrlEncoded",
+              "formUrlEncoded": [
+                {
+                  "name": "grant_type",
+                  "value": "client_credentials",
+                  "enabled": true
+                },
+                {
+                  "name": "client_id",
+                  "value": "{{clientID}}",
+                  "enabled": true
+                },
+                {
+                  "name": "client_secret",
+                  "value": "{{clientSecret}}",
+                  "enabled": true
+                }
+              ],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "none",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": ""
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"should be able to login\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the token\", function() {\n  const data = res.getBody();\n  expect(data.access_token).to.be.a('string');\n  bru.setEnvVar(\"identityToken\", data.access_token);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "2 - Get Accounts",
+          "seq": 2,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts/",
+            "method": "GET",
+            "headers": [],
+            "body": {
+              "mode": "json",
+              "json": "",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "function findIdByName(array, nameValue) {\n  const item = array.find(item => item.name === nameValue);\n  return item ? item.id : null;\n}\n\ntest(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive account\", function() {\n  const data = res.getBody();\n  const idResult = findIdByName(data.value, bru.getEnvVar(\"accountName\"));\n  expect(idResult).to.be.a('string');\n  bru.setEnvVar(\"accountID\", idResult);\n});",
+            "query": []
+          }
+        },
+        {
+          "type": "http",
+          "name": "3 - Retrieve Secret",
+          "seq": 3,
+          "request": {
+            "url": "https://{{pCloudURL}}/PasswordVault/API/Accounts/{{accountID}}/Secret/Retrieve",
+            "method": "POST",
+            "headers": [],
+            "body": {
+              "mode": "json",
+              "json": "{\n  \"reason\" :\"Demo\"\n}",
+              "formUrlEncoded": [],
+              "multipartForm": []
+            },
+            "auth": {
+              "mode": "bearer",
+              "basic": {
+                "username": "",
+                "password": ""
+              },
+              "bearer": {
+                "token": "{{identityToken}}"
+              }
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "test(\"valid request status\", function() {\n  const data = res.getBody();\n  expect(res.getStatus()).to.equal(200);\n});\n\ntest(\"should receive the account\", function() {\n  const data = res.getBody();\n  expect(data).to.be.a('string');\n  bru.setEnvVar(\"oldPassword\", data);\n});",
+            "query": []
+          }
+        }
+      ]
     }
   ],
-  "activeEnvironmentUid": "AbLYJcFYjrnaw7fJp6u1L",
+  "activeEnvironmentUid": "alzfBbeYFTvqlS8YMtISW",
   "environments": [
     {
       "variables": [
