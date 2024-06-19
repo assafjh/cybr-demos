@@ -1,0 +1,17 @@
+---
+# Load policy into data branch
+# This policy give permissions to the vault and conjur safe
+
+# Add the host we have created to the group 
+- !grant
+  roles:
+    - !group kubernetes/applications/jwt
+  members:
+    - !host kubernetes/applications/system:serviceaccount:conjur-jwt-cc:conjur-demo-acct
+
+# Add the host to vault/Conjur-Kuberentes/delegation/consumers
+- !grant
+  roles:
+    - !group vault/Conjur-Kuberentes/delegation/consumers
+  members:
+    - !host kubernetes/applications/system:serviceaccount:conjur-jwt-cc:conjur-demo-acct

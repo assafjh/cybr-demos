@@ -1,0 +1,33 @@
+---
+# Deployment for an application that consumes Conjur secrets using REST API bash script
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-conjur-via-rest
+  namespace: conjur-jwt-cc
+  labels:
+    app: jwtsecrets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: demo
+      app: jwtsecrets
+  template:
+    metadata:
+      labels:
+        role: demo
+        app: jwtsecrets
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      - name: k8s-jwt-app
+        image: assafhazan/rest-api-jwt-consumer:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: CONJUR_VARIABLE_PATH
+          value: "data/vault/Conjur-Kuberentes/secret1/password"
+        envFrom:
+        - configMapRef:
+            name: conjur-connect
+
