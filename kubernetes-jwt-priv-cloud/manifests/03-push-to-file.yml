@@ -1,0 +1,94 @@
+---
+# Deployment for Conjur Secrets Provider - push to file mode as sidecar
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: conjur-push-to-file
+  name: demo-sidecar-push-to-file-jwt
+  namespace: conjur-jwt-cc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: conjur-push-to-file
+  template:
+    metadata:
+      labels:
+        app: conjur-push-to-file
+      annotations:
+        # Secrets Provider configuration
+        conjur.org/container-mode: sidecar
+        conjur.org/secrets-destination: file
+        conjur.org/secrets-refresh-interval: 10s
+        conjur.org/secrets-refresh-enabled: "true"
+        # yaml format
+        conjur.org/conjur-secrets-policy-path.yaml1: data/vault/Conjur-Kuberentes/
+        conjur.org/conjur-secrets.yaml1: |
+          - secret3: secret3/password
+          - secret7: secret7/password
+        conjur.org/secret-file-path.yaml1: "./credentials.yaml"
+        conjur.org/secret-file-format.yaml1: "yaml"
+        # template - properties file format
+        conjur.org/conjur-secrets-policy-path.template1: data/vault/Conjur-Kuberentes/
+        conjur.org/conjur-secrets.template1: |
+          - secret3: secret3/password
+          - secret5: secret5/password
+          - secret7: secret7/password
+        conjur.org/secret-file-template.template1: |
+            property.safe.secret3={{ secret "secret3" }}
+            property.safe.secret5={{ secret "secret5" }}
+            property.safe.secret7={{ secret "secret7" }}
+        conjur.org/secret-file-path.template1: "./credentials.properties"
+        # template - binary file
+        conjur.org/conjur-secrets-policy-path.messenger-app: data/kubernetes/applications/safe/
+        conjur.org/conjur-secrets.messenger-app: |
+          - b64data: messenger
+        conjur.org/secret-file-template.messenger-app: |
+            {{ secret "b64data" | b64dec }}
+        conjur.org/secret-file-path.messenger-app: "./messenger"
+        conjur.org/secret-file-format.messenger-app: "template"
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      # Our demo application
+      - name: demo-application
+        image: assafhazan/push-to-file:latest
+        workingDir: /opt/secrets/conjur
+        imagePullPolicy: Always
+        volumeMounts:
+        # Path to the file with the secrets 
+          - name: conjur-secrets
+            mountPath: /opt/secrets/conjur
+      # Sidecar
+      - name: sidecar-push-to-file
+        image: assafhazan/secrets-provider-for-k8s:proxyfix
+        imagePullPolicy: Always
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        envFrom:
+        - configMapRef:
+            name: conjur-connect
+        volumeMounts:
+          - name: podinfo
+            mountPath: /conjur/podinfo
+          - name: conjur-secrets
+            mountPath: /conjur/secrets
+      volumes:
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: "annotations"
+                fieldRef:
+                  fieldPath: metadata.annotations
+        # This is where the sidecar keeps is authentiction token recieved from Conjur
+        - name: conjur-secrets
+          emptyDir:
+            medium: Memory
