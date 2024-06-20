@@ -2,8 +2,8 @@
 - name: Onboard multiple secrets to CyberArk
   hosts: localhost
   vars:
-    identity_url: "https://assaflab.id.cyberark.cloud/oauth2/platformtoken"
-    pcloud_url: "https://assaf-lab.privilegecloud.cyberark.cloud/PasswordVault/API"
+    identity_url: "https://<tenant>.id.cyberark.cloud/oauth2/platformtoken"
+    pcloud_url: "https://<tenant>.privilegecloud.cyberark.cloud/PasswordVault/API"
     client_id: "{{ lookup('env', 'CLIENT_ID') }}"
     client_secret: "{{ lookup('env', 'CLIENT_SECRET') }}"
     general_secrets:
@@ -24,8 +24,8 @@
     safe_name: "Conjur-Kuberentes"
     safe_description: "Demo Safe for Conjur Cloud Kubernetes Integration"
     platform_id_general: "SampleGroup"
-    give_full_access: true  # Set to true to give a member full access to the safe
-    member_name: "assaf@assaflab"
+    give_full_access: false  # Set to true to give a member full access to the safe
+    member_name: "<membername>"
     conjur_user:
       username: "Conjur Sync"
       permissions: ["Use accounts", "Retrieve accounts", "List accounts", "Access Safe without confirmation"]
