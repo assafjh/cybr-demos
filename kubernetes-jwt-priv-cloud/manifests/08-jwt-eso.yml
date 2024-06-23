@@ -1,0 +1,106 @@
+---
+# Conjur External Secret Store
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: conjur
+  namespace: conjur-jwt-cc
+spec:
+  provider:
+    conjur:
+      # Service URL
+      url: "${CONJUR_APPLIANCE_URL}"
+      auth:
+        apikey:
+        jwt:
+          account: "${CONJUR_ACCOUNT}"
+          serviceID: "${CONJUR_AUTHENTICATOR_ID}"
+          serviceAccountRef:
+            name: conjur-demo-acct
+            # optional
+            # audiences:
+            #  - audience
+---
+# Create external secrets
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: conjur-jwt-eso
+  namespace: conjur-jwt-cc
+spec:
+  refreshInterval: 900s
+  secretStoreRef:
+    # This name must match the metadata.name in the `SecretStore`
+    name: conjur
+    kind: SecretStore
+  target:
+    name: conjur-eso
+  dataFrom:
+    - find:
+        # You can use *either* `name` or `tags` to filter the secrets.
+        name:
+          # Match all secrets in the Conjur-Kuberentes branch
+          regexp: "^data/vault/Conjur-Kuberentes/.+$"
+---
+# Creating a role for consuming secrets
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: conjur-demo-allow-to-read-secrets
+  namespace: conjur-jwt-cc
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: [ "get", "update" ]
+---
+# Binding the role to the SA
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: conjur-jwt-cc
+  name: conjur-demo-allow-to-read-secrets-binding
+subjects:
+  - kind: ServiceAccount
+    namespace: conjur-jwt-cc
+    name: conjur-demo-acct
+roleRef:
+  kind: Role
+  apiGroup: rbac.authorization.k8s.io
+  name: conjur-demo-allow-to-read-secrets
+---
+# Deployment for demo application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: demo-consume-eso-secrets
+  name: demo-consume-eso-secrets
+  namespace: conjur-jwt-cc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-consume-eso-secrets
+  template:
+    metadata:
+      labels:
+        app: demo-consume-eso-secrets
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      # Our demo application
+      - name: demo-application
+        image: assafhazan/push-to-k8s-secrets:latest
+        imagePullPolicy: IfNotPresent
+        # Mapping to the secrets
+        env:
+          - name: SECRET6
+            valueFrom:
+              secretKeyRef:
+                name: conjur-eso
+                key: data_vault_Conjur-Kuberentes_secret6_password
+          - name: SECRET7
+            valueFrom:
+              secretKeyRef:
+                name: conjur-eso
+                key: data_vault_Conjur-Kuberentes_secret7_password
