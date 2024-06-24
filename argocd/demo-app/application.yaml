@@ -11,8 +11,6 @@ spec:
     path: argocd/demo-app
     repoURL: 'https://github.com/assafjh/cybr-demos'
     targetRevision: HEAD
-    plugin:
-      name: argocd-vault-plugin
   sources: []
   project: default
   syncPolicy:
