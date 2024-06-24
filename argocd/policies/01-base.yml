@@ -1,0 +1,21 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define argocd branch, create users, hosts, groups, layers, variables
+- !policy
+  id: argocd
+
+# argocd/admins group will admin everything under argocd branch
+- !group
+  id: argocd/admins
+
+- !permit
+  role: !group argocd/admins
+  privileges: [read,update,create]
+  resource: !policy argocd
+
+- !permit
+  role: !group argocd/admins
+  privileges: [read,update,create]
+  resource: !group argocd/admins

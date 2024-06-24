@@ -1,0 +1,17 @@
+---
+# Load policy into data/argocd branch
+# This policy defines the demo branch argocd
+
+# applications/jwt is a group that will aggregate permissions for all argocd applications that want to use JWT to consume Conjur secrets
+- !group
+  id: jwt
+  owner: !group admins
+
+# Create the JWT identity that we will use to authenticate to Conjur 
+- !host
+  id: system:serviceaccount:argocd:argocd-repo-server
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+    authn-jwt/k8s-argocd1/kubernetes.io/namespace: argocd
+    authn-jwt/k8s-argocd1/kubernetes.io/serviceaccount/name: argocd-repo-server
