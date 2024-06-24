@@ -9,12 +9,19 @@ data:
     metadata:
       name: argocd-vault-plugin
     spec:
-      init:
-        command: ["argocd-vault-plugin"]
-        args: ["generate", "/app/config/secret-template.yaml"]
+      allowConcurrency: true
+      discover:
+        find:
+          command:
+            - sh
+            - "-c"
+            - "find . -name '*.yaml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
       generate:
-        command: ["sh", "-c"]
-        args: ["argocd-vault-plugin generate /app/config/secret-template.yaml > all.yaml && cat all.yaml"]
+        command:
+          - argocd-vault-plugin
+          - generate
+          - "."
+      lockRepo: false
       sidecars:
         - name: argocd-vault-plugin
           image: itdistrict/argocd-vault-plugin:latest
