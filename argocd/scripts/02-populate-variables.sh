@@ -1,7 +1,5 @@
 #!/bin/bash
 #============ Variables ===============
-# Script path
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # Using kubectl/oc
 COP_CLI=kubectl
 # If needed, modify the below to configure Conjur CLI location

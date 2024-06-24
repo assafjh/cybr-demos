@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-application
+spec:
+  destination:
+    name: ''
+    namespace: conjur-argocd
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: argocd/demo-app
+    repoURL: 'https://github.com/assafjh/cybr-demos'
+    targetRevision: HEAD
+    plugin:
+      name: argocd-vault-plugin
+  sources: []
+  project: default
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      prune: true
+      selfHeal: true
