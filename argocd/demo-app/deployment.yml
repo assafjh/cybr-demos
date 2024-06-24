@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: demo-consume-secrets-argocd
+  name: demo-consume-secrets-argocd
+  namespace: conjur-argocd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-consume-secrets-argocd
+  template:
+    metadata:
+      labels:
+        app: demo-consume-secrets-argocd
+    spec:
+      serviceAccountName: conjur-demo-acct
+      containers:
+      - name: demo-application
+        image: assafhazan/push-to-k8s-secrets:latest
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: SECRET4
+            valueFrom:
+              secretKeyRef:
+                name: argocd-deployed-secrets
+                key: secret4
+          - name: SECRET5
+            valueFrom:
+              secretKeyRef:
+                name: argocd-deployed-secrets
+                key: secret5

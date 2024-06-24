@@ -1,0 +1,165 @@
+---
+- name: Onboard multiple secrets to CyberArk
+  hosts: localhost
+  vars:
+    identity_url: "https://<tenant>.id.cyberark.cloud/oauth2/platformtoken"
+    pcloud_url: "https://<tenant>.privilegecloud.cyberark.cloud/PasswordVault/API"
+    client_id: "{{ lookup('env', 'CLIENT_ID') }}"
+    client_secret: "{{ lookup('env', 'CLIENT_SECRET') }}"
+    general_secrets:
+      - name: secret1
+      - name: secret2
+      - name: secret3
+      - name: secret4
+      - name: secret5
+      - name: secret6
+      - name: secret7
+      - name: secret8
+    safe_name: "Conjur-ArgoCD"
+    safe_description: "Demo Safe for Conjur Cloud ArgoCD Integration"
+    platform_id_general: "SampleGroup"
+    give_full_access: false  # Set to true to give a member full access to the safe
+    member_name: "member"
+    conjur_user:
+      username: "Conjur Sync"
+      permissions: ["Use accounts", "Retrieve accounts", "List accounts", "Access Safe without confirmation"]
+    token: ""
+  tasks:
+    - name: Authenticate and get JWT token
+      ansible.builtin.uri:
+        url: "{{ identity_url }}"
+        method: POST
+        headers:
+          Content-Type: "application/x-www-form-urlencoded"
+        body: "grant_type=client_credentials&client_id={{ client_id }}&client_secret={{ client_secret }}"
+        return_content: true
+      register: auth_response
+
+    - name: Set JWT token
+      ansible.builtin.set_fact:
+        token: "{{ auth_response.json.access_token }}"
+      no_log: true
+
+    - name: Create safe
+      block:
+        - name: Attempt to create safe
+          ansible.builtin.uri:
+            url: "{{ pcloud_url }}/Safes"
+            method: POST
+            headers:
+              Authorization: "Bearer {{ token }}"
+              Content-Type: "application/json"
+            body_format: json
+            body: >
+              {
+                "safeName": "{{ safe_name }}",
+                "description": "{{ safe_description }}"
+              }
+            status_code: [201, 409]
+          register: create_safe_response
+          failed_when: create_safe_response.status not in [201, 409]
+          changed_when: create_safe_response.status == 201
+
+      rescue:
+        - name: Check if safe already exists
+          ansible.builtin.debug:
+            msg: "Safe already exists or another error occurred."
+          when: create_safe_response.status == 409 and 'ErrorCode' in create_safe_response.json and create_safe_response.json.ErrorCode == 'SFWS0002'
+
+    - name: Generate random passwords for general secrets
+      ansible.builtin.set_fact:
+        general_secrets_with_passwords: []
+
+    - name: Add random password to each secret
+      ansible.builtin.set_fact:
+        general_secrets_with_passwords: >-
+          {{
+            general_secrets_with_passwords + [
+              item | combine({'password': lookup('community.general.random_words', 'string=random' 'min_length=9 max_length=25')})
+            ]
+          }}
+      loop: "{{ general_secrets }}"
+
+    - name: Debug general secrets with passwords
+      ansible.builtin.debug:
+        var: general_secrets_with_passwords
+
+    - name: Create general secrets
+      ansible.builtin.uri:
+        url: "{{ pcloud_url }}/Accounts"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body: >
+          {
+            "safeName": "{{ safe_name }}",
+            "platformId": "{{ platform_id_general }}",
+            "name": "{{ item.name }}",
+            "secretType": "password",
+            "secret": "{{ item.password }}"
+          }
+        status_code: 201
+      loop: "{{ general_secrets_with_passwords }}"
+      loop_control:
+        loop_var: item
+
+    - name: Give member full access to the safe (optional)
+      ansible.builtin.uri:
+        url: "{{ pcloud_url }}/Safes/{{ safe_name }}/Members"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body: >
+          {
+            "memberName": "{{ member_name }}",
+            "memberType": "User",
+            "permissions": {
+                "UseAccounts": true,
+                "RetrieveAccounts": true,
+                "ListAccounts": true,
+                "AddAccounts": true,
+                "UpdateAccountContent": true,
+                "UpdateAccountProperties": true,
+                "InitiateCPMAccountManagementOperations": true,
+                "SpecifyNextAccountContent": true,
+                "RenameAccounts": true,
+                "DeleteAccounts": true,
+                "UnlockAccounts": true,
+                "ManageSafe": true,
+                "ManageSafeMembers": true,
+                "BackupSafe": true,
+                "ViewAuditLog": true,
+                "ViewSafeMembers": true,
+                "AccessWithoutConfirmation": true,
+                "CreateFolders": true,
+                "DeleteFolders": true,
+                "MoveAccountsAndFolders": true
+              }
+          }
+        status_code: 201
+      when: give_full_access
+
+    - name: Give Conjur sync user permissions to the safe
+      ansible.builtin.uri:
+        url: "{{ pcloud_url }}/Safes/{{ safe_name }}/Members"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ token }}"
+          Content-Type: "application/json"
+        body_format: json
+        body: >
+          {
+            "memberName": "{{ conjur_user.username }}",
+            "memberType": "User",
+            "permissions": {
+                "UseAccounts": true,
+                "RetrieveAccounts": true,
+                "ListAccounts": true,
+                "AccessWithoutConfirmation": true,
+              }
+          }
+        status_code: 201
