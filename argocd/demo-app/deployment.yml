@@ -4,7 +4,6 @@ metadata:
   labels:
     app: demo-consume-secrets-argocd
   name: demo-consume-secrets-argocd
-  namespace: conjur-argocd
 spec:
   replicas: 1
   selector:
@@ -15,7 +14,6 @@ spec:
       labels:
         app: demo-consume-secrets-argocd
     spec:
-      serviceAccountName: conjur-demo-acct
       containers:
       - name: demo-application
         image: assafhazan/push-to-k8s-secrets:latest
