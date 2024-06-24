@@ -9,7 +9,7 @@ spec:
 
       containers:
         # argocd-vault-plugin with Kustomize
-        - name: vault-plugin
+        - name: argocd-vault-plugin
           command: ["/var/run/argocd/argocd-cmp-server"]
           image: itdistrict/argocd-vault-plugin:latest
           securityContext:
@@ -28,7 +28,7 @@ spec:
               name: tmp
             # Register plugins into sidecar
             - mountPath: /home/argocd/cmp-server/config/plugin.yaml
-              subPath: avp-kustomize.yaml
+              subPath: avp.yaml
               name: cmp-plugin
             # Conjur token
             - mountPath: /run/conjur
