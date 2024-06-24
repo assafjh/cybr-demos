@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-plugin-cm
+data:
+  AVP_AUTH_TYPE: authToken
+  AVP_CONJUR_ACCOUNT: conjur
+  AVP_CONJUR_SSL_CERT: |-
+    $CONJUR_PUBLIC_CERTIFICATE
+  AVP_CONJUR_TOKEN_FILE: /run/conjur/access-token
+  AVP_CONJUR_URL: https://<tenant>.secretsmgr.cyberark.cloud/api
+  AVP_TYPE: conjurvault
+  # Addition for Conjur Authenticator
+  CONJUR_AUTHN_URL: "https://<tenant>.secretsmgr.cyberark.cloud/api/authn-jwt/k8s-argocd1"
+  CONJUR_AUTHENTICATOR_ID: "k8s-argocd1"

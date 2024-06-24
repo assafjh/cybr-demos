@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cmp-plugin
+data:
+  avp-kustomize.yaml: |
+    apiVersion: config.argoproj.io/v1alpha1
+    kind: ConfigManagementPlugin
+    metadata:
+      name: argocd-vault-plugin
+    spec:
+      init:
+        command: ["argocd-vault-plugin"]
+        args: ["generate", "/app/config/secret-template.yaml"]
+      generate:
+        command: ["sh", "-c"]
+        args: ["argocd-vault-plugin generate /app/config/secret-template.yaml > all.yaml && cat all.yaml"]
+      sidecars:
+        - name: argocd-vault-plugin
+          image: itdistrict/argocd-vault-plugin:latest
+          volumeMounts:
+            - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+              name: cmp-plugin
+              subPath: avp-kustomize.yaml
+            - mountPath: /run/conjur
+              name: conjur-access-token
+          envFrom:
+            configMapRef:
+              name: vault-plugin-cm
+        - name: cyberark-conjur-authn
+          image: cyberark/conjur-authn-k8s-client:latest
+          env:
+            - name: CONJUR_ACCOUNT
+              valueFrom:
+                configMapKeyRef:
+                  name: vault-plugin-cm
+                  key: AVP_CONJUR_ACCOUNT
+            - name: CONJUR_SSL_CERTIFICATE
+              valueFrom:
+                configMapKeyRef:
+                  name: AVP_CONJUR_SSL_CERT
+            - name: CONJUR_APPLIANCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: AVP_CONJUR_URL
+            - name: CONJUR_AUTHENTICATOR_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: CONJUR_AUTHENTICATOR_ID
+            - name: CONJUR_AUTHN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: CONJUR_AUTHN_URL
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - mountPath: /run/conjur
+              name: conjur-access-token
+            - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+              name: kube-api-access
+              readOnly: true
+      volumes:
+        - name: cmp-plugin
+          configMap:
+            name: cmp-plugin
