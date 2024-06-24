@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argocd-repo-server
+spec:
+  template:
+    spec:
+      automountServiceAccountToken: true
+
+      containers:
+        # argocd-vault-plugin with Kustomize
+        - name: vault-plugin
+          command: ["/var/run/argocd/argocd-cmp-server"]
+          image: itdistrict/argocd-vault-plugin:latest
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 999
+          envFrom:
+            - configMapRef:
+                name: vault-plugin-cm
+                optional: false
+          volumeMounts:
+            - mountPath: /var/run/argocd
+              name: var-files
+            - mountPath: /home/argocd/cmp-server/plugins
+              name: plugins
+            - mountPath: /tmp
+              name: tmp
+            # Register plugins into sidecar
+            - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+              subPath: avp-kustomize.yaml
+              name: cmp-plugin
+            # Conjur token
+            - mountPath: /run/conjur
+              name: conjur-access-token
+
+        # conjur authenticator
+        - name: cyberark-conjur-authn
+          image: cyberark/conjur-authn-k8s-client:latest
+          env:
+            - name: CONJUR_ACCOUNT
+              valueFrom:
+                configMapKeyRef:
+                  name: vault-plugin-cm
+                  key: AVP_CONJUR_ACCOUNT
+            - name: CONJUR_SSL_CERTIFICATE
+              valueFrom:
+                configMapKeyRef:
+                  name: vault-plugin-cm
+                  key: AVP_CONJUR_SSL_CERT
+            - name: CONJUR_APPLIANCE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: vault-plugin-cm
+                  key: AVP_CONJUR_URL
+            - name: CONJUR_AUTHENTICATOR_ID
+              valueFrom:
+                configMapKeyRef:
+                  name: vault-plugin-cm
+                  key: CONJUR_AUTHENTICATOR_ID
+            - name: CONJUR_AUTHN_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: vault-plugin-cm
+                  key: CONJUR_AUTHN_URL
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: MY_POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - mountPath: /run/conjur
+              name: conjur-access-token
+
+      volumes:
+        - name: cmp-plugin
+          configMap:
+            name: cmp-plugin
+        - name: custom-tools
+          emptyDir: {}
+        - name: conjur-access-token
+          emptyDir: {}
