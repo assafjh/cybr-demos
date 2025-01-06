@@ -88,7 +88,8 @@ demo_dynamic_secret() {
 # ========================
 demo_ec2_access() {
   echo "[INFO] Verifying access to AWS EC2 instances"
-  aws ec2 describe-instances --region "$AWS_REGION"
+  AWS_PAGER="" aws sts get-caller-identity --query "{Account: Account, Arn: Arn, UserId: UserId}" --output table
+  AWS_PAGER="" aws ec2 describe-instances --query 'Reservations[*].Instances[*].{ID:InstanceId,Type:InstanceType,PublicIP:PublicIpAddress,State:State.Name}' --output table --region "$AWS_REGION"
   if [ $? -ne 0 ]; then
     echo "[ERROR] Failed to access AWS EC2 instances"
     exit 1
