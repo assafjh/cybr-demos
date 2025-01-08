@@ -1,0 +1,31 @@
+---
+# Load policy into data branch
+# This policy give permissions to the vault and conjur safe
+
+# Add the dev host we have created to the group 
+- !grant
+  roles:
+    - !group springboot/applications/jwt
+  members:
+    - !host springboot/spring-demo-app-dev
+
+# Add the prod host we have created to the group 
+- !grant
+  roles:
+    - !group springboot/applications/jwt
+  members:
+    - !host springboot/spring-demo-app-prod
+
+# Add the dev host to vault/Conjur-Springboot-Dev/delegation/consumers
+- !grant
+  roles:
+    - !group vault/Conjur-Springboot-Dev/delegation/consumers
+  members:
+    - !host springboot/spring-demo-app-dev
+
+# Add the prod host to vault/Conjur-Springboot-Prod/delegation/consumers
+- !grant
+  roles:
+    - !group vault/Conjur-Springboot-Prod/delegation/consumers
+  members:
+    - !host springboot/spring-demo-app-prod
