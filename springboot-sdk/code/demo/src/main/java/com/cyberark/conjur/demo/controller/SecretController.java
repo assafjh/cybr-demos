@@ -2,7 +2,7 @@ package com.cyberark.conjur.demo.controller;
 
 import com.cyberark.conjur.demo.config.AppConfig;
 import com.cyberark.conjur.demo.util.JwtUtil;
-import com.cyberark.springboot.sdk.ConjurSecret;
+import com.cyberark.springboot.conjur.api.ConjurClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -19,6 +19,7 @@ public class SecretController {
 
     private final AppConfig appConfig;
     private final Environment environment;
+    private final ConjurClient conjurClient; // Injected ConjurClient from the SDK
 
     @GetMapping("/secret")
     public String getSecret() {
@@ -57,7 +58,7 @@ public class SecretController {
             // Retrieve secret from Conjur
             String secretPath = appConfig.getSecrets().get("my-secret");
             log.info("Retrieving secret from Conjur for path: {}", secretPath);
-            String secret = ConjurSecret.retrieve(secretPath, jwt);
+            String secret = conjurClient.retrieveSecret(secretPath);
 
             log.info("Successfully retrieved secret for profile: {}", profile);
             return "The secret is: " + secret;
