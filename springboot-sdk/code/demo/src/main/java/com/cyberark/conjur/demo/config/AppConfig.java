@@ -1,26 +1,25 @@
 package com.cyberark.conjur.demo.config;
 
-import lombok.Getter;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.Data;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
+
 @Configuration
-@Getter
+@ConfigurationProperties(prefix = "conjur")
+@Data
 public class AppConfig {
-
-    @Value("${conjur.secrets.my-secret}")
-    private String secretPath;
-
-    @Value("${conjur.account}")
-    private String conjurAccount;
-
-    @Value("${conjur.appliance-url}")
+    private String account;
     private String applianceUrl;
+    private AuthnJwt authnJwt;
+    private Map<String, String> secrets;
 
-    @Value("${conjur.authn-jwt.service-id}")
-    private String serviceId;
+    @Data
+    public static class AuthnJwt {
+        private String serviceId;
+    }
 
-    @Value("${jwks.file-path:./jwks.json}") // Default to './jwks.json' if not provided
+    // JWKS file path property
     private String jwksFilePath;
-
 }
