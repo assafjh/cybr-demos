@@ -14,7 +14,4 @@ if [ -z "$JAR_FILE" ]; then
     exit 1
 fi
 
-# Run the application with the chosen profile
-java -jar -Dspring.profiles.active="$PROFILE" "$JAR_FILE"
-
 java -Dmode=init -jar "$JAR_FILE"
