@@ -27,14 +27,14 @@ check_java() {
     install_java
 }
 
-# Check Gradle
-check_gradle() {
-    if check_command gradle; then
-        echo "Gradle is already installed."
+# Check Maven
+check_maven() {
+    if check_command mvn; then
+        echo "Maven is already installed."
         return
     fi
-    echo "Gradle is not installed. Installing Gradle..."
-    install_gradle
+    echo "Maven is not installed. Installing Maven..."
+    install_maven
 }
 
 # Detect OS
@@ -78,30 +78,30 @@ install_java() {
     echo "Java 17 installed successfully."
 }
 
-# Install Gradle
-install_gradle() {
+# Install Maven
+install_maven() {
     case $OS in
-        "ubuntu" | "redhat")
-            sudo apt update || sudo yum update -y
-            sudo apt install -y wget unzip || sudo yum install -y wget unzip
-            wget https://services.gradle.org/distributions/gradle-8.4-bin.zip -P /tmp
-            sudo unzip -d /opt/gradle /tmp/gradle-8.4-bin.zip
-            sudo ln -sfn /opt/gradle/gradle-8.4/bin/gradle /usr/bin/gradle
+        "ubuntu")
+            sudo apt update
+            sudo apt install -y maven
+            ;;
+        "redhat")
+            sudo yum install -y maven
             ;;
         "macos")
-            brew install gradle
+            brew install maven
             ;;
         *)
-            echo "Unsupported OS for Gradle installation."
+            echo "Unsupported OS for Maven installation."
             exit 1
             ;;
     esac
-    echo "Gradle installed successfully."
+    echo "Maven installed successfully."
 }
 
 # Main Script Execution
 detect_os
 check_java
-check_gradle
+check_maven
 
 echo "All dependencies are installed and ready!"
