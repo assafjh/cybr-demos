@@ -1,15 +1,18 @@
 package com.cyberark.conjur.demo.util;
 
 import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.JWKSet;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.Map;
 
@@ -39,8 +42,10 @@ public class JwtUtil {
 
         log.info("Generating new JWKS file at: {}", jwksFilePath);
 
-        // Generate a new RSA key pair
-        RSAKey rsaKey = new RSAKey.Builder(RSAKey.generate(2048))
+        // Generate RSA key pair
+        KeyPair keyPair = generateRSAKeyPair();
+        RSAKey rsaKey = new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
+                .privateKey((RSAPrivateKey) keyPair.getPrivate())
                 .keyID("springboot-demo-key") // Optional: set a fixed key ID for reference
                 .expirationTime(new Date(System.currentTimeMillis() + TEN_YEARS_MILLIS)) // Valid for 10 years
                 .build();
@@ -69,16 +74,16 @@ public class JwtUtil {
         try {
             // Load the RSA key from the existing JWKS file
             RSAKey rsaKey = (RSAKey) JWKSet.load(new File(jwksFilePath)).getKeys().get(0);
-            Key privateKey = rsaKey.toPrivateKey();
+            RSAPrivateKey privateKey = rsaKey.toRSAPrivateKey();
 
             // Build and sign the JWT
             String jwt = Jwts.builder()
-                    .setSubject(subject) // Set the "sub" claim
-                    .setIssuer("springboot-conjur-demo-app") // Set the "iss" claim
-                    .setIssuedAt(new Date()) // Set the "iat" claim
-                    .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Token expiration
-                    .addClaims(customClaims) // Add custom claims
-                    .signWith(privateKey, SignatureAlgorithm.RS256) // Sign with RSA private key
+                    .claim("sub", subject) // Set the "sub" claim (subject)
+                    .claim("iss", "springboot-conjur-demo-app") // Set the "iss" claim (issuer)
+                    .claim("iat", new Date()) // Set the "iat" claim (issued at)
+                    .claim("exp", new Date(System.currentTimeMillis() + EXPIRATION_TIME)) // Set expiration time
+                    .claims(customClaims) // Add custom claims
+                    .signWith(privateKey) // Sign with RSA private key
                     .compact();
 
             log.info("Successfully generated JWT for subject: {}", subject);
@@ -89,6 +94,24 @@ public class JwtUtil {
         } catch (IOException e) {
             log.error("Failed to load JWKS file at {}: {}", jwksFilePath, e.getMessage(), e);
             throw new RuntimeException("Failed to load JWKS file", e);
+        } catch (java.text.ParseException e) {
+            log.error("Failed to parse the JWKS file at {}: {}", jwksFilePath, e.getMessage(), e);
+            throw new RuntimeException("Failed to parse JWKS file", e);
+        } catch (JOSEException e) {
+            log.error("Failed to handle JOSE operation: {}", e.getMessage(), e);
+            throw new RuntimeException("Error occurred while processing JOSE operation", e);
         }
+    }
+
+    /**
+     * Generate an RSA key pair.
+     *
+     * @return RSA KeyPair containing public and private keys.
+     * @throws Exception If an error occurs during key generation.
+     */
+    private static KeyPair generateRSAKeyPair() throws Exception {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(2048); // Set the key size
+        return keyPairGenerator.generateKeyPair();
     }
 }
