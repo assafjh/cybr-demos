@@ -11,11 +11,11 @@
   # If the service is publicly available, uncomment 'jwks-uri'.
   # If the service is not available, uncomment 'public-keys'
 
-  - !variable
-     id: jwks-uri
+# - !variable
+#     id: jwks-uri
 
-  # - !variable
-  #  id: public-keys
+  - !variable
+     id: public-keys
 
   # This variable tells Conjur which claim in the JWT to use to determine the conjur host identity.
   - !variable
