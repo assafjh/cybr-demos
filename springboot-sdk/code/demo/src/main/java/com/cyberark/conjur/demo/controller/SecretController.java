@@ -2,7 +2,7 @@ package com.cyberark.conjur.demo.controller;
 
 import com.cyberark.conjur.demo.config.AppConfig;
 import com.cyberark.conjur.demo.util.JwtUtil;
-import com.cyberark.springboot.conjur.ConjurSecret;
+import com.cyberark.springboot.conjur.ConjurClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -17,14 +17,15 @@ import java.util.Map;
 @Slf4j
 public class SecretController {
 
-    private final AppConfig appConfig;
-    private final Environment environment; // Access to active profiles
+    private final AppConfig appConfig; // Injected AppConfig for configurations
+    private final Environment environment; // For active profiles
+    private final ConjurClient conjurClient; // Injected ConjurClient for SDK integration
 
     @GetMapping("/secret")
     public String getSecret() {
-        log.info("Generating JWT for Conjur authentication");
+        log.info("Fetching secret using Conjur Spring Boot SDK");
 
-        // Get JWKS file path from AppConfig
+        // Get the JWKS file path from AppConfig
         String jwksFilePath = appConfig.getJwksFilePath();
 
         // Check if we are running in 'init' mode
@@ -42,29 +43,23 @@ public class SecretController {
             }
         }
 
-        // Regular mode for generating JWT and fetching secret
+        // Fetch active profile
         String[] activeProfiles = environment.getActiveProfiles();
         String profile = activeProfiles.length > 0 ? activeProfiles[0] : "default";
 
-        String subject = "spring-demo-app-" + profile;
-
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("profile", profile);
+        // Fetch the secret path from AppConfig
+        String secretPath = appConfig.getSecrets().get("my-secret");
 
         try {
-            // Generate JWT using JWKS (it will use the JWKS file if it exists, otherwise it will generate and save it)
-            String jwt = JwtUtil.generateJwt(subject, claims, jwksFilePath);
-            log.debug("Generated JWT: {}", jwt);
+            // Retrieve the secret using ConjurClient
+            String secret = conjurClient.getSecretsApi().getSecret(secretPath);
 
-            log.info("Fetching secret from Conjur");
-            String secret = ConjurSecret.retrieve(appConfig.getSecretPath(), jwt);
-            log.debug("Retrieved secret: {}", secret);
-
+            log.info("Successfully retrieved secret for profile: {}", profile);
             return "The secret is: " + secret;
 
         } catch (Exception e) {
-            log.error("Error while generating JWT or fetching secret: ", e);
-            return "Error occurred";
+            log.error("Error while fetching secret from Conjur", e);
+            return "Error occurred while fetching the secret.";
         }
     }
 }
