@@ -17,19 +17,18 @@ import java.util.Map;
 @Slf4j
 public class SecretController {
 
-    private final AppConfig appConfig;
-    private final Environment environment; // Access to active profiles
+    private final AppConfig appConfig; // AppConfig for configuration
+    private final Environment environment; // Spring environment for profiles
 
     @GetMapping("/secret")
     public String getSecret() {
-        log.info("Generating JWT for Conjur authentication");
+        log.info("Starting JWT generation and secret retrieval process");
 
         // Get JWKS file path from AppConfig
         String jwksFilePath = appConfig.getJwksFilePath();
 
         // Check if we are running in 'init' mode
         String initMode = System.getProperty("mode");
-
         if ("init".equalsIgnoreCase(initMode)) {
             try {
                 // Generate and save the JWKS file
@@ -48,18 +47,21 @@ public class SecretController {
 
         String subject = "spring-demo-app-" + profile;
 
+        // Custom claims for the JWT
         Map<String, Object> claims = new HashMap<>();
         claims.put("profile", profile);
 
         try {
-            // Generate JWT using JWKS (it will use the JWKS file if it exists, otherwise it will generate and save it)
+            // Generate JWT using JWKS
             String jwt = JwtUtil.generateJwt(subject, claims, jwksFilePath);
             log.debug("Generated JWT: {}", jwt);
 
-            log.info("Fetching secret from Conjur");
-            String secret = ConjurSecret.retrieve(appConfig.getSecretPath(), jwt);
-            log.debug("Retrieved secret: {}", secret);
+            // Fetch the secret using ConjurSecret.retrieve()
+            String secretPath = appConfig.getSecrets().get("my-secret");
+            log.info("Retrieving secret from Conjur for path: {}", secretPath);
+            String secret = ConjurSecret.retrieve(secretPath, jwt);
 
+            log.info("Successfully retrieved secret for profile: {}", profile);
             return "The secret is: " + secret;
 
         } catch (Exception e) {
