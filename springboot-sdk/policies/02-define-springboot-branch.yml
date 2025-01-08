@@ -1,0 +1,27 @@
+---
+# Load policy into data/springboot branch
+# This policy defines the demo branch springboot
+
+- !policy
+  id: applications
+  owner: !group admins
+
+# applications/jwt is a group that will aggregate permissions for all springboot applications that want to use JWT to consume Conjur secrets
+- !group
+  id: applications/jwt
+  owner: !group admins
+
+# Create the JWT identity that we will use to authenticate to Conjur 
+- !host
+  id: spring-demo-app-dev
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+    authn-jwt/springboot1/profile: dev
+
+- !host
+  id: spring-demo-app-prod
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+    authn-jwt/springboot1/profile: prod

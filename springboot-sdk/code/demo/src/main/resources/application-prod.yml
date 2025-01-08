@@ -1,0 +1,7 @@
+conjur:
+  account: prod-conjur-account
+  appliance-url: https://conjur.prod.my-org.com
+  authn-jwt:
+    service-id: prod-jwt-service
+  secrets:
+    my-secret: data/vault/Conjur-Springboot-Prod/secret1/password

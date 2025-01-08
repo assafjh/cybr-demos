@@ -1,0 +1,40 @@
+
+---
+
+### **.gitignore**
+
+```plaintext
+# Gradle-specific files
+.gradle/
+build/
+
+# IDE-specific files
+.idea/
+*.iml
+.vscode/
+*.class
+
+# Logs
+logs/
+*.log
+
+# Runtime-specific files
+*.pid
+hs_err_pid*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Spring Boot-specific files
+.env
+
+# Lombok generated files
+*.lombok.config
+
+# Sensitive files
+*.key
+*.pem
+*.crt
+*.jks
+secrets/

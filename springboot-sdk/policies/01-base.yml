@@ -1,0 +1,21 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define springboot branch, create users, hosts, groups, layers, variables
+- !policy
+  id: springboot
+
+# springboot/admins group will admin everything under springboot branch
+- !group
+  id: springboot/admins
+
+- !permit
+  role: !group springboot/admins
+  privileges: [read,update,create]
+  resource: !policy springboot
+
+- !permit
+  role: !group springboot/admins
+  privileges: [read,update,create]
+  resource: !group springboot/admins
