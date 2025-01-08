@@ -4,7 +4,7 @@
 set -e
 
 # Define directories
-CODE_DIR="../code"
+CODE_DIR="../code/demo"
 OUTPUT_DIR="../compiled"
 
 # Move to the code directory

@@ -28,7 +28,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
     // Conjur Spring Boot SDK
-    implementation 'com.cyberark:conjur-spring-boot-sdk:1.0.1'
+    implementation 'com.cyberark:conjur-spring-boot-sdk:LATEST'
 
     // JWT utilities
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
