@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Bean;
 import java.security.KeyPair;
 
 @SpringBootApplication
-public class DemoApplication {
+public class ConjurDemoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(DemoApplication.class, args);
+        SpringApplication.run(ConjurDemoApplication.class, args);
     }
 
     @Bean

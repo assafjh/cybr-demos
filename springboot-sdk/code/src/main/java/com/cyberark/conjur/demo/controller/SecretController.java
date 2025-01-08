@@ -2,15 +2,13 @@ package com.cyberark.conjur.demo.controller;
 
 import com.cyberark.conjur.demo.config.AppConfig;
 import com.cyberark.conjur.demo.util.JwtUtil;
-import com.cyberark.springboot.annotations.ConjurPropertySource;
-import com.cyberark.springboot.annotations.ConjurValues;
+import com.cyberark.conjur.springboot.annotations.ConjurPropertySource;
+import com.cyberark.conjur.springboot.annotations.ConjurValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -24,13 +22,13 @@ import java.util.Map;
 public class SecretController {
 
     private final AppConfig appConfig;
-    private final Environment environment;
 
-    @ConjurValues({
-        @com.cyberark.springboot.annotations.ConjurValue(key = "${conjur.secrets.my-secret1}"),
-        @com.cyberark.springboot.annotations.ConjurValue(key = "${conjur.secrets.my-secret2}"),
-        @com.cyberark.springboot.annotations.ConjurValue(key = "${conjur.secrets.my-secret3}")
+    @ConjurValues(keys={
+        "${conjur.secrets.my-secret1}",
+        "${conjur.secrets.my-secret2}",
+        "${conjur.secrets.my-secret3}"
     })
+    
     private Map<String, String> secrets;
 
     @GetMapping("/secrets")

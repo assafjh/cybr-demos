@@ -23,7 +23,7 @@ public class JwksController {
                 .keyID("key-id")
                 .build();
         JWKSet jwkSet = new JWKSet(rsaKey);
-        String jwks = jwkSet.toJSONObject().toJSONString();
+        String jwks = jwkSet.toJSONObject().toString();
         log.debug("Generated JWKS: {}", jwks);
         return jwks;
     }
