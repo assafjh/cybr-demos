@@ -5,3 +5,5 @@ conjur:
     service-id: dev-jwt-service
   secrets:
     my-secret: data/vault/Conjur-Springboot-Dev/secret1/password
+    my-secret2: data/vault/Conjur-Springboot-Dev/secret2/password
+    my-secret3: data/vault/Conjur-Springboot-Dev/secret3/password
