@@ -1,0 +1,7 @@
+conjur:
+  account: conjur
+  appliance-url: https://assaf-lab.secretsmgr.cyberark.cloud/api
+  authn-jwt:
+    service-id: springboot1
+  secrets:
+    my-secret: data/vault/Conjur-Springboot-Prod/secret1/password

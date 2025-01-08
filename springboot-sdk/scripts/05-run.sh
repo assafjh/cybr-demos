@@ -56,4 +56,4 @@ fi
 echo "Running the application with profile: $PROFILE"
 
 # Run the application with the chosen profile
-java -jar -Dspring.profiles.active="$PROFILE" "$JAR_FILE"
+java -jar -Dspring.config.location=./ -Dspring.profiles.active="$PROFILE" "$JAR_FILE"
