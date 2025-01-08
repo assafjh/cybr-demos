@@ -25,7 +25,10 @@ repositories {
 
 dependencies {
     // Spring Boot dependencies
+    implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.apache.commons:commons-lang3:3.12.0' // For Apache Commons
+    implementation 'javax.annotation:javax.annotation-api:1.3.2' // For Javax annotations
 
     // Conjur Spring Boot SDK
     implementation 'com.cyberark:conjur-sdk-springboot:2.1.2'
