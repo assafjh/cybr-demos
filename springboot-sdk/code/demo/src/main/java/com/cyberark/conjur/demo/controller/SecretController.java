@@ -2,7 +2,8 @@ package com.cyberark.conjur.demo.controller;
 
 import com.cyberark.conjur.demo.config.AppConfig;
 import com.cyberark.conjur.demo.util.JwtUtil;
-import com.cyberark.springboot.conjur.api.ConjurClient;
+import com.cyberark.springboot.annotations.ConjurPropertySource;
+import com.cyberark.springboot.annotations.ConjurValues;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -15,57 +16,48 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@ConjurPropertySource({
+    "${conjur.secrets.my-secret1}",
+    "${conjur.secrets.my-secret2}",
+    "${conjur.secrets.my-secret3}"
+})
 public class SecretController {
 
     private final AppConfig appConfig;
     private final Environment environment;
-    private final ConjurClient conjurClient; // Injected ConjurClient from the SDK
 
-    @GetMapping("/secret")
-    public String getSecret() {
-        log.info("Starting secret retrieval process");
+    @ConjurValues({
+        @com.cyberark.springboot.annotations.ConjurValue(key = "${conjur.secrets.my-secret1}"),
+        @com.cyberark.springboot.annotations.ConjurValue(key = "${conjur.secrets.my-secret2}"),
+        @com.cyberark.springboot.annotations.ConjurValue(key = "${conjur.secrets.my-secret3}")
+    })
+    private Map<String, String> secrets;
 
-        // Get JWKS file path
-        String jwksFilePath = appConfig.getJwksFilePath();
+    @GetMapping("/secrets")
+    public Map<String, String> getSecrets() {
+        log.info("Starting secrets retrieval process");
 
         // Check for 'init' mode
+        String jwksFilePath = appConfig.getJwksFilePath();
         String initMode = System.getProperty("mode");
         if ("init".equalsIgnoreCase(initMode)) {
             try {
                 JwtUtil.generateAndSaveJWKS(jwksFilePath);
                 log.info("JWKS generated and saved at {}", jwksFilePath);
-                return "JWKS generated successfully!";
+                return Map.of("message", "JWKS generated successfully!");
             } catch (Exception e) {
                 log.error("Error generating JWKS: ", e);
-                return "Error occurred while generating JWKS.";
+                throw new RuntimeException("Error occurred while generating JWKS.", e);
             }
         }
 
-        // Retrieve active profile
-        String[] activeProfiles = environment.getActiveProfiles();
-        String profile = activeProfiles.length > 0 ? activeProfiles[0] : "default";
-
-        // Prepare JWT claims
-        String subject = "spring-demo-app-" + profile;
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("profile", profile);
-
         try {
-            // Generate JWT
-            String jwt = JwtUtil.generateJwt(subject, claims, jwksFilePath);
-            log.debug("Generated JWT: {}", jwt);
-
-            // Retrieve secret from Conjur
-            String secretPath = appConfig.getSecrets().get("my-secret");
-            log.info("Retrieving secret from Conjur for path: {}", secretPath);
-            String secret = conjurClient.retrieveSecret(secretPath);
-
-            log.info("Successfully retrieved secret for profile: {}", profile);
-            return "The secret is: " + secret;
-
+            // Retrieve and log secrets
+            secrets.forEach((key, value) -> log.info("Retrieved secret: {} = {}", key, value));
+            return secrets;
         } catch (Exception e) {
-            log.error("Error while retrieving secret: ", e);
-            return "Error occurred while retrieving the secret.";
+            log.error("Error while retrieving secrets: ", e);
+            throw new RuntimeException("Error occurred while retrieving the secrets.", e);
         }
     }
 }

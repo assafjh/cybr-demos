@@ -5,3 +5,5 @@ conjur:
     service-id: prod-jwt-service
   secrets:
     my-secret: data/vault/Conjur-Springboot-Prod/secret1/password
+    my-secret2: data/vault/Conjur-Springboot-Prod/secret2/password
+    my-secret3: data/vault/Conjur-Springboot-Prod/secret3/password
