@@ -3,11 +3,14 @@
 # Stop the script if any command fails
 set -e
 
-# Define directories
-OUTPUT_DIR="../compiled"
+# Script path
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+TARGET_DIR="$SCRIPT_DIR"/../compiled/
+
+cd "$TARGET_DIR" || { echo "Error: Failed to change directory to $TARGET_DIR"; exit 1; }
 
 # Find the JAR file in the compiled directory
-JAR_FILE=$(find "$OUTPUT_DIR" -name "*.jar" | head -n 1)
+JAR_FILE=demo-app-0.0.1-SNAPSHOT.jar
 
 if [ -z "$JAR_FILE" ]; then
     echo "Error: No JAR file found in $OUTPUT_DIR. Please compile the project first using ./compile.sh."
@@ -56,4 +59,4 @@ fi
 echo "Running the application with profile: $PROFILE"
 
 # Run the application with the chosen profile
-java -jar -Dspring.config.location=./ -Dspring.profiles.active="$PROFILE" "$JAR_FILE"
+java -jar -Dspring.profiles.active="$PROFILE" "$JAR_FILE"

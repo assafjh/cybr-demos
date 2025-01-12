@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "kid": "conjur-springboot-demo-1736678388633",
+      "use": "sig",
+      "alg": "RS256",
+      "n": "AKeTm0ETjKjrkywjYHbqqvdUiw_a2afctF1WQTqL-sdsDwg7CIArUHlH3LYDAB_cI-3LKcYidfaWKA2pRxmNRhG2AVIJKvG_2OKUHoNj-7nEqL8IN1TjAztVCoxD6b-rEdb025GFql4ivsUqbbvIrn0kz9Ww1juG1dYHNdojp6KfDAj4VDqbTor7yTSUA8yQWlBwealeFE-hBmiREwXDIUOfun5eWpyC_CtOnxXSqyCrpH3aQ83nxLcJNc_yNWeJeSqjaOIa-faU5_N9m8bAcke4gBE0oF2bp6mJ3Xr-b2rrJtmrfIyPMNBpDVq0I2lqVh6HW0Mf7S9wetDARDRYjc8=",
+      "e": "AQAB"
+    }
+  ]
+}
