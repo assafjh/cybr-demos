@@ -1,0 +1,22 @@
+---
+# Load policy into data branch
+# This policy defines a demo organization for testing basic capabilities
+
+# Define aws branch, create users, hosts, groups, layers, variables
+- !policy
+  id: aws
+
+# aws/admins group will admin everything under aws branch
+- !group
+  id: aws/admins
+
+- !permit
+  role: !group aws/admins
+  privileges: [read,update,create]
+  resource: !policy aws
+
+- !permit
+  role: !group aws/admins
+  privileges: [read,update,create]
+  resource: !group aws/admins
+

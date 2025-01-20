@@ -1,0 +1,30 @@
+---
+# Load policy into data branch
+# This policy defines the demo branch aws
+
+# iam-roles is a group that will aggregate safe permissions for aws workloads
+- !group
+  id: aws/iam-roles
+  owner: !group aws/admins
+
+# Create the Project identities that we will use to authenticate to Conjur
+# before loading this, change the variables below or export and load with envsubst
+# envsubst < policies/02-define-aws-branch.yml > 02-define-aws-branch.yml
+# ROLE_ARN structure is: $ACCOUNT_NUMBER/$ROLE_NAME
+# Example: arn:aws:iam::1234:role/service-role/ajh-elastic-conjur-role-123 -> export ROLE_ARN=1234/ajh-elastic-conjur-role-123
+- &hosts
+  - !host
+    id: aws/$ROLE_ARN
+    owner: !group aws/admins
+
+# Add the hosts we have created to their respective group
+- !grant
+  roles:
+    - !group aws/iam-roles
+  members: *hosts
+
+# Add the dev host to data/vault/Conjur-aws/delegation/consumers
+- !grant
+  roles:
+    - !group vault/Conjur-aws/delegation/consumers
+  members: *hosts
