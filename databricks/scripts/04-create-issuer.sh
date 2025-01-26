@@ -84,13 +84,6 @@ setup_aws() {
   fi
   echo "[INFO] Created IAM Policy with ARN: $POLICY_ARN"
 
-  # Attach Policy to User
-  aws iam attach-user-policy \
-    --user-name "$AWS_USER_NAME" \
-    --policy-arn "$POLICY_ARN"
-
-  echo "[INFO] Attached policy to IAM User"
-
   # Create IAM Role with Trust Policy referencing the specific user
   USER_ARN="arn:aws:iam::$(aws sts get-caller-identity --query Account --output text):user/$AWS_USER_NAME"
   TRUST_POLICY=$(jq -n \
