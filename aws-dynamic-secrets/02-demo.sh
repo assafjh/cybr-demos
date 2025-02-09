@@ -102,7 +102,7 @@ demo_ec2_access() {
 # ========================
 check_conjur_login() {
   echo "[INFO] Checking Conjur login status"
-  LOGIN_STATUS=$($CONJUR_CLI whoami 2>/dev/null)
+  command -p $CONJUR_CLI whoami > /dev/null 2>&1
 
   if [ -z "$LOGIN_STATUS" ]; then
     echo "[INFO] Not logged into Conjur. Prompting for login."

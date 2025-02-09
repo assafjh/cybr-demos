@@ -1,0 +1,35 @@
+# Local Terraform directories
+.terraform/
+.terraform.lock.hcl
+
+# Terraform State Files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+
+# Exclude all .log files
+*.log
+
+# Override this by including specific files
+# !example.log
+
+# Exclude tfvars files which may contain sensitive data
+*.tfvars
+
+# Ignore override files as they are usually used to override resources locally
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore plan files
+*.tfplan
+
+# Ignore .pkl and .xlsx files
+*.pkl
+*.xlsx
+
+# Ignore .log files in the logs folder
+logs/*.log
