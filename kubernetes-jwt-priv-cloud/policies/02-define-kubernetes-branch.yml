@@ -32,6 +32,5 @@
   id: applications/system:serviceaccount:conjur-jwt-cc:conjur-demo-acct
   owner: !group admins
   annotations:
-    authn/api-key: true
     authn-jwt/k8s-cluster1/kubernetes.io/namespace: conjur-jwt-cc
     authn-jwt/k8s-cluster1/kubernetes.io/serviceaccount/name: conjur-demo-acct
