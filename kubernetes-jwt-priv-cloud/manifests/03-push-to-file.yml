@@ -56,13 +56,16 @@ spec:
         image: assafhazan/push-to-file:latest
         workingDir: /opt/secrets/conjur
         imagePullPolicy: Always
+        env:
+          - name: RUN_MESSENGER
+            value: "true"
         volumeMounts:
         # Path to the file with the secrets 
           - name: conjur-secrets
             mountPath: /opt/secrets/conjur
       # Sidecar
       - name: sidecar-push-to-file
-        image: assafhazan/secrets-provider-for-k8s:proxyfix
+        image: cyberark/secrets-provider-for-k8s:latest
         imagePullPolicy: Always
         env:
         - name: MY_POD_NAME
