@@ -1,7 +1,8 @@
 FROM alpine:latest
 LABEL maintainer=AssafHazan
 
-ENV INJECTED_FILES_PATH /opt/secrets/conjur
+ENV INJECTED_FILES_PATH=/opt/secrets/conjur
+ENV RUN_MESSENGER=false
 
 RUN  apk update \
   && apk add dumb-init \
