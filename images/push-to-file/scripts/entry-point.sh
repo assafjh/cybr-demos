@@ -1,5 +1,5 @@
 #!/bin/sh
-sleep 1
+sleep 3
 echo "======================"
 echo "Files were injected by sidecar:"
 ls -ltr "$INJECTED_FILES_PATH/"
@@ -9,8 +9,10 @@ cat "$INJECTED_FILES_PATH/credentials.properties"
 echo "======================"
 echo "printing $INJECTED_FILES_PATH/credentials.properties"
 cat "$INJECTED_FILES_PATH/credentials.properties"
-echo "======================"
-echo "running $INJECTED_FILES_PATH/messenger"
-chmod +x "$INJECTED_FILES_PATH/messenger"
-"$INJECTED_FILES_PATH/messenger"
+if [ "$RUN_MESSENGER" = "true" ]; then
+    echo "======================"
+    echo "running $INJECTED_FILES_PATH/messenger"
+    chmod +x "$INJECTED_FILES_PATH/messenger"
+    "$INJECTED_FILES_PATH/messenger"
+fi
 sleep infinity
