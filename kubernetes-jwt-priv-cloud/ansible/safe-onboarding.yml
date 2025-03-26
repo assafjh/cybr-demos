@@ -23,7 +23,7 @@
       platform_id: "PostgreSQL"
     safe_name: "Conjur-Kuberentes"
     safe_description: "Demo Safe for Conjur Cloud Kubernetes Integration"
-    platform_id_general: "SampleGroup"
+    platform_id_general: "ConjurSecret"
     give_full_access: false  # Set to true to give a member full access to the safe
     member_name: "<membername>"
     conjur_user:
