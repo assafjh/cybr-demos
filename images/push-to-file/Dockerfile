@@ -3,6 +3,7 @@ LABEL maintainer=AssafHazan
 
 ENV INJECTED_FILES_PATH=/opt/secrets/conjur
 ENV RUN_MESSENGER=false
+ENV WAIT_TIMEOUT=5
 
 RUN  apk update \
   && apk add dumb-init \
