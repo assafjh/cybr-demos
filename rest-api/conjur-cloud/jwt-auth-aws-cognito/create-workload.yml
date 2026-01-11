@@ -1,0 +1,13 @@
+---
+# Load policy into data branch
+# This policy defines the demo branch kubernetes
+
+# Define kubernetes branch, create users, hosts, groups, layers, variables
+- !policy
+  id: aws-cognito
+
+# Create the JWT identity that we will use to authenticate to Conjur 
+- !host
+  id: aws-cognito/<client_id>
+  annotations:
+    authn-jwt/aws-cognito/client_id: <client_id>
