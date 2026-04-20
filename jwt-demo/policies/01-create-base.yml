@@ -1,0 +1,7 @@
+# ccloud policy update -b data -f ./01-create-base.yml
+
+- !policy
+  id: intro-demo
+  body:
+    - !policy
+      id: apps

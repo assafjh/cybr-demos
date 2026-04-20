@@ -1,0 +1,50 @@
+# ccloud policy update -b conjur/authn-jwt -f ./03-create-authenticator.yml
+# ccloud authenticator enable -i authn-jwt/intro-demo-authn
+
+- !policy
+  id: intro-demo-authn
+  body:
+    - !webservice
+
+    - !group
+      id: apps
+
+    - !permit
+      role: !group apps
+      privilege: [ read, authenticate ]
+      resource: !webservice
+
+    - !variable
+      id: jwks-uri
+
+    - !variable
+      id: issuer
+
+    - !variable
+      id: token-app-property
+
+    - !variable
+      id: identity-path
+
+    - !variable
+      id: enforced-claims
+
+    - !webservice
+      id: status
+
+    - !group
+      id: operators
+
+    - !permit
+      role: !group operators
+      privilege: [ read ]
+      resource: !webservice status
+
+    - !permit
+      role: !group operators
+      privilege: [ read ]
+      resource: !webservice
+
+- !grant
+  role: !group intro-demo-authn/apps
+  member: !host ../../data/intro-demo/apps/demo-webapp

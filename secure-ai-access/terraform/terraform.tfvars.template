@@ -1,0 +1,9 @@
+vpc_id = "" 
+
+subnet_id = ""
+
+sg_id = ""
+
+key_name = ""
+
+# aws_region = "us-east-1"

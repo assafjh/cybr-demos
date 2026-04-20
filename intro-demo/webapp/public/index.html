@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>CyberArk Conjur | Governance Shield</title>
+
+<style>
+:root{
+  --bg: #0f172a; --panel: #1e293b; --border: #334155;
+  --text: #f8fafc; --muted: #94a3b8;
+  --accent: #38bdf8; --ok: #4ade80; --deny: #f87171; --warn: #facc15;
+  --system: #c084fc; 
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+*{ box-sizing:border-box; }
+body {
+  margin: 0; padding: 40px 20px;
+  background-color: var(--bg); color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex; justify-content: center; min-height: 100vh;
+}
+.container { width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 16px; }
+
+header h2 { margin: 0; font-size: 20px; font-weight: 700; }
+.subtitle { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+/* Buttons */
+.btn-group { display: flex; gap: 12px; }
+button {
+  flex: 1; padding: 14px; background: #172033; border: 1px solid var(--border);
+  color: var(--text); border-radius: 6px; cursor: pointer; text-align: left;
+  transition: all 0.2s; display: flex; justify-content: space-between; align-items: center;
+}
+button:hover { border-color: var(--accent); transform: translateY(-1px); }
+button.selected { border-color: var(--accent); background: rgba(56, 189, 248, 0.1); box-shadow: 0 0 0 1px var(--accent); }
+
+/* Tabs System */
+.tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.tab { padding: 8px 0; font-size: 11px; font-weight: 700; color: var(--muted); cursor: pointer; text-transform: uppercase; border-bottom: 2px solid transparent; transition: 0.2s; }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Identity Card */
+.card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; box-shadow: var(--shadow); }
+.card-header { font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 800; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; letter-spacing: 0.05em; }
+
+.identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 13px; }
+.id-item { display: flex; flex-direction: column; gap: 4px; }
+.id-label { color: var(--muted); font-size: 10px; font-weight:700; }
+.id-val { font-family: monospace; background: rgba(0,0,0,0.3); padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border); color: var(--warn); min-height: 27px; }
+
+.jwt-toggle { grid-column: span 2; font-size: 11px; color: var(--accent); cursor: pointer; margin-top: 4px; }
+.jwt-body { grid-column: span 2; display: none; background: #0b1120; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 10px; color: var(--muted); word-break: break-all; border: 1px solid var(--border); white-space: pre-wrap; }
+
+/* Stepper */
+.stepper { display: flex; gap: 8px; }
+.step { flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 12px; color: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; font-weight: 700; }
+.step.active { background: rgba(56, 189, 248, 0.1); border-color: var(--accent); color: var(--text); opacity: 1; }
+
+/* Outcome Tables */
+.data-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+.data-table td { padding: 12px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.data-key { color: var(--muted); font-weight: 600; width: 30%; }
+.data-val { font-family: monospace; color: var(--ok); word-break: break-all; }
+.data-val.err { color: var(--deny); }
+
+pre.payload-box {
+  background: #000; border: 1px solid var(--border); border-radius: 6px;
+  padding: 12px; font-family: "SFMono-Regular", Consolas, monospace; 
+  font-size: 11px; color: var(--ok); margin: 0;
+  white-space: pre; overflow-x: auto; line-height: 1.5;
+}
+pre.payload-box.error-box { color: var(--deny); border-color: rgba(248, 113, 113, 0.3); }
+
+/* Audit Box */
+#outcome { display: none; }
+.audit-container { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+.audit-box {
+  background: #0d1117; border: 1px solid #30363d; border-radius: 6px;
+  padding: 16px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 11px; color: #c9d1d9; overflow-x: auto; line-height: 1.6;
+}
+.log-block { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.log-key { color: #8b949e; font-weight: bold; width: 135px; display: inline-block; }
+.log-val { color: #a5d6ff; word-break: break-all; }
+.timestamp-row { color: #8b949e; margin-bottom: 10px; border-bottom: 1px dashed #30363d; padding-bottom: 5px; font-weight: bold; }
+
+.hl-identity { color: var(--warn); }
+.hl-resource { color: var(--accent); }
+.hl-system { color: var(--system); font-weight: 500; }
+.hl-event-ok { color: var(--ok); font-weight: bold; }
+.hl-event-err { color: var(--deny); font-weight: bold; }
+
+.animate-in { animation: fadeSlide 0.4s ease-out forwards; }
+@keyframes fadeSlide { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <header>
+    <h2>Secrets Governance & Control</h2>
+    <div class="subtitle">Enforcing real-time machine-to-machine trust across any environment</div>
+  </header>
+
+  <div class="btn-group">
+    <button id="btnAllowed" onclick="runScenario('allowed')">
+      <div>
+        <div style="font-weight:700">Valid Business Request</div>
+        <div style="font-size:10px; opacity:0.6">App fetching operational data</div>
+      </div>
+    </button>
+    <button id="btnDenied" onclick="runScenario('denied')">
+      <div>
+        <div style="font-weight:700; color:var(--deny)">Unauthorized Attempt</div>
+        <div style="font-size:10px; opacity:0.6">App trying to access Payment Vault</div>
+      </div>
+    </button>
+  </div>
+
+  <div class="card">
+    <div class="card-header">1. Machine Identity (Workload)</div>
+    <div id="identityPlaceholder" style="font-size:13px; color:var(--muted); font-style:italic;">Waiting for workload session...</div>
+    <div id="identityGrid" class="identity-grid" style="display:none;">
+      <div class="id-item"><span class="id-label">IDENTITY PROVIDER</span><span class="id-val" id="dispIssuer">...</span></div>
+      <div class="id-item"><span class="id-label">CONJUR AUTH METHOD</span><span class="id-val" id="dispMethod">...</span></div>
+      <div class="id-item" style="grid-column: span 2"><span class="id-label">MACHINE IDENTIFIER (CLAIM: app_id)</span><span class="id-val" id="dispWorkload">...</span></div>
+      <div class="jwt-toggle" onclick="toggleJwt()">▶ Show Raw Identity Token (JWT)</div>
+      <pre id="jwtBody" class="jwt-body"></pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">2. Real-time Governance Flow</div>
+    <div class="stepper">
+      <div class="step" id="s1">🔍 IDENTIFY</div>
+      <div class="step" id="s2">⚖️ CHECK RULES</div>
+      <div class="step" id="s3">🛡️ DECISION</div>
+    </div>
+  </div>
+
+  <div id="outcome">
+    <div class="card">
+      <div id="statusHeader" style="margin-bottom:16px; font-weight:700; font-size:18px"></div>
+      
+      <div class="tabs" id="resultTabs">
+        <div class="tab active" data-target="strategic-view" onclick="switchTab(this)">Strategic View</div>
+        <div class="tab" data-target="technical-result" onclick="switchTab(this)">Raw Response (JSON)</div>
+      </div>
+
+      <div id="strategic-view" class="tab-content active"><table class="data-table" id="dataTable"></table></div>
+      <div id="technical-result" class="tab-content"><pre id="payloadBox" class="payload-box"></pre></div>
+
+      <div class="audit-container">
+        <div class="card-header" style="border:none; margin-bottom:4px;">Audit Trail</div>
+        <div class="tabs" id="auditTabs">
+          <div class="tab active" data-target="audit-summary" onclick="switchTab(this)">Summary</div>
+          <div class="tab" data-target="audit-full" onclick="switchTab(this)">Full Conjur Audit Log</div>
+        </div>
+        <div id="audit-summary" class="tab-content active"><div id="auditSummaryBox" class="audit-box"></div></div>
+        <div id="audit-full" class="tab-content"><div id="auditFullBox" class="audit-box"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; font-size:11px; color:var(--muted); margin-top:10px;">Enforced by CyberArk Conjur Cloud</div>
+</div>
+
+<script>
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+function switchTab(el) {
+  const tabsContainer = el.parentElement;
+  const targetId = el.getAttribute('data-target');
+  tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  let sibling = tabsContainer.nextElementSibling;
+  while (sibling) {
+    if (sibling.classList.contains('tab-content')) {
+      sibling.classList.remove('active');
+      if (sibling.id === targetId) sibling.classList.add('active');
+    }
+    sibling = sibling.nextElementSibling;
+  }
+}
+
+function resetTabs() {
+    switchTab(document.querySelector('#resultTabs [data-target="strategic-view"]'));
+    switchTab(document.querySelector('#auditTabs [data-target="audit-summary"]'));
+}
+
+function resetUI(){
+  document.querySelectorAll(".step").forEach(x => x.classList.remove("active"));
+  document.getElementById("outcome").style.display = "none";
+  document.getElementById("identityGrid").style.display = "none";
+  document.getElementById("identityPlaceholder").style.display = "block";
+  resetTabs();
+}
+
+function toggleJwt(){
+  const body = document.getElementById("jwtBody");
+  body.style.display = body.style.display === "block" ? "none" : "block";
+}
+
+async function runScenario(scenario){
+  resetUI();
+  const btns = document.querySelectorAll("button");
+  btns.forEach(b => { b.classList.remove("selected"); b.disabled = true; });
+  document.getElementById(scenario === 'allowed' ? 'btnAllowed' : 'btnDenied').classList.add("selected");
+
+  try {
+    const r = await fetch("/api/access", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ scenario }) });
+    const d = await r.json();
+
+    // 1. Identify
+    document.getElementById("s1").classList.add("active");
+    document.getElementById("identityPlaceholder").style.display = "none";
+    document.getElementById("identityGrid").style.display = "grid";
+    
+    const fullId = d.workload_id ? `host:data/intro-demo/apps/${d.workload_id}` : `host:data/intro-demo/apps/${d.workload}`;
+    
+    // DYNAMIC LABELS FROM BACKEND
+    document.getElementById("dispWorkload").textContent = d.workload_id || d.workload;
+    document.getElementById("dispIssuer").textContent = d.identity_token?.issuer || "AWS Cognito";
+    document.getElementById("dispMethod").textContent = d.identity_token?.method || "JWT (authn-jwt)";
+    document.getElementById("jwtBody").textContent = d.identity_token?.jwt || "";
+    
+    await sleep(400);
+
+    // 2. Check Rules
+    document.getElementById("s2").classList.add("active");
+    await sleep(400);
+
+    // 3. Decision
+    document.getElementById("s3").classList.add("active");
+    document.getElementById("outcome").style.display = "block";
+
+    const statusHeader = document.getElementById("statusHeader");
+    const dataTable = document.getElementById("dataTable");
+    const payloadBox = document.getElementById("payloadBox");
+
+    let tableHtml = `<tr><td class="data-key">Vault Resource</td><td class="data-val" style="color:var(--accent)">🔒 ${d.secret_name}</td></tr>`;
+    
+    if (d.result === "allowed") {
+      statusHeader.innerHTML = `<span style="color:var(--ok)">✅ Request Authorized</span>`;
+      const payload = d.payload || {};
+      Object.keys(payload).forEach(k => { tableHtml += `<tr><td class="data-key">${k}</td><td class="data-val">${payload[k]}</td></tr>`; });
+      payloadBox.textContent = JSON.stringify(d.payload, null, 2);
+      payloadBox.className = "payload-box";
+    } else {
+      statusHeader.innerHTML = `<span style="color:var(--deny)">⛔ Access Blocked (Leak Prevented)</span>`;
+      tableHtml += `<tr><td class="data-key">Status</td><td class="data-val err">Forbidden (403)</td></tr>`;
+      tableHtml += `<tr><td class="data-key">Verdict</td><td class="data-val err">${d.error?.details?.error?.message || "Privilege Violation"}</td></tr>`;
+      payloadBox.textContent = JSON.stringify(d.error, null, 2);
+      payloadBox.className = "payload-box error-box";
+    }
+    dataTable.innerHTML = tableHtml;
+
+    const ts = new Date().toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'numeric', second:'numeric', hour12:true });
+    const uuid = crypto.randomUUID();
+    const logRow = (k, v, cl="") => `<div class="log-block"><span class="log-key">${k}</span><span class="log-val ${cl}">${v}</span></div>`;
+
+    // Summary - 100% Fidelity with Machine & Conjur labels
+    document.getElementById("auditSummaryBox").innerHTML = 
+        logRow("Timestamp", ts) + 
+        logRow("Verdict", d.result === 'allowed' ? "GRANTED" : "DENIED", d.result === 'allowed' ? "hl-event-ok" : "hl-event-err") + 
+        logRow("Machine Identity", fullId, "hl-identity") + 
+        logRow("Identity Type", "Machine", "hl-system") +
+        logRow("Service", "CyberArk Conjur", "hl-system") +
+        logRow("Resource", d.secret_name, "hl-resource");
+
+    // Full Log - Exact Replica (20 fields)
+    document.getElementById("auditFullBox").innerHTML = `<div class="timestamp-row">Timestamp: ${ts}</div>` +
+      logRow("Event", "fetch-fetch", d.result === 'allowed' ? 'hl-event-ok' : 'hl-event-err') +
+      `<div class="log-block"><span class="log-key">Description</span><span class="log-val"><span class="hl-identity">conjur:${fullId}</span> ${d.result === 'allowed' ? 'fetched' : 'tried to fetch'} <span class="hl-resource">conjur:variable:${d.secret_name}</span>${d.result === 'allowed' ? '' : ': Forbidden'}</span></div>` +
+      logRow("Audit code", "CSM0001") + 
+      logRow("Event source", "194.90.225.101") + 
+      logRow("Event target", "N/A") + 
+      logRow("User Name", fullId, "hl-identity") +
+      logRow("User ID", fullId) + 
+      logRow("Session ID", "N/A") + 
+      logRow("Service", "Secrets Manager", "hl-system") + 
+      logRow("Component", "Conjur", "hl-system") +
+      logRow("Vaulted accounts", "N/A") + 
+      logRow("UUID", uuid) + 
+      logRow("Account name", "N/A") + 
+      logRow("Target platform", "N/A") + 
+      logRow("Safe", "N/A") +
+      logRow("Target account", "N/A") + 
+      logRow("Identity type", "Machine", "hl-system") + 
+      logRow("Access method", "N/A") + 
+      logRow("Account ID", "N/A") + 
+      logRow("Correlation ID", "N/A");
+
+  } catch (e) { console.error(e); } 
+  finally { btns.forEach(b => { b.disabled = false; }); }
+}
+</script>
+</body>
+</html>

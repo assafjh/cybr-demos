@@ -1,0 +1,5 @@
+#ccloud policy update -b data -f ./04-add-workload-to-safe.yml
+# Allow workload to consume secrets from the "WebApp" safe
+- !grant
+  role: !group vault/IntroDemo-WebApp-Safe/delegation/consumers
+  member: !host intro-demo/apps/demo-webapp
