@@ -1,0 +1,12 @@
+# ccloud policy update -b data/intro-demo/apps -f ./02-create-workload.yml
+
+- !host
+  id: demo-webapp
+  annotations:
+    authn-jwt/intro-demo-authn/client_id: 7j03g529sdski9nde886qac460
+    type: other
+
+# Allow workload to consume secrets from the "WebApp" safe
+#- !grant
+#  role: !group data/vault/IntroDemo-WebApp-Safe/delegation/consumers
+#  member: !host data/apps/intro-demo-app
