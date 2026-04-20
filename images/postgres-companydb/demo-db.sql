@@ -744,7 +744,7 @@ insert into orders (id, customer_id, order_date, amount_usd, status, product_sku
 insert into orders (id, customer_id, order_date, amount_usd, status, product_sku) values (499, 23, '2026/03/01', '82435.87', 'shipped', 'OFFICE-DSK-IKEA-BEKANT-160');
 insert into orders (id, customer_id, order_date, amount_usd, status, product_sku) values (500, 13, '2025/09/01', '394472.01', 'pending', 'STOR-HDD-WD-RED-4TB');
 
-/ * support_tickets */
+/* support_tickets */
 insert into support_tickets (id, customer_id, opened_date, severity, status, subject) values (1, 133, '2025/08/25', 'low', 'open', 'Donec dapibus. Duis at velit eu est congue elementum.');
 insert into support_tickets (id, customer_id, opened_date, severity, status, subject) values (2, 83, '2025/08/13', 'medium', 'in_progress', 'Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis.');
 insert into support_tickets (id, customer_id, opened_date, severity, status, subject) values (3, 75, '2025/08/12', 'critical', 'open', 'Donec vitae nisi. Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla.');
