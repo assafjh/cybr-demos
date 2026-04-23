@@ -1,4 +1,0 @@
-CREATE ROLE demo_readonly;
-GRANT USAGE ON SCHEMA public TO demo_readonly;
-GRANT SELECT ON ALL TABLES IN SCHEMA public TO demo_readonly;
-ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO demo_readonly;
