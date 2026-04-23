@@ -13,6 +13,15 @@ data "aws_ami" "al2023_arm" {
   }
 }
 
+resource "aws_eip" "postgres_eip" {
+  domain   = "vpc"
+  instance = aws_instance.postgres.id
+  
+  tags = {
+    Name = "${var.demo_tag_prefix}-postgres-eip"
+  }
+}
+
 resource "aws_instance" "postgres" {
   ami                    = data.aws_ami.al2023_arm.id
   instance_type          = "t4g.small"
@@ -29,6 +38,20 @@ resource "aws_instance" "postgres" {
     delete_on_termination = true
   }
 
+  user_data = <<-EOF
+              #!/bin/bash
+              dnf update -y
+              dnf install -y docker
+              systemctl enable --now docker
+              
+              docker run -d \
+                --name company-db \
+                -e POSTGRES_PASSWORD=your_secure_password \
+                -p 5432:5432 \
+                --restart always \
+                assafhazan/postgres-companydb:17-alpine
+              EOF
+
   tags = {
     Name = "${var.demo_tag_prefix}-postgres"
   }
@@ -37,7 +60,6 @@ resource "aws_instance" "postgres" {
     ignore_changes = [
       tags,
       tags_all,
-      user_data,
       root_block_device[0].tags,
     ]
   }
