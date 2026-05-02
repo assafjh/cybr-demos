@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Exit immediately if a command exits with a non-zero status
+set -e
+
 # Function to check if a command is available
 command_exists() {
     command -v "$1" >/dev/null 2>&1

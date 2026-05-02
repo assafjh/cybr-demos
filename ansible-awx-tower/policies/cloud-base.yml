@@ -1,0 +1,13 @@
+# cloud-base.yml
+# Load this policy into the 'data' branch:
+# conjur policy load -b data -f cloud-base.yml
+
+- !policy
+  id: ansible
+  body:
+    - !group admins
+
+    - !permit
+      role: !group admins
+      privileges: [ read, update, create ]
+      resource: !policy ""

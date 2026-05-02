@@ -1,0 +1,28 @@
+---
+- name: Conjur Demo - Secure Secret Retrieval (CLI)
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    # Defining the base path in Conjur to avoid repetition
+    conjur_base_path: "data/ansible/apps/safe"
+
+  tasks:
+    - name: "⚠️ SECURITY NOTICE"
+      ansible.builtin.debug:
+        msg: "This is a DEMO. In production, always use 'no_log: true'."
+
+    - name: Retrieve secrets from Conjur securely
+      ansible.builtin.set_fact:
+        # Tilde (~) is used in Ansible/Jinja to concatenate strings securely
+        db_password: "{{ lookup(lookup_cmd, conjur_base_path ~ '/db_password') }}"
+        api_key:     "{{ lookup(lookup_cmd, conjur_base_path ~ '/api_key') }}"
+        ssh_key:     "{{ lookup(lookup_cmd, conjur_base_path ~ '/ssh_key') }}"
+      no_log: true 
+
+    - name: Show secrets (DEMO ONLY - Remove in production)
+      ansible.builtin.debug:
+        msg: 
+          - "DB Password: {{ db_password }}"
+          - "API Key: {{ api_key }}"
+          - "SSH Key: {{ ssh_key }}"

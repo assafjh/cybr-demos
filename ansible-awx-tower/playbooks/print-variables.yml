@@ -1,29 +1,33 @@
 ---
-- name: Demo variable pulling from Conjur
+- name: Demo - Application Secrets Injection via Conjur
   hosts: localhost
   gather_facts: false
 
+  vars:
+    # Aggregating the injected variables into a dictionary for clean looping.
+    # We use 'default' to prevent the playbook from crashing if a variable is missing.
+    demo_secrets:
+      db_pass: "{{ db_password | default('NOT_SET') }}"
+      api_key: "{{ api_key | default('NOT_SET') }}"
+      ssh_key: "{{ ssh_key | default('NOT_SET') }}"
+
   tasks:
-  - name: display variable 1
-    debug:
-      var: variable_1
+    - name: "⚠️ SECURITY NOTICE"
+      ansible.builtin.debug:
+        msg: |
+          This playbook demonstrates dynamic variable injection via the custom
+          AWX Conjur Credential Type.
 
-  - name: display variable 2
-    debug:
-      var: variable_2
+    # DRY Principle: One task, looping over all secrets
+    - name: Display injected variables (DEMO ONLY - Remove in production)
+      ansible.builtin.debug:
+        msg: "Secret for '{{ item.key }}' successfully injected. Value: '{{ item.value }}'"
+      loop: "{{ demo_secrets | dict2items }}"
 
-  - name: display variable 3
-    debug:
-      var: variable_3
-
-  - name: echo variable 1 on shell
-    shell: "echo {{ variable_1 }}"
-    no_log: True
-
-  - name: echo variable 2 on shell
-    shell: "echo {{ variable_2 }}"
-    no_log: True
-
-  - name: echo variable 3 on shell
-    shell: "echo {{ variable_3 }}"
-    no_log: True
+    - name: Simulate configuring an application with the secrets
+      ansible.builtin.command: "echo 'Applying configuration for {{ item.key }}...'"
+      environment:
+        SECRET_VALUE: "{{ item.value }}"
+      no_log: true
+      changed_when: false
+      loop: "{{ demo_secrets | dict2items }}"

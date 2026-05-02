@@ -1,5 +1,12 @@
 ---
+# Injecting the secret paths AND the Conjur authentication details
 extra_vars:
-  variable_1: '{{ variable_1 }}'
-  variable_2: '{{ variable_2 }}'
-  variable_3: '{{ variable_3 }}'
+  conjur_secret_path_db_password: '{{ db_password_path }}'
+  conjur_secret_path_api_key: '{{ api_key_path }}'
+  conjur_secret_path_ssh_key: '{{ ssh_key_path }}'
+
+env:
+  CONJUR_APPLIANCE_URL: '{{ conjur_url }}'
+  CONJUR_ACCOUNT: '{{ conjur_account }}'
+  CONJUR_AUTHN_LOGIN: '{{ conjur_authn_login }}'
+  CONJUR_AUTHN_API_KEY: '{{ conjur_api_key }}'

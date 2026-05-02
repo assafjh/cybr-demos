@@ -28,38 +28,53 @@ public class ZooServlet extends HttpServlet {
             postgresDS = (DataSource) ctx.lookup("java:comp/env/jdbc/PostgresDS");
             cyberArkDS = (DataSource) ctx.lookup("java:comp/env/jdbc/CyberArkDS");
         } catch (NamingException e) {
+            logger.severe("JNDI Lookup failed: " + e.getMessage());
             throw new ServletException("Unable to lookup DataSource", e);
         }
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
+        response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         
-        String dataSourceName;
+        String sourceParam = request.getParameter("source");
         DataSource dataSource;
+        String dataSourceName;
         
-        if ("cyberark".equals(request.getParameter("source"))) {
+        if ("cyberark".equals(sourceParam)) {
             dataSource = cyberArkDS;
-            dataSourceName = "CyberArkDS";
+            dataSourceName = "CyberArkDS (Managed by ASCP)";
         } else {
             dataSource = postgresDS;
-            dataSourceName = "PostgresDS";
+            dataSourceName = "PostgresDS (Standard JNDI)";
         }
         
-        // Log the data source used
-        logger.info("Using DataSource: " + dataSourceName);
+        logger.info("Processing request using DataSource: " + dataSourceName);
+
+        // Start HTML Output with basic CSS for a modern look
+        out.println("<!DOCTYPE html><html><head>");
+        out.println("<style>");
+        out.println("body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; }");
+        out.println("h1 { color: #333; }");
+        out.println(".info-box { background: #e7f3fe; border-left: 6px solid #2196F3; margin-bottom: 20px; padding: 10px; }");
+        out.println("table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }");
+        out.println("th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }");
+        out.println("th { background-color: #004a99; color: white; }");
+        out.println("tr:nth-child(even) { background-color: #f9f9f9; }");
+        out.println("tr:hover { background-color: #f1f1f1; }");
+        out.println(".back-link { display: inline-block; margin-top: 20px; text-decoration: none; color: #004a99; font-weight: bold; }");
+        out.println("</style></head><body>");
 
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery("SELECT * FROM zoo")) {
 
-            out.println("<html><body>");
-            out.println("<h1>Zoo Table</h1>");
-            out.println("<p>Using DataSource: " + dataSourceName + "</p>");
-            out.println("<table border='1'>");
-            out.println("<tr><th>ID</th><th>Type</th><th>Caregiver</th><th>Email</th></tr>");
+            out.println("<h1>🦁 Zoo Management System</h1>");
+            out.println("<div class='info-box'><strong>Active DataSource:</strong> " + dataSourceName + "</div>");
+            
+            out.println("<table>");
+            out.println("<thead><tr><th>ID</th><th>Animal Type</th><th>Caregiver</th><th>Email</th></tr></thead><tbody>");
 
             while (rs.next()) {
                 out.println("<tr>");
@@ -70,12 +85,22 @@ public class ZooServlet extends HttpServlet {
                 out.println("</tr>");
             }
 
-            out.println("</table>");
+            out.println("</tbody></table>");
+            out.println("<a href='index.jsp' class='back-link'>← Back to Home</a>");
             out.println("</body></html>");
 
         } catch (Exception e) {
-            out.println("Error: " + e.getMessage());
-            e.printStackTrace(out);
+            // Log the actual error for the admin
+            logger.severe("Database Error: " + e.getMessage());
+            
+            // Security: Show a sanitized message to the user
+            out.println("<div style='color: #721c24; background: #f8d7da; padding: 20px; border: 1px solid #f5c6cb; border-radius: 4px;'>");
+            out.println("<h2>Database Connection Error</h2>");
+            out.println("<p>The system was unable to retrieve data. This might be due to incorrect credential provider configuration or network issues.</p>");
+            out.println("<p>Please refer to the server logs for more details.</p>");
+            out.println("</div>");
+            out.println("<a href='index.jsp' class='back-link'>← Back to Home</a>");
+            out.println("</body></html>");
         }
     }
 }

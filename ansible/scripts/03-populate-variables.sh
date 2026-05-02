@@ -1,21 +1,38 @@
 #!/bin/bash
+# This script populates Conjur safe secrets with securely generated values
+
+set -euo pipefail
+
 #============ Variables ===============
-# Path to our safe at Conjur, leave as is
-SAFE_PATH=data/ansible/apps/safe/secret
-# If needed, modify the below to configure Conjur CLI location
-CONJUR_CLI=conjur
+# Note: The base path is aligned with app.yml
+SAFE_BASE_PATH="data/ansible/apps/safe"
+CONJUR_CLI="conjur"
+
+# Array of specific secrets to populate
+SECRETS=("db_password" "api_key" "ssh_key")
+
 #============ Script ===============
 
-# Checking if a user is logged-in to Conjur-CLI
-"$CONJUR_CLI" whoami
+echo "Verifying Conjur CLI authentication..."
+if ! "$CONJUR_CLI" whoami > /dev/null 2>&1; then
+    echo "Error: You are not logged into Conjur CLI. Please log in first."
+    exit 1
+fi
 
-# Populate safe secrets with values
-for i in {1..3}
-do
-   if command -p md5sum  /dev/null >/dev/null 2>&1
-    then
-        "$CONJUR_CLI" variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5sum | head -c 20; echo;)"
+echo "Successfully authenticated. Populating secrets..."
+
+for SECRET_NAME in "${SECRETS[@]}"; do
+    # Using openssl for a more secure standard of random secret generation
+    if command -v openssl > /dev/null 2>&1; then
+        SECRET_VAL=$(openssl rand -hex 12)
     else
-        "$CONJUR_CLI" variable set -i "$SAFE_PATH$i" -v "$(echo $RANDOM | md5 | head -c 20; echo;)"
+        # Fallback if openssl is not installed
+        SECRET_VAL=$(head -c 12 /dev/urandom | od -An -tx1 | tr -d ' \n')
     fi
+    
+    FULL_PATH="${SAFE_BASE_PATH}/${SECRET_NAME}"
+    echo "Setting variable: ${FULL_PATH}"
+    "$CONJUR_CLI" variable set -i "$FULL_PATH" -v "$SECRET_VAL"
 done
+
+echo "Secrets populated successfully."

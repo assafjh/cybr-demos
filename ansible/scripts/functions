@@ -1,39 +1,33 @@
 #!/bin/bash
 # Snippet that contains internal functions for scripts
-#========== Functions  ===============
+
+#========== Functions ===============
+
 function check_if_command_exists {
-if ! command -v "$1" &> /dev/null
-then
-    echo "Please install $1 and re-run the script"
-    exit 1
-fi
+    if ! command -v "$1" &> /dev/null; then
+        echo "Error: Please install $1 and re-run the script."
+        exit 1
+    fi
 }
 
 function compare_version() {
-    if [[ $1 == $2 ]]
-    then
+    if [[ "$1" == "$2" ]]; then
         return 0
     fi
     local IFS=.
     local i ver1=($1) ver2=($2)
     # fill empty fields in ver1 with zeros
-    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++))
-    do
+    for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
         ver1[i]=0
     done
-    for ((i=0; i<${#ver1[@]}; i++))
-    do
-        if [[ -z ${ver2[i]} ]]
-        then
-            # fill empty fields in ver2 with zeros
+    for ((i=0; i<${#ver1[@]}; i++)); do
+        if [[ -z ${ver2[i]} ]]; then
             ver2[i]=0
         fi
-        if ((10#${ver1[i]} > 10#${ver2[i]}))
-        then
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
             return 1
         fi
-        if ((10#${ver1[i]} < 10#${ver2[i]}))
-        then
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
             return 2
         fi
     done
@@ -41,36 +35,42 @@ function compare_version() {
 }
 
 function test_version() {
-	compare_version "$1" "$2"
-	case $? in
-        	0) echo equal;;
-	        1) echo newer;;
-        	2) echo older;;
-	esac
+    compare_version "$1" "$2"
+    case $? in
+        0) echo "equal";;
+        1) echo "newer";;
+        2) echo "older";;
+    esac
 }
 
 function decide_values_for_playbook {
-    check_if_command_exists ansible
+    check_if_command_exists "ansible"
+    
+    local ANSIBLE_VERSION
     ANSIBLE_VERSION=$(ansible --version | head -n 1)
     ANSIBLE_VERSION=${ANSIBLE_VERSION#*[* }
     ANSIBLE_VERSION=${ANSIBLE_VERSION%]*}
-    VERSION=$(test_version "$ANSIBLE_VERSION" "2.8")
-    if [ "$VERSION" == "newer" ]; then
-        VERSION=$(test_version "$ANSIBLE_VERSION" "2.9")
-        if [ $VERSION == "equal" ]; then
-            export ANSIBLE_PLUGIN=new
-            export LOOKUP_CMD=cyberark.conjur.conjur_variable
-        elif [ $VERSION == "older" ]; then
-            export ANSIBLE_PLUGIN=old
-            export LOOKUP_CMD=conjur_variable
+    
+    local VERSION_CHECK
+    VERSION_CHECK=$(test_version "$ANSIBLE_VERSION" "2.8")
+    
+    if [[ "$VERSION_CHECK" == "newer" ]]; then
+        local VERSION_CHECK_29
+        VERSION_CHECK_29=$(test_version "$ANSIBLE_VERSION" "2.9")
+        
+        if [[ "$VERSION_CHECK_29" == "equal" || "$VERSION_CHECK_29" == "newer" ]]; then
+            export ANSIBLE_PLUGIN="new"
+            export LOOKUP_CMD="cyberark.conjur.conjur_variable"
         else
-            ANSIBLE_PLUGIN=new
-            export LOOKUP_CMD=cyberark.conjur.conjur_variable 
+            export ANSIBLE_PLUGIN="old"
+            export LOOKUP_CMD="conjur_variable"
         fi
-    elif [ $VERSION == "equal" ]; then 
-        export ANSIBLE_PLUGIN=old
-        export LOOKUP_CMD=conjur_variable
+    elif [[ "$VERSION_CHECK" == "equal" ]]; then 
+        export ANSIBLE_PLUGIN="old"
+        export LOOKUP_CMD="conjur_variable"
     else
-        export ANSIBLE_PLUGIN=not_supported
+        export ANSIBLE_PLUGIN="not_supported"
+        echo "Error: Ansible version must be 2.8 or higher."
+        exit 1
     fi
 }

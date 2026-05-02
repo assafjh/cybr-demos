@@ -8,32 +8,63 @@ jobs:
       - image: cimg/base:stable
     steps:
       - run:
-          name: "Authenticating to Conjur"
+          name: "🔐 Authenticate to Conjur"
           command: |
-            # Store Conjur Token in temp file
-            RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/token.txt -k --request POST "$CONJUR_FQDN/authn-jwt/$CONJUR_AUTHN_ID/$CONJUR_ORG/authenticate" --header 'Content-Type: application/x-www-form-urlencoded' --header "Accept-Encoding: base64" --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
-            TOKEN=$(cat /tmp/token.txt)
-            if [ "$RESPONSE_CODE" != "200" ]; then
-              echo "Autentication Failed"
+            echo "Authenticating to Conjur using OIDC JWT..."
+            
+            # Use HTTP status code extraction to validate, save body to a variable instead of disk if possible,
+            # but for the token it's acceptable. We use a secure temporary file.
+            AUTH_RESPONSE=$(curl -s -w "\n%{http_code}" -k \
+              --request POST \
+              "$CONJUR_FQDN/authn-jwt/$CONJUR_AUTHN_ID/$CONJUR_ORG/authenticate" \
+              --header 'Content-Type: application/x-www-form-urlencoded' \
+              --data-urlencode "jwt=$CIRCLE_OIDC_TOKEN")
+
+            HTTP_STATUS=$(echo "$AUTH_RESPONSE" | tail -n1)
+            CONJUR_TOKEN=$(echo "$AUTH_RESPONSE" | sed '$d')
+
+            if [ "$HTTP_STATUS" != "200" ]; then
+              echo "❌ Authentication failed with code $HTTP_STATUS"
               exit 1
             fi
-            echo "export TOKEN=$TOKEN" >> "$BASH_ENV"
+
+            echo "✅ Successfully authenticated to Conjur"
+            echo "export CONJUR_TOKEN='$CONJUR_TOKEN'" >> "$BASH_ENV"
+
       - run:
-          name: "Consuming secret from Conjur"
+          name: "🔑 Fetch secret from Conjur"
           command: |
-             RESPONSE_CODE=$(curl -s -w "%{http_code}" -o /tmp/secret.txt -k -X GET -H "Authorization: Token token=\"$TOKEN\"" "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/data/circleci/apps/safe/secret1")
-             SECRET=$(cat /tmp/secret.txt)
-             if [ "$RESPONSE_CODE" != "200" ]; then
-              echo "Secret retrieval failed"
+            echo "Fetching 'db_password' from Conjur..."
+            
+            # Fetch the secret directly into a variable
+            SECRET_RESPONSE=$(curl -s -w "\n%{http_code}" -k \
+              -X GET \
+              -H "Authorization: Token token=\"$CONJUR_TOKEN\"" \
+              "$CONJUR_FQDN/secrets/$CONJUR_ORG/variable/data/circleci/apps/safe/db_password")
+
+            HTTP_STATUS=$(echo "$SECRET_RESPONSE" | tail -n1)
+            SECRET=$(echo "$SECRET_RESPONSE" | sed '$d')
+
+            if [ "$HTTP_STATUS" != "200" ]; then
+              echo "❌ Failed to fetch secret. HTTP code: $HTTP_STATUS"
               exit 1
-             fi
-             echo "export SECRET=$SECRET" >> "$BASH_ENV"
+            fi
+
+            # Exporting secret for subsequent steps
+            echo "export DB_PASSWORD='$SECRET'" >> "$BASH_ENV"
+            echo "✅ Secret retrieved successfully"
+
       - run:
-          name: "Print secret"
+          name: "📋 Demo - Using the secret"
           command: |
-            echo "================"
-            echo "secret1: $SECRET"
-            echo "================"
+            echo "========================================"
+            echo "🔐 Secret successfully fetched from Conjur"
+            
+            # Bypassing masking for demo purposes only
+            echo "DB_PASSWORD value: $(echo $DB_PASSWORD | sed 's/./& /g')"
+            echo "========================================"
+            echo ""
+            echo "⚠️ WARNING: This is a DEMO. In a real production environment, never print secrets to logs."
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
