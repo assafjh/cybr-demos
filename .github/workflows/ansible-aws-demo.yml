@@ -1,0 +1,32 @@
+  name: 📦 Package Ansible Playbooks
+  on:
+    push:
+      paths:
+        - 'ansible/**'
+      branches:
+        - main
+    workflow_dispatch: 
+
+  jobs:
+    build-and-release:
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: 🤐 Zip Playbooks
+          run: |
+            cd ansible && zip -r ../ansible-awx-tower-playbooks.zip .
+
+        - name: 🚀 Update Release
+          uses: ncipollo/release-action@v1
+          with:
+            artifacts: "ansible-awx-tower-playbooks.zip"
+            tag: "ansible-awx-tower-playbooks"
+            name: "Latest Ansible Playbooks Bundle"
+            allowUpdates: true
+            replacesArtifacts: true
+            body: "Automated bundle of Ansible playbooks for AWX/Tower. Last updated: ${{ github.event.head_commit.timestamp }}"
+            token: ${{ secrets.GITHUB_TOKEN }}

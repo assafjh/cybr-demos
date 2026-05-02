@@ -4,13 +4,13 @@ on:
   push:
     paths:
       - 'application-server-credential-provider/**'
-  workflow_dispatch: # הפעלה ידנית
+  workflow_dispatch: 
 
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # נדרש כדי ליצור/לערוך Release
+      contents: write 
 
     steps:
       - name: Checkout Repository

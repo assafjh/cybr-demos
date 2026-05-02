@@ -1,4 +1,6 @@
 # 🔐 Ansible AWX / Tower Integration with Conjur
+[![Package Status](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml)
+
 
 This repository demonstrates how to integrate CyberArk Conjur with Ansible AWX or Ansible Tower. The integration steps are identical for both platforms.
 
