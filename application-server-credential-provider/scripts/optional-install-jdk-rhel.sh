@@ -1,16 +1,13 @@
 #!/bin/bash
-
-# Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Check if Java version is provided as an argument, otherwise use default
+# Default to Java 17 as required for our Jakarta Servlet
 JAVA_VERSION=${1:-17}
 
-# Function to check Java version
-check_java_version() {
+function check_java_version() {
     if command -v java &> /dev/null; then
-        JAVA_CURRENT_VERSION=$(java -version 2>&1 | awk -F[\".] 'NR==1{print $2}')
-        echo "Detected Java version: $JAVA_CURRENT_VERSION"
+        # More robust version parsing
+        JAVA_CURRENT_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
         if [ "$JAVA_CURRENT_VERSION" -ge "$JAVA_VERSION" ]; then
             return 0
         else
@@ -21,34 +18,21 @@ check_java_version() {
     fi
 }
 
-# Check if Java is installed and if it meets the required version
 if check_java_version; then
-    echo "Java version $(java -version 2>&1 | awk -F[\".] 'NR==1{print $2"."$3}') is already installed."
-    java -version
+    echo "✅ Java $JAVA_VERSION or higher is already installed."
     exit 0
-else
-    echo "Java is either not installed or the version is less than $JAVA_VERSION. Proceeding with installation."
 fi
 
-# Install OpenJDK Development Kit
-echo "Installing OpenJDK $JAVA_VERSION..."
+echo "📦 Installing OpenJDK $JAVA_VERSION Development Kit..."
 sudo yum install -y java-$JAVA_VERSION-openjdk-devel
 
-# Set Java 17 as the default version
-echo "Configuring alternatives to set Java $JAVA_VERSION as the default..."
-sudo alternatives --install /usr/bin/java java /usr/lib/jvm/java-$JAVA_VERSION-openjdk/bin/java 1
-sudo alternatives --install /usr/bin/javac javac /usr/lib/jvm/java-$JAVA_VERSION-openjdk/bin/javac 1
+# Set as default and configure JAVA_HOME for the session
 sudo alternatives --set java /usr/lib/jvm/java-$JAVA_VERSION-openjdk/bin/java
 sudo alternatives --set javac /usr/lib/jvm/java-$JAVA_VERSION-openjdk/bin/javac
 
-# Verify the installation
-if check_java_version; then
-    echo "JDK installation successful."
-    java -version
-    javac -version
-    exit 0
-else
-    echo "Installed Java version is less than $JAVA_VERSION after installation. Something went wrong."
-    exit 1
-fi
+# Create a global JAVA_HOME environment variable
+echo "export JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::')" | sudo tee /etc/profile.d/jdk_home.sh
+source /etc/profile.d/jdk_home.sh
 
+echo "✨ JDK installation successful. Current version:"
+java -version

@@ -1,0 +1,18 @@
+# cloud-base.yml
+# Load policy into data branch
+# This policy defines the foundation for the Ansible CLI demo
+
+- !policy
+  id: ansible
+  body:
+    - !group admins
+
+    - !permit
+      role: !group admins
+      privileges: [ read, update, create ]
+      resource: !policy ""
+
+    - !permit
+      role: !group admins
+      privileges: [ read, update, create ]
+      resource: !group admins

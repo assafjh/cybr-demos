@@ -1,0 +1,45 @@
+# onprem-base.yml
+# Load policy into root branch
+# This policy defines the demo organization and root level administration for On-Prem
+
+- !group
+  id: admins
+
+- !user
+  id: admin01
+  owner: !group admins
+  annotations:
+    description: "Global Administrator"
+
+- !permit
+  role: !group admins
+  privileges: [ read, update, create ]
+  resource: !policy root
+
+- !grant
+  role: !group admins
+  member: !user admin01
+
+# Define data branch and delegate to a dedicated policy
+- !policy
+  id: data
+  owner: !group admins
+  body:
+    - !policy
+      id: ansible
+      owner: !group ../admins
+      body:
+        - !group admins
+
+        - !permit
+          role: !group admins
+          privileges: [ read, update, create ]
+          resource: !policy ""
+
+        - &ansible-admin-users
+          - !user
+            id: ansible-admin01
+
+        - !grant
+          role: !group admins
+          members: *ansible-admin-users

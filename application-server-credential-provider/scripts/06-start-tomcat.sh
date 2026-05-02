@@ -1,22 +1,11 @@
 #!/bin/bash
-
-# Exit immediately if a command exits with a non-zero status
-set -e
-
-# Variables
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-INSTALL_DIR="$SCRIPT_DIR/tomcat"
-TOMCAT_PORT=${1:-8081}  # Default port is 8081 if not specified
+TOMCAT_HOME="$SCRIPT_DIR/tomcat"
 
-# Function to start Tomcat
-start_tomcat() {
-  local install_dir=$1
-
-  echo "Starting Tomcat..."
-  $install_dir/bin/startup.sh
-  echo "Tomcat started. Access it at http://<host>:$TOMCAT_PORT/demo-app"
-}
-
-# Main script
-start_tomcat $INSTALL_DIR
-
+if [ -f "$TOMCAT_HOME/bin/startup.sh" ]; then
+    echo "🚀 Starting Tomcat..."
+    "$TOMCAT_HOME/bin/startup.sh"
+    echo "📊 Monitor logs with: tail -f $TOMCAT_HOME/logs/catalina.out"
+else
+    echo "❌ Error: Tomcat not found. Run scripts 02 and 05 first."
+fi

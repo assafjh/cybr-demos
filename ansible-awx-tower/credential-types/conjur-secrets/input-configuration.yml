@@ -1,18 +1,40 @@
 ---
 fields:
-  - id: variable_1
+  # --- Conjur Connection Details ---
+  - id: conjur_url
     type: string
-    label: Variable 1 Path
-    secret: true
-  - id: variable_2
+    label: Conjur Appliance URL
+    secret: false
+  - id: conjur_account
     type: string
-    label: Variable 2 Path
-    secret: true
-  - id: variable_3
+    label: Conjur Account
+    secret: false
+  - id: conjur_authn_login
     type: string
-    label: Variable 3 Path
+    label: Conjur Host Login (e.g., host/ansible-node)
+    secret: false
+  - id: conjur_api_key
+    type: string
+    label: Conjur API Key
     secret: true
+
+  # --- Secret Paths in Conjur ---
+  - id: db_password_path
+    type: string
+    label: DB Password Conjur Path
+    secret: false # The path itself isn't a secret, the value it points to is!
+  - id: api_key_path
+    type: string
+    label: API Key Conjur Path
+    secret: false
+  - id: ssh_key_path
+    type: string
+    label: SSH Key Conjur Path
+    secret: false
+
 required:
-  - variable_1
-  - variable_2
-  - variable_3
+  - conjur_url
+  - conjur_account
+  - conjur_authn_login
+  - conjur_api_key
+  - db_password_path

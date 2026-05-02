@@ -1,13 +1,14 @@
 ---
 name: Conjur Demo - Secrets Fetch Showcase
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  id-token: write # Required for requesting the JWT from GitHub OIDC provider
+  contents: read  # Required for actions/checkout
 on:
   push: 
     paths:
       - github-actions/**
   workflow_dispatch:
+  
 jobs:
   fetch-secret-from-conjur:
     runs-on: ubuntu-latest
@@ -28,11 +29,11 @@ jobs:
           url: ${{ secrets.CONJUR_URL }}
           account: conjur
           authn_id: ${{ secrets.CONJUR_AUTHN_ID }}
+          # Fetching secrets aligned with our global demo architecture
           secrets: |
-            data/github/apps/safe/secret1|SECRET1
-            data/github/apps/safe/secret2|SECRET2
-            data/github/apps/safe/secret3|SECRET3
-          certificate: ${{ secrets.CONJUR_PUBLIC_KEY }}
+            data/github/apps/safe/db_password|DB_PASSWORD
+            data/github/apps/safe/api_key|API_KEY
+            data/github/apps/safe/ssh_key|SSH_KEY
 
       - name: ✨ Displaying Retrieved Secrets (DEMO)
         shell: bash
@@ -40,9 +41,9 @@ jobs:
           echo "✅ Successfully retrieved 3 secrets from Conjur!"
           echo ""
           echo "📋 Visual representation (bypassing GitHub Actions masking for demo):"
-          echo "SECRET1: $(echo $SECRET1 | sed 's/./& /g')"
-          echo "SECRET2: $(echo $SECRET2 | sed 's/./& /g')"
-          echo "SECRET3: $(echo $SECRET3 | sed 's/./& /g')"
+          echo "DB_PASSWORD: $(echo $DB_PASSWORD | sed 's/./& /g')"
+          echo "API_KEY:     $(echo $API_KEY | sed 's/./& /g')"
+          echo "SSH_KEY:     $(echo $SSH_KEY | sed 's/./& /g')"
           echo ""
           echo "⚠️  REMINDER: This is a DEMO only. Never print real secrets in production workflows!"
 

@@ -1,0 +1,32 @@
+name: ASCP Demo - Build Artifact
+
+on:
+  push:
+    paths:
+      - 'application-server-credential-provider/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build WAR with Maven
+        # אנחנו מדלגים על טסטים ב-CI כי אין לנו שרת JNDI זמין ב-GitHub Runner
+        working-directory: application-server-credential-provider/code/demo-app
+        run: mvn clean package -DskipTests
+
+      - name: Upload Build Artifact (WAR)
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-app-v${{ github.run_number }}
+          path: application-server-credential-provider/code/demo-app/target/*.war

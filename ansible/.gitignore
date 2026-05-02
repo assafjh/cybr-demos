@@ -1,1 +1,6 @@
-**/playbook/**.yml
+# Ignore environment and secret files
+.env
+*.log
+
+# Allow playbook yaml files! Do NOT ignore them anymore.
+# (Removed the **/playbook/**.yml line)

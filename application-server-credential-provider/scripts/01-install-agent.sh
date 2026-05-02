@@ -3,87 +3,89 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# Logging setup
+LOG_FILE="/var/log/cyberark_cp_install.log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+
 # Check if the user is running the script as root
 if [[ $EUID -ne 0 ]]; then
-   echo "This script must be run as root" 
+   echo "❌ Error: This script must be run as root" 
    exit 1
 fi
 
-# Variables (adjust these paths and variables as needed)
-CP_INSTALLER_PATH="/path/to/CyberArk-Credential-Provider-Linux-x86_64.tar.gz"
-INSTALL_DIR="/opt/CARKaim"
-LOG_FILE="/var/log/cyberark_cp_install.log"
-VAULT_IP="your_vault_ip"
-VAULT_PORT="your_vault_port"
-VAULT_USERNAME="your_vault_username"
-VAULT_PASSWORD="your_vault_password"
+# Variables - Use environment variables or defaults
+VAULT_IP="${VAULT_IP:-"10.0.0.1"}"
+VAULT_USER="${VAULT_USER:-"prov_user"}"
+# Never hardcode the password; provide it via env var before running
+VAULT_PASSWORD="${VAULT_PASSWORD:? "Error: VAULT_PASSWORD environment variable is not set."}"
+
+# Locate installer in current or parent directory
+INSTALLER_NAME="CyberArk-Credential-Provider-Linux-x86_64.tar.gz"
+CP_INSTALLER_PATH=$(find . -name "$INSTALLER_NAME" -print -quit)
 
 # Functions
 function check_prerequisites {
-    echo "Checking prerequisites..."
-    # Check if necessary commands are available
-    for cmd in tar curl; do
+    echo "🔍 Checking prerequisites..."
+    for cmd in tar curl rpm; do
         if ! command -v $cmd &> /dev/null; then
-            echo "Error: $cmd is not installed. Please install it and try again."
+            echo "❌ Error: $cmd is not installed."
             exit 1
         fi
     done
+
+    if [[ -z "$CP_INSTALLER_PATH" ]]; then
+        echo "❌ Error: Installer $INSTALLER_NAME not found in current directory."
+        exit 1
+    fi
 }
 
-function create_directories {
-    echo "Creating necessary directories..."
-    mkdir -p /var/opt/CARKaim
-    mkdir -p /etc/opt/CARKaim
-    mkdir -p /opt/CA
-    chmod 755 /var/opt/CARKaim
-    chmod 755 /etc/opt/CARKaim
-    chmod 755 /opt/CA
+function prepare_installation {
+    echo "📂 Preparing installation environment..."
+    mkdir -p /var/tmp/ascp_install
+    tar -xzf "$CP_INSTALLER_PATH" -C /var/tmp/ascp_install
 }
 
-function set_permissions {
-    echo "Setting permissions..."
-    chown root:root /var/opt/CARKaim
-    chown root:root /etc/opt/CARKaim
-    chown root:root /opt/CA
-}
-
-function extract_installer {
-    echo "Extracting installer..."
-    tar -xzf "$CP_INSTALLER_PATH" -C /tmp
+function configure_aimparms {
+    echo "📝 Configuring installation parameters (aimparms)..."
+    # Create the required aimparms file for silent installation
+    cat > /var/tmp/ascp_install/aimparms <<EOL
+AcceptEULA=Yes
+CreateVaultEnvironment=Yes
+VaultFilePath=/etc/opt/CARKaim/vault.ini
+MainSafe=App_Secrets
+AdminUser=$VAULT_USER
+AdminPassword=$VAULT_PASSWORD
+EOL
 }
 
 function install_cp {
-    echo "Installing CyberArk Credential Provider..."
-    /tmp/CyberArk-Credential-Provider-Install/install.sh --install_dir "$INSTALL_DIR" --accept_eula --skip_interactive
-
-    echo "Installation complete."
+    echo "🚀 Installing CyberArk Credential Provider..."
+    cd /var/tmp/ascp_install
+    
+    # Check if we are on RHEL/CentOS/Ubuntu and use the appropriate package manager
+    if [[ -f "./CARKaim-latest.x86_64.rpm" ]]; then
+        rpm -ivh CARKaim-latest.x86_64.rpm
+    else
+        # Fallback to provided install script if RPM isn't used
+        ./install.sh --accept_eula --skip_interactive
+    fi
 }
 
-function configure_cp {
-    echo "Configuring CyberArk Credential Provider..."
-
-    # Create and configure dbparm.ini
-    cat > /etc/opt/CARKaim/dbparm.ini <<EOL
-    Address=$VAULT_IP
-    Port=$VAULT_PORT
-    UserName=$VAULT_USERNAME
-    Password=$VAULT_PASSWORD
-EOL
-
-    chmod 600 /etc/opt/CARKaim/dbparm.ini
-    chown root:root /etc/opt/CARKaim/dbparm.ini
-
-    echo "Configuration complete."
+function verify_installation {
+    echo "✅ Verifying installation..."
+    if systemctl is-active --quiet aimprv; then
+        echo "🌟 CyberArk AIM Provider service is running!"
+    else
+        echo "⚠️ Warning: Service aimprv is not running. Check /var/log/cyberark_cp_install.log"
+    fi
 }
 
-# Main script execution
-{
-    check_prerequisites
-    create_directories
-    set_permissions
-    extract_installer
-    install_cp
-    configure_cp
-} | tee -a "$LOG_FILE"
+# Main execution
+echo "Starting CyberArk Agent Installation..."
+check_prerequisites
+prepare_installation
+configure_aimparms
+install_cp
+verify_installation
 
-echo "Installation log saved to $LOG_FILE"
+echo "🏁 Installation process finished. Log: $LOG_FILE"

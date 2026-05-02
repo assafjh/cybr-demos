@@ -13,6 +13,11 @@ Instructions for each scenario can be found in its respective folder.
 
 ---
 
+## Disclaimer
+This is a personal repository containing demonstrations and proof-of-concept integrations. It is not officially affiliated with, endorsed by, or supported by CyberArk. All scripts and configurations are provided "as-is" for educational and portfolio purposes.
+
+---
+
 ## Scenarios
 1. deploy-conjur: Scripts to quickly deploy Conjur
 2. kubernetes-jwt: Integration with Kubernetes using JWT Authenticator

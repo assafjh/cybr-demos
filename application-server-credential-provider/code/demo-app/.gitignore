@@ -1,53 +1,20 @@
-# Maven target directory
-/target/
+# === Maven Build Output ===
+target/
+*.war
+*.jar
+*.ear
 
-# Eclipse specific files
-/.classpath
-/.project
-/.settings/
+# === IDE Settings ===
+.idea/
+*.iml
+.project
+.settings/
+.classpath
+.factorypath
+.vscode/
+bin/
 
-# IntelliJ IDEA specific files
-/.idea/
-/*.iml
-/out/
-
-# NetBeans specific files
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-# VS Code specific files
-/.vscode/
-
-# macOS specific files
+# === OS & Logs ===
 .DS_Store
-
-# Windows specific files
 Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Linux specific files
-*~
-
-# Logs
-/logs/
-/*.log
-
-# Compiled class files
-*.class
-
-# Temporary files
-*.tmp
-*.temp
-*.swp
-
-# Others
-/.idea/
-/*.iml
-/.classpath
-/.project
-/.settings/
-
+*.log

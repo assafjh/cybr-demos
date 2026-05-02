@@ -1,440 +1,213 @@
-# Ansible AWX/Tower Integration
+# 🔐 Ansible AWX / Tower Integration with Conjur
 
-Integration steps are the same for Ansible AWX and Ansible Tower.
+This repository demonstrates how to integrate CyberArk Conjur with Ansible AWX or Ansible Tower. The integration steps are identical for both platforms.
 
-If needed, instructions are supplied for deploying an AWX instance on your Kubernetes node
+This demo showcases two distinct secret consumption methods:
+1. **Machine Credential Injection:** Injecting a password directly into Ansible's core facts (`ansible_password`).
+2. **Custom Credential Type Injection:** Pulling multiple application-specific secrets dynamically.
 
-**Two playbooks will be used**
-- A playbook that reads a machine type credential
-- A playbook that consumes multiple secrets from a custom type credential
+---
 
-## 1. Deploy AWX Instance
-- If needed, install Ansible AWX
-- Installation based on instructions from: [AWX Operator GitHub](https://github.com/ansible/awx-operator) and modified based on version 1.1.3
-- All work will be done under the ***manifests*** folder
-### Modify kustomization.yml
-#### 1. If needed, use a custom certificate
-**Note**: You will need to provide a private and public key and save it to the manifests folder.
-Uncomment lines #9 - #13
-```yaml
-...
-# Uncomment for using a custom certificate
-- name: awx-secret-tls
-  type: kubernetes.io/tls
-  files:
-    - tls.crt # name of the public key file
-    - tls.key # name of the private key file
-...
-```
-#### 2. If needed, bypass Postgres configuration
-Uncomment and modify lines #16 - #25
-```yaml
-...
-# Uncomment for bypassing Postgres configuration
-- name: awx-postgres-configuration
-  type: Opaque
-  literals:
-  - host=awx-postgres-13
-  - port=5432 # database port
-  - database=awx # database name
-  - username=awx # database username
-  - password=Ansible123! # database username password
-  - type=managed
-  - sslmode=prefer
-...
-```
-#### 3. Select AWX admin password
-Modify line #31
-```yaml
-...
-      - password=Ansible123!
-...
-```
-#### 3. Select Operator namespace
-Modify line #46
-```yaml
-...
-namespace: awx
-...
-```
-### Modify pv.yml
-#### If there is a need for a persistent Postgres volume
-**Note**: you will need to create a directory for the volume mount on your node.
-Uncomment and modify lines #3 - #15
-```yaml
-...
-# Uncomment if there is a need for a persistent postgres volume
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: awx-postgres-13-volume
-spec:
-  accessModes:
-    - ReadWriteOnce
-   persistentVolumeReclaimPolicy: Retain
-   capacity:
-   storage: 8Gi
-   storageClassName: awx-postgres-volume
-   hostPath:
-     path: /awx-data/postgres-13 # Path to your directory on the node
-...
-```
-#### Modify the folder path for persistent projects volume
-##### 1. Create the projects folder on the node
+## 🏗️ 1. Deploy AWX Instance (Optional)
+
+If you do not have a running AWX instance, you can deploy a lean, demo-ready instance on your Kubernetes node using the provided manifests.
+
+*Note: The installation is based on the [AWX Operator GitHub](https://github.com/ansible/awx-operator) (v1.1.3).*
+
+All modifications should be done within the `/manifests` folder.
+
+### Step 1.1: Customize Kubernetes Manifests
+
+**Modify `kustomization.yml`**
+1. **Custom Certificate (Optional):** Uncomment lines regarding `awx-secret-tls` and ensure your `tls.crt` and `tls.key` files are in the folder.
+2. **Postgres Configuration:** Define your database limits or bypass logic.
+3. **Set Admin Password:** *IMPORTANT: Use the `.env` setup as described in the manifest section instead of plain text if pushing to public repos.*
+4. **Namespace:** Change `namespace: awx` if required.
+
+**Modify `pv.yml` (Persistent Volume)**
+Create the host path folder on your node:
 ```bash
-AWX_PROJECTS_PARENT_PATH=$HOME # Modify to desired path
+AWX_PROJECTS_PARENT_PATH=$HOME
 mkdir -p "$AWX_PROJECTS_PARENT_PATH"/awx-data/projects
 ```
-##### 2. Modify line  #31 to point to the folder created above
-```yaml
-    path: /home/ec2-user/awx-data/projects
-```
-### Modify awx.yml
-#### If using a custom certificate
-Uncomment line #11
-```yaml
-...
-  ingress_tls_secret: awx-secret-tls
-...
-```
-#### Fill in external hostname or machine FQDN at line #14
-```yaml
-  hostname: awx-machine #That will be the address we will access AWX UI - https://awx-machine
-```
-#### If using custom Postgres configuration
-Uncomment line #23
-```yaml
-...
-  postgres_configuration_secret: awx-postgres-configuration
-...
-```
-#### If using a persistent volume for Postgres
-Uncomment lines #26 - #29
-```yaml
-...
-  postgres_storage_class: awx-postgres-volume
-  postgres_storage_requirements:
-   requests:
-     storage: 8Gi
-...
-```
-#### If custom operator resource requirements are needed
-Uncomment and modify lines #35 - #39
-```yaml
-...
-  postgres_init_container_resource_requirements: {}
-  postgres_resource_requirements: {}
-  web_resource_requirements: {}
-  task_resource_requirements: {}
-  ee_resource_requirements: {}
-...
-```
-#### To open Ansible censored logs
-Uncomment line #42
-```
-...
-  no_log: false
-...
-```
-### 4. Deploy AWX operator and instance
+Then, update line #31 in `pv.yml` to match this path.
+
+**Modify `awx.yml`**
+1. Update line #14 with your external hostname: `hostname: <your-awx-machine-fqdn>`.
+2. Uncomment sections for custom certificates, Postgres PVs, or Resource limits based on your node's capacity.
+
+### Step 1.2: Deploy
 ```bash
 scripts/01-deploy-axw-operator-and-instance.sh
 ```
 
-## 2. Loading Conjur policies
-- Policy statements are loaded into either the Conjur root/data policy branch or a policy branch under root/data.
-- Per best practices, most policies will be created in branches off of root/data.
-- Branches have the following advantages: better organizing, help policy isolation for least privilege assignments, enforce RBAC, allowing relevant users to manage their own policy.
-- The demo uses an organizational structure that can be found under the folder ***policies***.
-
-### Conjur Enterprise
-#### Root branch
-##### 1. Login to Conjur as admin using the CLI
-```bash
-conjur login -i admin
-```
-##### 2. Update root policy
-```bash
-conjur policy update -b root -f policies/conjur-enterprise/01-base.yml | tee -a 01-base.log
-```
-##### 3. Logout from Conjur
-```Bash
-conjur logout
-```
-#### Ansible branch
-##### 1. Login as user ansible-admin01
-- Use the API key as a password from the 01-base.log file for the user ansible-admin01
-```bash
-conjur login -i ansible-admin01
-```
-##### 2. Load ansible policy
-```bash
-conjur policy update -b data/ansible -f policies/conjur-enterprise/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
-```
-##### 3. Populate Conjur variables
-1. Modify the variables at populate variables script:
-```bash
-vi  scripts/03-populate-variables.sh
-```
-2. Run the script:
-```Bash
-scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
-```
-##### 4. Logout from Conjur CLI
-```Bash
-conjur logout
-```
-### Conjur Cloud
-#### Data branch
-##### 1. Login to Conjur as admin using the CLI
-```bash
-conjur login -i <username>
-```
-##### 2. Update data policy
-```bash
-conjur policy update -b data -f policies/conjur-cloud/01-base.yml | tee -a 01-base.log
-```
-##### 3. Logout from Conjur
-```Bash
-conjur logout
-```
-#### Ansible branch
-##### 1. Login as user ansible-admin01
-- Use the API key as a password from the 01-base.log file for the user ansible-admin01
-```bash
-conjur login -i ansible-admin01
-```
-##### 2. Load ansible policy
-```bash
-conjur policy update -b data/ansible -f policies/conjur-cloud/02-define-ansible-branch.yml | tee -a 02-define-ansible-branch.log
-```
-##### 3. Populate Conjur variables
-1. Modify the variables at populate variables script:
-```bash
-vi  scripts/03-populate-variables.sh
-```
-2. Run the script:
-```Bash
-scripts/03-populate-variables.sh | tee -a 03-populate-variables.sh
-```
-##### 4. Logout from Conjur CLI
-```Bash
-conjur logout
-```
-
-## 3. Configure AWX custom credential type: Conjur Secrets
-Work will be done at AWX/Tower UI under Administration -> Credential Types
-### 1. Click Add 
-### 2. Fill the form
-```properties
-Name: Conjur Secrets
-```
-### 3. Copy the YAML below to the Input configuration form:
-```yaml
 ---
-fields:
-  - id: variable_1
-    type: string
-    label: Variable 1 Path
-    secret: true
-  - id: variable_2
-    type: string
-    label: Variable 2 Path
-    secret: true
-  - id: variable_3
-    type: string
-    label: Variable 3 Path
-    secret: true
-required:
-  - variable_1
-  - variable_2
-  - variable_3
+
+## 📜 2. Loading Conjur Policies
+
+To adhere to the principle of least privilege, policies are split between **Base** (Infrastructure) and **App** (Application).
+
+### Option A: Conjur Enterprise (On-Premise)
+
+1. **Login as admin and load the Base policy:**
+   ```bash
+   conjur login -i admin
+   conjur policy update -b root -f policies/onprem-base.yml | tee -a base.log
+   conjur logout
+   ```
+2. **Login as `ansible-admin01` and load the App policy:**
+   *(Use the API key from `base.log`)*
+   ```bash
+   conjur login -i ansible-admin01
+   conjur policy update -b data/ansible -f policies/app.yml | tee -a app-policy.log
+   ```
+
+### Option B: Conjur Cloud
+
+1. **Login as your Cloud admin and load the Base policy:**
+   ```bash
+   conjur login -i <username>
+   conjur policy update -b data -f policies/cloud-base.yml | tee -a base.log
+   conjur logout
+   ```
+2. **Login as `ansible-admin01` and load the App policy:**
+   *(Use the API key from `base.log`)*
+   ```bash
+   conjur login -i ansible-admin01
+   conjur policy update -b data/ansible -f policies/app.yml | tee -a app-policy.log
+   ```
+
+### Populate Conjur Variables
+Generate and inject secure values into the newly created variables (`ansible_password`, `db_password`, `api_key`, `ssh_key`):
+```bash
+scripts/03-populate-variables.sh | tee -a populate.log
 ```
-### 4. Copy the YAML below to the Injector configuration form:
-```yaml
+*(Make sure you are still logged in to Conjur CLI before running this).*
+
 ---
-extra_vars:
-  variable_1: '{{ variable_1 }}'
-  variable_2: '{{ variable_2 }}'
-  variable_3: '{{ variable_3 }}'
-```
-### 5. Click Save
 
-## 4. Configure a new AWX/Tower Organization
-Work will be done at AWX/Tower UI under Access -> Organizations
-### 1. Click Add 
-### 2. Fill the form
-```properties
-Name: Conjur Demo
-```
-### 3. Click Save 
+## ⚙️ 3. Configure AWX Custom Credential Type
 
-## 5. Configure AWX/Tower Credentials
-Work will be done at AWX/Tower UI under Resources -> Credentials
-### 1. Configure CyberArk Conjur Secrets Manager Lookup credential
-#### 1. Click Add 
-#### 2. Fill the form
-```properties
-Name: Conjur Instance
-Orginization: Conjur Demo
-Credential Type: CyberArk Conjur Secrets Manager Lookup
-```
-#### 3. Fill the type details form
-```properties
-Conjur URL: https://conjur-host:433 #Conjur FQDN with scheme and port
-API Key: 123456 #Use the API key as a password from the 02-define-ansible-branch.log file for the identity: host/ansible/apps/conjur-demo
-Credential Type: CyberArk Conjur Secrets Manager Lookup
-Account: conjur
-Username: data/host/ansible/apps/conjur-demo
-Public Key Certificate: # Copy the contents of your Conjur public key
-```
-#### 4. Click Test
-##### 1. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
-##### 2. Click Run
-Make Sure that Test passed
-##### 3. Click Cancel
-#### 5. Click Save
+1. Log into the AWX/Tower UI.
+2. Navigate to **Administration -> Credential Types** -> Click **Add**.
+3. Name it: `Conjur Secrets`.
+4. **Input Configuration (YAML):**
+   ```yaml
+   ---
+   fields:
+     - id: conjur_url
+       type: string
+       label: Conjur Appliance URL
+     - id: conjur_account
+       type: string
+       label: Conjur Account
+     - id: conjur_authn_login
+       type: string
+       label: Conjur Host Login
+     - id: conjur_api_key
+       type: string
+       label: Conjur API Key
+       secret: true
+     - id: db_password_path
+       type: string
+       label: DB Password Path
+   required:
+     - conjur_url
+     - conjur_account
+     - conjur_authn_login
+     - conjur_api_key
+     - db_password_path
+   ```
+5. **Injector Configuration (YAML):**
+   ```yaml
+   ---
+   extra_vars:
+     db_password: '{{ db_password_path }}'
+   env:
+     CONJUR_APPLIANCE_URL: '{{ conjur_url }}'
+     CONJUR_ACCOUNT: '{{ conjur_account }}'
+     CONJUR_AUTHN_LOGIN: '{{ conjur_authn_login }}'
+     CONJUR_AUTHN_API_KEY: '{{ conjur_api_key }}'
+   ```
+6. Click **Save**.
 
-### 2. Configure Conjur Secrets credential
-#### 1. Click Add 
-#### 2. Fill the form
-```properties
-Name: Conjur Variables
-Orginization: Conjur Demo
-Credential Type: Conjur Secrets
-```
-#### 3. Fill the type details form
-##### 1. Variable 1 Path
-1. Click on the key icon next to the Variable1 Path input box.
-2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
-4. Click Test
-Make Sure that Test passed
-5. Click OK
-##### 2. Variable 2 Path
-1. Click on the key icon next to the Variable2 Path input box.
-2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
-4. Click Test
-Make Sure that Test passed
-5. Click OK
-##### 3. Variable 3 Path
-1. Click on the key icon next to the Variable3 Path input box.
-2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret2
-4. Click Test
-Make Sure that Test passed
-5. Click OK
-#### 4. Click Save
+---
 
-### 3. Configure Machine credential
-#### 1. Click Add 
-#### 2. Fill the form
-```properties
-Name: Conjur Machine Secret
-Orginization: Conjur Demo
-Credential Type: Machine
-```
-#### 3. Fill the type details form
-##### 1. Username
-1. Fill in ``dummy``
-##### 2. Password
-1. Click on the key icon next to the Password input box.
-2. Select **Conjur Instance**
-3. Fill in ``Secret Identifier``: data/ansible/apps/safe/secret1
-4. Click Test
-Make Sure that Test passed
-5. Click OK
-##### 3. Click Save
+## 🏢 4. Configure AWX Environment
 
-## 6. Create Project
-Work will be done at AWX/Tower UI under Resources -> Projects
-#### 1. Click Add
-#### 2. Fill the form
-```properties
-Name: Conjur Demo Project
-Orginization: Conjur Demo
-Source Control Type: Git
-```
-#### 3. Fill the type details form
-```properties
-Source Control URL: https://github.com/assafjh/cybr-demos.git
-Source Control Branch/Tag/Commit: ansible-awx-tower-playbooks
-```
-#### 4. Click Save
+### 4.1 Create Organization
+1. Go to **Access -> Organizations** -> Click **Add**.
+2. Name: `Conjur Demo`.
+3. Click **Save**.
 
-### 3. Create an Inventory
-Work will be done at AWX/Tower UI under Resources -> Inventories
-#### 1. Click Add -> Add inventory template
-#### 2. Fill the form
-```properties
-Name: Conjur
-Orginization: Conjur Demo
-```
-#### 3. Click Save
+### 4.2 Create Project
+1. Go to **Resources -> Projects** -> Click **Add**.
+2. Name: `Conjur Demo Project`.
+3. Organization: `Conjur Demo`.
+4. Source Control Type: `Git`.
+5. Source Control URL: `[https://github.com/assafjh/cybr-demos.git](https://github.com/assafjh/cybr-demos.git)`.
+6. Source Control Branch: `ansible-awx-tower-playbooks` *(Change this to your actual branch name if different)*.
+7. Click **Save**.
 
-## 7. Create a Template for using the Custom Secret type Playbook
-Work will be done at AWX/Tower UI under Resources -> Templates
-### 1. Click Add -> Add job template
-### 2. Fill the form
-```properties
-Name: Conjur with Custom Type Credential
-Job Type: Run
-Inventory: Conjur
-Project: Conjur Demo Project
-Playbook: print-variables.yml
-```
-#### 3. Select credentials
-##### 1. Under ```Credentials``` input box, select the ```magnifier glass``` icon
-##### 2.  Selected Category is ```Conjur Secrets```
-##### 3. Select ```Conjur Variables```
-##### 4. Click ```Select```
-### 4. Click Save
-### 5. Click Launch
-### 6. Take a look at the Job Output - see the variables printed
-Example
-```json
-...
-TASK [display variable 1] ******************************************************
-ok: [localhost] => {
-"variable_1": "60d689ca20ee0521ae30"
-}
-TASK [display variable 2] ******************************************************
-ok: [localhost] => {
-"variable_2": "9876be3dd08fde733894"
-}
-TASK [display variable 3] ******************************************************
-ok: [localhost] => {
-"variable_3": "7001eb20153a1faa8e2e"
-}
-...
-```
+### 4.3 Create Inventory
+1. Go to **Resources -> Inventories** -> Click **Add** -> **Add inventory**.
+2. Name: `Conjur`.
+3. Organization: `Conjur Demo`.
+4. Click **Save**.
 
-## 8. Create a Template for using the Machine type Playbook
-Work will be done at AWX/Tower UI under Resources -> Templates
-### 1. Click Add -> Add job template
-### 2. Fill the form
-```properties
-Name: Conjur with Machine Type Credential
-Job Type: Run
-Inventory: Conjur
-Project: Conjur Demo Project
-Playbook: print-machine-password.yml
-```
-### 3. Select credentials
-##### 1. Under ```Credentials``` input box, select the ```magnifier glass``` icon
-##### 2.  Selected Category is ```Machine```
-##### 3. Select ```Conjur Machine Secret```
-##### 4. Click ```Select```
-### 4. Click Save
-### 5. Click Launch
-### 6. Take a look at the Job Output - see the variables printed
-Example
-```json
-...
-TASK [display encrypted password] **********************************************
-ok: [localhost] => {
-"ansible_password": "60d689ca20ee0521ae30"
-}
-...
-```
+---
+
+## 🔑 5. Configure Credentials in AWX
+
+Navigate to **Resources -> Credentials** to create the following three credentials.
+
+### Credential A: Conjur Instance Connection
+1. Click **Add**.
+2. Name: `Conjur Instance` | Organization: `Conjur Demo`.
+3. Credential Type: `CyberArk Conjur Secrets Manager Lookup`.
+4. **Fill Details:**
+   - **Conjur URL:** `https://<your-conjur-fqdn>`
+   - **API Key:** Use the API key from `app-policy.log` for `host/apps/awx-node`.
+   - **Account:** `conjur`
+   - **Username:** `host/data/ansible/apps/awx-node`
+5. Test it against `data/ansible/apps/safe/db_password` and **Save**.
+
+### Credential B: Application Variables (Custom Type)
+1. Click **Add**.
+2. Name: `Conjur Variables` | Organization: `Conjur Demo`.
+3. Credential Type: `Conjur Secrets` (The one we created in Step 3).
+4. **Fill Details:** Link the `Conjur Instance` credential created above and specify the paths (e.g., `data/ansible/apps/safe/db_password`).
+5. **Save**.
+
+### Credential C: Machine Secret
+1. Click **Add**.
+2. Name: `Conjur Machine Secret` | Organization: `Conjur Demo`.
+3. Credential Type: `Machine`.
+4. **Fill Details:**
+   - Username: `dummy` (or your actual target user)
+   - Password: Click the key icon, select the `Conjur Instance` lookup, and enter `data/ansible/apps/safe/ansible_password`.
+5. **Save**.
+
+---
+
+## 🚀 6. Execution & Job Templates
+
+Navigate to **Resources -> Templates**.
+
+### Demo 1: Application Secrets Retrieval
+1. Click **Add -> Add job template**.
+2. Name: `Conjur App Variables Demo`.
+3. Job Type: `Run` | Inventory: `Conjur` | Project: `Conjur Demo Project`.
+4. Playbook: `print-variables.yml`.
+5. **Credentials:** Select `Conjur Variables`.
+6. Click **Save** and then **Launch**.
+7. *Observe the output dynamically printing the fetched `db_password`.*
+
+### Demo 2: Machine Password Injection
+1. Click **Add -> Add job template**.
+2. Name: `Conjur Machine Secret Demo`.
+3. Job Type: `Run` | Inventory: `Conjur` | Project: `Conjur Demo Project`.
+4. Playbook: `print-machine-password.yml`.
+5. **Credentials:** Select `Conjur Machine Secret`.
+6. Click **Save** and then **Launch**.
+7. *Observe the output confirming the injection of the `ansible_password`.*
