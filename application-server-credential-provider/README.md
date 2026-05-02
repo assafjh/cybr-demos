@@ -1,5 +1,5 @@
 # 🐯 CyberArk ASCP Demo: Jakarta Servlet on Tomcat
-![ASCP Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/ascp-build.yml/badge.svg)
+![ASCP Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/ascp-demo.yml/badge.svg)
 
 ### Secure Secrets Management with Zero Code Changes
 
