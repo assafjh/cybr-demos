@@ -1,11 +1,11 @@
 # Kubernetes Certificate authentication based follower
 Instructions for deploying a demo certificate authentication based follower inside a Kubernetes cluster.
 
-## How does the Kubernetes Cert Authenticator works?
+## How does the Kubernetes Cert Authenticator work?
 
-![Conjur k8s cert authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-follower/cert-based/k8s-cert-authenticator.png?raw=true)
+![Conjur k8s cert authenticator](./k8s-cert-authenticator.png)
 ## Follower deployment flow
-![Cert-based authn deployment flow](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-follower/cert-based/follower-cert-based-flow.png?raw=true)
+![Cert-based authn deployment flow](./follower-cert-based-flow.png)
 
 ## Instructions
 ### 1. Loading Conjur policies

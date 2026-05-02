@@ -1,7 +1,17 @@
 # CYBR-Demos
-My personal demos repository.
+Hi, I'm Assaf! 👋 Welcome to my personal demos repository.
+
+This repository serves as a portfolio of my work and contains various demonstrations of integrating CyberArk Conjur with a wide range of DevOps tools and platforms.
 
 Instructions for each scenario can be found in its respective folder.
+
+## Technologies Used
+- **Secrets Management**: CyberArk Conjur Enterprise / OSS
+- **CI/CD**: Jenkins, GitHub Actions, GitLab CI, CircleCI, TeamCity, Azure DevOps
+- **Orchestration & Infrastructure**: Kubernetes (K8s), OpenShift (OCP), Terraform, Ansible, AWS (EC2, Lambda)
+- **Languages & Frameworks**: Java (Spring Boot, Tomcat), Node.js, Shell Scripting
+
+---
 
 ## Scenarios
 1. deploy-conjur: Scripts to quickly deploy Conjur

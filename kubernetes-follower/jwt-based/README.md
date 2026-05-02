@@ -1,11 +1,11 @@
 # JWT authentication based follower
 Instructions for deploying a demo JWT authentication based follower inside a Kubernetes cluster.
 
-## How does the JWT Authenticator works?
+## How does the JWT Authenticator work?
 
-![Conjur k8s cert authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-follower/jwt-based/jwt-authenticator.png?raw=true)
+![Conjur k8s cert authenticator](./jwt-authenticator.png)
 ## Follower deployment flow
-![Cert-based authn deployment flow](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-follower/jwt-based/follower-jwt-based-flow.png?raw=true)
+![Cert-based authn deployment flow](./follower-jwt-based-flow.png)
 
 ## Instructions
 ### 1. Loading Conjur policies
