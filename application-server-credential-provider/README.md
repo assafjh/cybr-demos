@@ -46,7 +46,7 @@ Follow the numbered scripts in order:
 2.  **`./02-install-tomcat.sh`**: Downloads and extracts Tomcat 10+[cite: 1].
 3.  **`./03-deploy-postgres-server.sh`**: Provisions the demo database[cite: 1].
 4.  **`./04-configure-datasource.sh`**: Injects JNDI resources into Tomcat's `context.xml`[cite: 1].
-5.  **`./05-deploy-app.sh`**: Pulls the latest build from GitHub or builds locally and deploys to Tomcat[cite: 1].
+5.  **`./05-pull-app.sh`**: Pulls the latest build from GitHub or builds locally and deploys to Tomcat[cite: 1].
 6.  **`./06-start-tomcat.sh`**: Boots the server[cite: 1].
 
 ---

@@ -1,14 +1,17 @@
-name: ASCP Demo - Build Artifact
+name: ASCP Demo - Build & Release
 
 on:
   push:
     paths:
       - 'application-server-credential-provider/**'
-  workflow_dispatch:
+  workflow_dispatch: # הפעלה ידנית
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # נדרש כדי ליצור/לערוך Release
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -21,12 +24,17 @@ jobs:
           cache: 'maven'
 
       - name: Build WAR with Maven
-        # אנחנו מדלגים על טסטים ב-CI כי אין לנו שרת JNDI זמין ב-GitHub Runner
         working-directory: application-server-credential-provider/code/demo-app
-        run: mvn clean package -DskipTests
+        # בנייה נקייה ללא הרצת טסטים כדי להאיץ את התהליך[cite: 1, 2]
+        run: mvn clean package -DskipTests 
 
-      - name: Upload Build Artifact (WAR)
-        uses: actions/upload-artifact@v4
+      - name: Update GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: demo-app-v${{ github.run_number }}
-          path: application-server-credential-provider/code/demo-app/target/*.war
+          tag_name: latest-build
+          name: "Latest ASCP Demo Build"
+          body: "This release contains the most recent stable build of the ASCP Demo app."
+          files: application-server-credential-provider/code/demo-app/target/*.war
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
