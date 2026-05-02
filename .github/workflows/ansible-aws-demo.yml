@@ -1,8 +1,8 @@
-  name: 📦 Package Ansible Playbooks
+  name: Package Ansible Playbooks
   on:
     push:
       paths:
-        - 'ansible/**'
+        - 'ansible-awx-tower/**'
       branches:
         - main
     workflow_dispatch: 
