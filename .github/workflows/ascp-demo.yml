@@ -30,7 +30,7 @@ jobs:
       - name: Update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest-build
+          tag_name: ascp-demo-latest-build
           name: "Latest ASCP Demo Build"
           body: "This release contains the most recent stable build of the ASCP Demo app."
           files: application-server-credential-provider/code/demo-app/target/*.war
