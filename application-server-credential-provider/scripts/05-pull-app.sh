@@ -1,5 +1,5 @@
 # הכתובת החדשה תיראה כך:
-RELEASE_URL="https://github.com/$GITHUB_USER/$GITHUB_REPO/releases/download/latest-build/demo-app.war"
+RELEASE_URL="https://github.com/assafjh/cybr-demos/releases/download/latest-build/ascp-demo-app.war"
 
 function download_from_release() {
     echo "🌐 Pulling latest artifact from GitHub Releases..."

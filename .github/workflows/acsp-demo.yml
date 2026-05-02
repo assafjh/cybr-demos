@@ -25,7 +25,6 @@ jobs:
 
       - name: Build WAR with Maven
         working-directory: application-server-credential-provider/code/demo-app
-        # בנייה נקייה ללא הרצת טסטים כדי להאיץ את התהליך[cite: 1, 2]
         run: mvn clean package -DskipTests 
 
       - name: Update GitHub Release

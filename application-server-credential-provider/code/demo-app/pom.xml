@@ -35,7 +35,7 @@
     </dependencies>
 
     <build>
-        <finalName>demo-app</finalName>
+        <finalName>ascp-demo-app</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
