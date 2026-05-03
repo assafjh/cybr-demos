@@ -1,23 +1,34 @@
 FROM postgres:17-alpine
-LABEL maintainer=AssafHazan
 
+# OCI Labels
+LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
+LABEL org.opencontainers.image.description="Hardened PostgreSQL instance with enforced mTLS/SSL for secure demo environments"
+LABEL org.opencontainers.image.licenses="MIT"
+
+# Environment variables
 ENV POSTGRES_USER=admin
-ENV POSTGRES_PASSWORD=123456
-ENV POSTGRES_DB=companydb
+ENV POSTGRES_PASSWORD="123456" 
+ENV POSTGRES_DB=postgres
 
+# Initial SQL Seed
 COPY demo-db.sql /docker-entrypoint-initdb.d/
 
-COPY ./certs/postgresdb.key /var/lib/postgresql
-COPY ./certs/postgresdb.pem /var/lib/postgresql
+# Create a secure, non-volume directory for certificates
+RUN mkdir -p /etc/ssl/postgresql && chown -R postgres:postgres /etc/ssl/postgresql
 
-COPY ./certs/rootCA.pem /var/lib/postgresql
+# Copy certificates from host
+COPY ./certs/postgresdb.key ./certs/postgresdb.pem ./certs/rootCA.pem /etc/ssl/postgresql/
 
-RUN chown 0:70 /var/lib/postgresql/postgresdb.key && chmod 640 /var/lib/postgresql/postgresdb.key \
-    && chown 0:70 /var/lib/postgresql/postgresdb.pem && chmod 640 /var/lib/postgresql/postgresdb.pem \
-    && chown 0:70 /var/lib/postgresql/rootCA.pem && chmod 640 /var/lib/postgresql/rootCA.pem
+# Enforce strict permissions (MANDATORY for PostgreSQL SSL)
+RUN chown postgres:postgres /etc/ssl/postgresql/* \
+    && chmod 600 /etc/ssl/postgresql/postgresdb.key \
+    && chmod 644 /etc/ssl/postgresql/postgresdb.pem \
+    && chmod 644 /etc/ssl/postgresql/rootCA.pem
 
-ENTRYPOINT ["docker-entrypoint.sh"] 
-
-CMD [ "-c", "ssl=on" , "-c", "ssl_cert_file=/var/lib/postgresql/postgresdb.pem", "-c",\
-    "ssl_key_file=/var/lib/postgresql/postgresdb.key", "-c",\
-    "ssl_ca_file=/var/lib/postgresql/rootCA.pem" ]
+# We don't need to redefine ENTRYPOINT as it's inherited.
+# CMD is appended to the entrypoint script automatically.
+CMD ["-c", "ssl=on", \
+     "-c", "ssl_cert_file=/etc/ssl/postgresql/postgresdb.pem", \
+     "-c", "ssl_key_file=/etc/ssl/postgresql/postgresdb.key", \
+     "-c", "ssl_ca_file=/etc/ssl/postgresql/rootCA.pem"]

@@ -1,9 +1,9 @@
 /* This SQL create the demo db "companydb" */
 
-SELECT 'CREATE DATABASE companydb'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'companydb')\gexec
+SELECT 'CREATE DATABASE postgres'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'postgres')\gexec
 
-\c companydb;
+\c postgres;
 
 CREATE TABLE customers (
     id            INTEGER PRIMARY KEY,
