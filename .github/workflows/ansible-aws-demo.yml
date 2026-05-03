@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - 'ansible-awx-tower/playbooks/**'
+      - '!**/*.md'
     branches:
       - main
   workflow_dispatch: 

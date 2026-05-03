@@ -1,4 +1,5 @@
 # jenkins-image
+[![Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/build-jenkins-image.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/build-jenkins-image.yml)
 This folder contains the definitions for creating the custom Jenkins image used for this demo.
 ### Files
 - `Dockerfile` - the image assembly commands.

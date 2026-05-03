@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'images/jenkins/**'
+      - '!**/*.md'
     branches: [ "main", "master" ]
   pull_request:
     paths:
