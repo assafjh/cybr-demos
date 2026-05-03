@@ -1,14 +1,19 @@
 FROM alpine:latest
-LABEL maintainer=AssafHazan
 
-ENV INJECTED_FILES_PATH /opt/secrets/conjur
+# OCI Labels
+LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
+LABEL org.opencontainers.image.description="Demo application for Conjur Kubernetes Secrets injection (Env Vars)"
+LABEL org.opencontainers.image.licenses="MIT"
 
-RUN  apk update \
-  && apk add dumb-init \
-  && mkdir -p /scripts
+# Install dumb-init
+RUN apk update \
+    && apk add --no-cache dumb-init \
+    && mkdir -p /scripts
 
 COPY ./scripts/entry-point.sh /scripts/
+RUN chmod +x /scripts/entry-point.sh
 
 WORKDIR /scripts
 
-ENTRYPOINT [ "dumb-init", "/scripts/entry-point.sh" ]
+ENTRYPOINT [ "dumb-init", "--", "/scripts/entry-point.sh" ]
