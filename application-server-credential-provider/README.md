@@ -47,8 +47,8 @@ Follow the numbered scripts in order:
 
 ## 📦 Latest Build & Artifacts
 The application is automatically built and packaged using GitHub Actions.
-*   **Latest WAR File**: Download the most recent stable build from our [Releases Page](https://github.com/assafjh/cybr-demos/releases/tag/latest-build).
-*   **Automated Pull**: Script `05-deploy-app.sh` is pre-configured to fetch this artifact directly.
+*   **Latest WAR File**: Download the most recent stable build from our [Releases Page](https://github.com/assafjh/cybr-demos/releases/tag/ascp-demo-latest-build).
+*   **Automated Pull**: Script `05-pull-app.sh` is pre-configured to fetch this artifact directly.
 
 ---
 
