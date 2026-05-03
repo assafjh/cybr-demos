@@ -10,4 +10,4 @@
     - !permit
       role: !group admins
       privileges: [ read, update, create ]
-      resource: !policy ""
+      resource: !policy ansible
