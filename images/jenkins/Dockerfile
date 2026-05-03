@@ -1,4 +1,4 @@
-FROM docker.io/jenkins/jenkins:lts-jdk17
+FROM jenkins/jenkins:2.541.3-lts-jdk17
 ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
 ENV CASC_JENKINS_CONFIG="/var/jenkins_home/casc.yml"
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt

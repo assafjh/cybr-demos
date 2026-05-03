@@ -8,16 +8,16 @@ jenkins:
             pattern: ".*"
             permissions:
               - "Overall/Administer"
-            assignments:
-              - "${JENKINS_ADMIN_ID}"
+            entries:
+              - user: "${JENKINS_ADMIN_ID}"
           - name: "readonly"
             description: "Read-only users"
             pattern: ".*"
             permissions:
               - "Overall/Read"
               - "Job/Read"
-            assignments:
-              - "authenticated"
+            entries:
+              - group: "authenticated"
   projectNamingStrategy:
     roleBased:
       forceExistingJobs: true

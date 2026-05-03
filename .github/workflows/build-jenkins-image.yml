@@ -13,7 +13,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  # This will result in ghcr.io/assafjh/jenkins-demo
   IMAGE_NAME: ${{ github.repository_owner }}/jenkins-demo
 
 jobs:
@@ -29,8 +28,8 @@ jobs:
         with:
           dockerfile: images/jenkins/Dockerfile
 
-  build-and-push:
-    name: Build & Push Docker Image
+  build-test-push:
+    name: Build, Test & Push
     needs: lint
     runs-on: ubuntu-latest
     permissions:
@@ -41,7 +40,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up QEMU (for multi-platform)
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
@@ -61,13 +60,10 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=ref,event=pr
             type=raw,value=latest,enable={{is_default_branch}}
             type=sha,format=short
-            type=sha
 
-      - name: Build image for testing (Local)
+      - name: Build local image for testing
         uses: docker/build-push-action@v6
         with:
           context: images/jenkins
@@ -75,33 +71,37 @@ jobs:
           tags: jenkins-test:latest
           cache-from: type=gha
 
-      - name: Test Docker Image (Smoke Test)
+      - name: Smoke Test (Health Check)
         run: |
-          echo "Starting Jenkins container for testing..."
-          docker run -d --name jenkins-test jenkins-test:latest
+          docker run -d --name jenkins-test -p 8080:8080 jenkins-test:latest
           
-          echo "Waiting 15 seconds for Jenkins initialization..."
-          sleep 15
-          
-          if [ "$(docker inspect -f '{{.State.Running}}' jenkins-test)" = "true" ]; then
-            echo "✅ Jenkins container is running successfully!"
-            
-            echo "📋 Retrieving resolved plugin versions (Copy these and replace in plugins.txt):"
-            docker exec jenkins-test jenkins-plugin-cli --list
-            # Optional: curl -sI http://localhost:8080 | grep 403
-          else
-            echo "❌ Jenkins container failed to start (crash loop). Logs:"
+          echo "Waiting for Jenkins to be ready..."
+          # Checking every 5 seconds up to 60 seconds
+          TIMEOUT=12
+          while [ $TIMEOUT -gt 0 ]; do
+            if curl -sI http://localhost:8080/login | grep -q "200 OK"; then
+              echo "✅ Jenkins is up and responding!"
+              break
+            fi
+            echo "Waiting... ($TIMEOUT)"
+            sleep 5
+            TIMEOUT=$((TIMEOUT-1))
+          done
+
+          if [ $TIMEOUT -eq 0 ]; then
+            echo "❌ Smoke Test Failed: Jenkins didn't respond in time."
             docker logs jenkins-test
             exit 1
           fi
           
           docker rm -f jenkins-test
 
-      - name: Build and push
+      - name: Build and push final image
+        if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
           context: images/jenkins
-          push: ${{ github.event_name != 'pull_request' }}
+          push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
