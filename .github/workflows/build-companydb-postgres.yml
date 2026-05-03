@@ -1,9 +1,9 @@
-name: CI - Build & Push Postgres mTLS Image
+name: CI - Build & Push Postgres (companydb) mTLS Image
 
 on:
   push:
     paths:
-      - 'images/postgres/**'
+      - 'images/postgres-companydb/**'
       - '!**/*.md'
     branches: [ "main", "master" ]
   workflow_dispatch:
