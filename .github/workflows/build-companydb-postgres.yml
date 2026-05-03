@@ -41,6 +41,7 @@ jobs:
           
           mkdir -p certs
           
+          export SCRIPT_DIR="$(pwd)"
           export CERT_DIR="$(pwd)/certs"
           
           source .env
