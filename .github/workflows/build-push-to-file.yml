@@ -6,6 +6,10 @@ on:
       - 'images/push-to-file/**'
       - '!**/*.md'
     branches: [ "main", "master" ]
+  pull_request:
+    paths:
+      - 'images/push-to-file/**'
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 env:
@@ -13,8 +17,21 @@ env:
   IMAGE_NAME: ${{ github.repository_owner }}/push-to-file
 
 jobs:
+  lint:
+    name: Lint Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Lint with Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: images/push-to-file/Dockerfile
+          ignore: DL3007,DL3018
+
   build-test-push:
     name: Build, Test & Push Multi-Arch Image
+    needs: lint
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -66,7 +83,7 @@ jobs:
           echo "✅ Negative test passed: Container timed out correctly."
 
           echo "--- Test 2: Positive Test (Simulating Sidecar Injection) ---"
-          docker run -d --name app-test-success push-test:latest
+          docker run -d --name app-test-success -e WAIT_TIMEOUT=30 push-test:latest
           
           sleep 2
           

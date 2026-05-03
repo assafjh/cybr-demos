@@ -41,7 +41,5 @@ docker run -d \
   -e JENKINS_PORT \
   -e CONJUR_FQDN \
   -e CONJUR_ACCOUNT \
-  docker.io/assafhazan/jenkins:conjur
+  ghcr.io/assafjh/jenkins-demo:latest
 ```
-
-*(Note: Adjust the image registry URL to your active GitHub/Docker registry as needed).*

@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'application-server-credential-provider/**'
+      - '!**/*.md'
   workflow_dispatch: 
 
 jobs:

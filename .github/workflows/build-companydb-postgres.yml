@@ -6,6 +6,10 @@ on:
       - 'images/postgres-companydb/**'
       - '!**/*.md'
     branches: [ "main", "master" ]
+  pull_request:
+    paths:
+      - 'images/postgres-companydb/**'
+    branches: [ "main", "master" ]
   workflow_dispatch:
 
 env:

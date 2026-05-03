@@ -72,19 +72,26 @@ jobs:
           tags: jenkins-test:latest
           cache-from: type=gha
 
-      - name: Smoke Test (Health Check)
+      - name: Smoke Test (Health Check & JCasC Validation)
         run: |
-          docker run -d --name jenkins-test -p 8080:8080 jenkins-test:latest
-          
+          docker run -d --name jenkins-test -p 8080:8080 \
+            -e JENKINS_ADMIN_ID=admin \
+            -e JENKINS_ADMIN_PASSWORD=Admin123 \
+            -e JENKINS_ADDRESS=localhost \
+            -e JENKINS_PORT=8080 \
+            -e CONJUR_FQDN=conjur.example.com \
+            -e CONJUR_ACCOUNT=conjur \
+            jenkins-test:latest
+
           echo "Waiting for Jenkins to be ready..."
-          # Checking every 5 seconds up to 60 seconds
           TIMEOUT=12
           while [ $TIMEOUT -gt 0 ]; do
-            if curl -sI http://localhost:8080/login | grep -q "200 OK"; then
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login)
+            if [ "$HTTP_CODE" = "200" ]; then
               echo "✅ Jenkins is up and responding!"
               break
             fi
-            echo "Waiting... ($TIMEOUT)"
+            echo "Waiting... ($TIMEOUT attempts left)"
             sleep 5
             TIMEOUT=$((TIMEOUT-1))
           done
@@ -94,7 +101,17 @@ jobs:
             docker logs jenkins-test
             exit 1
           fi
-          
+
+          echo "Verifying JCasC configuration was applied..."
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u admin:Admin123 http://localhost:8080/api/json)
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ JCasC validation passed: admin user authenticated successfully."
+          else
+            echo "❌ JCasC validation failed: could not authenticate as admin (HTTP $HTTP_CODE)."
+            docker logs jenkins-test
+            exit 1
+          fi
+
           docker rm -f jenkins-test
 
       - name: Build and push final image
