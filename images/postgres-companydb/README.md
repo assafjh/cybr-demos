@@ -1,7 +1,7 @@
 # Hardened PostgreSQL (mTLS Enabled)
 
-[![Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/build-companydb-image.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/build-companydb-image.yml)
-
+[![Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/build-companydb-postgres.ymll/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/l)
+build-companydb-postgres.yml
 This repository provides a hardened PostgreSQL 17 (Alpine-based) image engineered for **Security-in-Transit**. It enforces Mutual TLS (mTLS) by default, ensuring that all database connections are encrypted and authenticated via client certificates.
 
 ## 🏗️ Architectural Design
