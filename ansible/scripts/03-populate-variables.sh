@@ -22,17 +22,18 @@ fi
 echo "Successfully authenticated. Populating secrets..."
 
 for SECRET_NAME in "${SECRETS[@]}"; do
-    # Using openssl for a more secure standard of random secret generation
     if command -v openssl > /dev/null 2>&1; then
         SECRET_VAL=$(openssl rand -hex 12)
     else
-        # Fallback if openssl is not installed
         SECRET_VAL=$(head -c 12 /dev/urandom | od -An -tx1 | tr -d ' \n')
     fi
-    
+
     FULL_PATH="${SAFE_BASE_PATH}/${SECRET_NAME}"
     echo "Setting variable: ${FULL_PATH}"
-    "$CONJUR_CLI" variable set -i "$FULL_PATH" -v "$SECRET_VAL"
+    if ! "$CONJUR_CLI" variable set -i "$FULL_PATH" -v "$SECRET_VAL"; then
+        echo "Error: Failed to set ${FULL_PATH}"
+        exit 1
+    fi
 done
 
 echo "Secrets populated successfully."
