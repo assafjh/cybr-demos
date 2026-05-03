@@ -18,7 +18,7 @@
 
         - name: 🤐 Zip Playbooks
           run: |
-            cd ansible && zip -r ../ansible-awx-tower-playbooks.zip .
+            cd ansible-awx-tower/playbooks && zip -r ../ansible-awx-tower-playbooks.zip .
 
         - name: 🚀 Update Release
           uses: ncipollo/release-action@v1
