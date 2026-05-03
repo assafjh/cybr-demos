@@ -101,7 +101,7 @@ jobs:
 
           # 1. Check Connectivity & SSL
           echo "Checking SSL..."
-          docker exec pg-test psql -U admin -d postgres -c "SELECT ssl_is_used();" | grep -q "t"
+          docker exec pg-test psql -t -U admin -d postgres -c "SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid();" | grep -q "t"
 
           # 2. Check Data Integrity (Functional Test)
           echo "Checking Data..."
