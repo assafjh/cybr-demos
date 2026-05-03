@@ -25,18 +25,18 @@
   body:
     - !policy
       id: ansible
-      owner: !group ../admins
+      owner: !group /admins
       body:
         - !group admins
-        
+
         - !permit
           role: !group admins
           privileges: [ read, update, create ]
-          resource: !policy ""
-          
+          resource: !policy ansible
+
         - &ansible-admin-users
           - !user ansible-admin01
-          
+
         - !grant
           role: !group admins
           members: *ansible-admin-users
