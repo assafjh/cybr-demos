@@ -1,6 +1,3 @@
-הנה קובץ ה-`README.md` עבור אימג' ה-Push-to-File, כולל תגית ה-Build Status (תצטרך להתאים את הקישור לשם ה-Workflow האמיתי שלך), והסבר ברור על התפקיד שלו בארכיטקטורת הדמו.
-
-```markdown
 # Conjur Push-to-File Demo Application
 
 [![Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/build-push-to-file.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/build-push-to-file.yml)
