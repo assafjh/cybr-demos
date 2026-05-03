@@ -21,7 +21,7 @@ jobs:
       - name: Lint with Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
-          dockerfile: images/postgres/Dockerfile
+          dockerfile: images/postgres-companydb/Dockerfile
 
   build-test-push:
     name: Build, Test & Push
@@ -37,7 +37,7 @@ jobs:
 
       - name: Generate mTLS Certificates
         run: |
-          cd images/postgres
+          cd images/postgres-companydb
           chmod +x tools/*.sh
           
           export ROOT_CA_CN="Demo Root CA"
@@ -81,7 +81,7 @@ jobs:
       - name: Build local image for testing
         uses: docker/build-push-action@v6
         with:
-          context: images/postgres
+          context: images/postgres-companydb
           load: true
           tags: postgres-test:latest
           cache-from: type=gha
@@ -121,7 +121,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6
         with:
-          context: images/postgres
+          context: images/postgres-companydb
           push: true
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
