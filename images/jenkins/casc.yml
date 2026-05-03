@@ -22,36 +22,40 @@ jenkins:
     roleBased:
       forceExistingJobs: true
   disabledAdministrativeMonitors:
-  - "jenkins.diagnostics.ControllerExecutorsNoAgents"
+    - "jenkins.diagnostics.ControllerExecutorsNoAgents"
   securityRealm:
     local:
       allowsSignup: false
       users:
-       - id: ${JENKINS_ADMIN_ID}
-         password: ${JENKINS_ADMIN_PASSWORD}
+        - id: ${JENKINS_ADMIN_ID}
+          password: ${JENKINS_ADMIN_PASSWORD}
   log:
     recorders:
-    - loggers:
-      - level: "ALL"
-        name: "org.conjur.jenkins"
-      name: "Conjur"
+      - loggers:
+          - level: "ALL"
+            name: "org.conjur.jenkins"
+        name: "Conjur"
+
 security:
   queueItemAuthenticator:
     authenticators:
-    - global:
-        strategy: triggeringUsersAuthorizationStrategy
+      - global:
+          strategy: triggeringUsersAuthorizationStrategy
+
 unclassified:
   location:
     url: http://${JENKINS_ADDRESS}:${JENKINS_PORT}/
   globalConjurConfiguration:
-    authWebServiceId: "authn-jwt/jenkins1"
     conjurConfiguration:
       account: "${CONJUR_ACCOUNT}"
       applianceURL: "https://${CONJUR_FQDN}"
-    enableContextAwareCredentialStore: true
-    enableJWKS: true
-    identityFieldsSeparator: "-"
-    identityFormatFieldsFromToken: "jenkins_full_name"
+    authWebServiceId: "authn-jwt/jenkins1"
     jwtAudience: "conjur-jenkins-demo1"
     keyLifetimeInMinutes: 60
     tokenDurationInSeconds: 120
+    selectAuthenticator: "APIKey"
+    identityFormatFieldsFromToken: "jenkins_full_name"
+    selectIdentityFormatToken: "jenkins_full_name"
+    selectIdentityFieldsSeparator: "-"
+    identityFieldName: "sub"
+    enableIdentityFormatFieldsFromToken: false
