@@ -38,6 +38,21 @@ CREATE INDEX idx_orders_date              ON orders(order_date);
 CREATE INDEX idx_support_tickets_customer ON support_tickets(customer_id);
 CREATE INDEX idx_support_tickets_severity ON support_tickets(severity);
 
+/* Demo App User */
+
+-- Create a dedicated read-only user for the reporting application
+CREATE USER reporting_service_ro PASSWORD 'reporting123';
+
+-- Grant basic connection rights to the default DB
+GRANT CONNECT ON DATABASE postgres TO reporting_service_ro;
+GRANT USAGE ON SCHEMA public TO reporting_service_ro;
+
+-- Grant read-only access to all specific tables
+GRANT SELECT ON customers, orders, support_tickets TO reporting_service_ro;
+
+-- (Optional) Ensure any future tables also get read access automatically
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO reporting_service_ro;
+
 /* Populate tables with sample data */
 
 /* Customers */
