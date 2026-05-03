@@ -1,6 +1,6 @@
 # onprem-base.yml
-# Load policy into root branch
-# This policy defines the demo organization and root level administration for On-Prem
+# Load policy into: root branch
+# conjur policy load -b root -f onprem-base.yml
 
 - !group
   id: admins
@@ -20,21 +20,20 @@
   role: !group admins
   member: !user admin01
 
-# Define data branch and delegate to a dedicated policy
 - !policy
   id: data
   owner: !group admins
   body:
     - !policy
       id: ansible
-      owner: !group ../admins
+      owner: !group /admins
       body:
         - !group admins
 
         - !permit
           role: !group admins
           privileges: [ read, update, create ]
-          resource: !policy ""
+          resource: !policy ansible
 
         - &ansible-admin-users
           - !user
