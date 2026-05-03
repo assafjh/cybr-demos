@@ -10,50 +10,72 @@
 - [x] Add `node_modules/` to the root `.gitignore`.
 
 ## 📝 Documentation Improvements
-- [x] **Root README.md**: Add a personal introduction (e.g., "Hi, I'm Assaf..."), the purpose of the repo (Portfolio/Demos), and a "Technologies Used" section.
-- [x] **Sub-folder READMEs**: Expand the READMEs in `ansible`, `jenkins`, `terraform`, `teamcity`, `circleci`, and `aws-iam` to include:
-  - [x] Short description of what the demo achieves.
-  - [x] Prerequisites (tools needed, versions).
-  - [x] Basic instructions on how to run/deploy.
+- [x] **Root README.md**: Add a personal introduction, the purpose of the repo (Portfolio/Demos), and a "Technologies Used" section.
+- [x] **Sub-folder READMEs**: Expand the READMEs in `ansible`, `jenkins`, `terraform`, `teamcity`, `circleci`, and `aws-iam` to include a short description, prerequisites, and basic instructions.
 
 ## 🛠️ Fixes & Formatting
-- [x] **Relative Image Paths**: Convert absolute GitHub URLs for images to relative paths (e.g., `!alt text`) across all README files.
-- [x] **Grammar & Typos**: Fix minor typos (e.g., change `How does the ... works?` to `work?` in the Kubernetes READMEs).
+- [x] **Relative Image Paths**: Convert absolute GitHub URLs for images to relative paths across all README files.
+- [x] **Grammar & Typos**: Fix minor typos across all README files.
 
 ## 🏭 Industry Standard Files
-- [x] Add `LICENSE` (e.g., MIT, Apache 2.0).
-- [x] Add `SECURITY.md` (Vulnerability reporting process - highly recommended for Security SMEs).
-- [ ] Add `CHANGELOG.md` (Optional: Track major updates to demos).
+- [x] Add `LICENSE`.
+- [x] Add `SECURITY.md`.
+- [ ] Add `CHANGELOG.md` (Optional).
 
 ## 🐳 Docker Images & CI/CD (GHCR)
-- [ ] Migrate custom Docker images (e.g., webapps, custom followers) to GitHub Container Registry (GHCR).
-- [ ] Create `.github/workflows/ci.yml` to automatically build and push Docker images on changes.
-- [ ] Add testing steps to the `ci.yml` workflow (e.g., Dockerfile linting using `hadolint`, basic container run tests).
+- [ ] Migrate custom Docker images to GHCR.
+- [ ] Create `.github/workflows/ci.yml` to build and push Docker images on changes.
+- [ ] Add testing steps to `ci.yml` (Dockerfile linting with `hadolint`, basic container run tests).
 
-## 🔎 Folder-by-Folder Quality Review (Standardization)
-- [x] `.circleci`: Validate pipeline config, hardcoded values, and integration flow.
-- [x] `.github`: Validate action workflows, runners setup, and Conjur steps.
-- [ ] `deploy-conjur`: Validate deployment scripts and documentation.
-- [ ] `kubernetes-jwt`: Validate manifests, policies, and instructions.
-- [ ] `kubernetes-cert`: Validate manifests, policies, and instructions.
-- [ ] `jenkins`: Validate CI pipeline syntax, logic, and documentation.
-- [ ] `github-actions`: Validate action workflows and documentation.
-- [ ] `circleci`: Validate CircleCI config and documentation.
-- [ ] `aws-iam`: Validate Lambda scripts, IAM role configs, and docs.
-- [ ] `terraform`: Validate `.tf` file formatting and provider config.
-- [ ] `gitlab-ci`: Validate GitLab CI YAML and scripts.
-- [ ] `rest-api`: Validate API call examples and documentation.
-- [x] `ansible-awx-tower`: Validate AWX/Tower integration docs.
-- [x] `ansible`: Validate playbooks structure and documentation.
-- [ ] `azure-devops`: Validate scripts, pipeline YAML formats, and docs.
-- [ ] `kubernetes-follower`: Validate manifests and Conjur policies.
-- [ ] `custom-certificates`: Validate scripts for cert generation and loading.
-- [ ] `kubernetes-external-secrets-operator`: Validate ESO manifests.
-- [ ] `upgrade-conjur-enterprise-version`: Validate upgrade scripts and flow.
-- [ ] `teamcity`: Validate TeamCity integration instructions.
-- [ ] `credential-provider`: Validate CP agent config and Java code.
-- [ ] `central-credential-provider`: Validate CCP examples (REST/SOAP).
-- [x] `application-server-credential-provider`: Validate Tomcat/Jakarta setup.
+## 🔎 Folder-by-Folder Quality Review
 
-## � Final Review
-- [ ] Review the repository structure locally as a clean clone to ensure everything works out-of-the-box before changing visibility to Public.
+> ⚠️ **Instructions for LLM:**
+> For each folder marked [ ], perform the following checks and mark [x] only after ALL checks pass.
+> Do NOT mark [x] based on visual inspection alone — read and verify each file.
+>
+> **Conjur Policy files (`.yml`)** — DO NOT modify policy logic, paths, or structure. Only:
+> - Fix variable/resource names to be descriptive (e.g., `secret1` → `db_password`) if the context makes the intent clear.
+> - Improve inline comments to be professional and accurate.
+> - Verify load branch in the file's header comment matches the README instructions for that folder.
+> - Flag (do not fix) anything that looks structurally wrong — leave a comment for human review.
+>
+> **Shell scripts (`.sh`)** — check for:
+> - Missing error handling on critical commands — add `if/then` guard where absent.
+> - Auth check (`conjur whoami`) present before performing operations.
+> - `set -euo pipefail` at the top.
+> - Secret variable names match those defined in the corresponding policy file exactly.
+> - Inline comments are clear and professional.
+> - **DO NOT change script logic** unless it is clearly broken (e.g., referencing a path that does not exist) or causes a runtime error. Scripts were tested before being committed.
+>
+> **README files** — check for:
+> - Policy file paths in `conjur policy` commands match the actual folder structure.
+> - Variable names mentioned match those defined in policy files.
+> - Diagrams or images that reference outdated policy structures — remove them.
+> - Broken or redundant markdown (e.g., double-bracketed URLs).
+
+- [x] `.circleci`
+- [x] `.github`
+- [ ] `deploy-conjur`
+- [ ] `kubernetes-jwt`
+- [ ] `kubernetes-cert`
+- [ ] `jenkins`
+- [ ] `github-actions`
+- [ ] `circleci`
+- [ ] `aws-iam`
+- [ ] `terraform`
+- [ ] `gitlab-ci`
+- [ ] `rest-api`
+- [x] `ansible-awx-tower`
+- [x] `ansible`
+- [ ] `azure-devops`
+- [ ] `kubernetes-follower`
+- [ ] `custom-certificates`
+- [ ] `kubernetes-external-secrets-operator`
+- [ ] `upgrade-conjur-enterprise-version`
+- [ ] `teamcity`
+- [ ] `credential-provider`
+- [ ] `central-credential-provider`
+- [x] `application-server-credential-provider`
+
+## 🏁 Final Review
+- [ ] Review the repository as a clean clone before changing visibility to Public.
