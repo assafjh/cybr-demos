@@ -54,5 +54,4 @@ unclassified:
     identityFormatFieldsFromToken: "jenkins_full_name"
     jwtAudience: "conjur-jenkins-demo1"
     keyLifetimeInMinutes: 60
-    tokenDurarionInSeconds: 120
-
+    tokenDurationInSeconds: 120
