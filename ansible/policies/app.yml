@@ -1,12 +1,11 @@
 # app.yml
-# Load policy into data/ansible branch
-# This policy defines the Ansible CLI application and its secrets
+# Load policy into: data/ansible branch
+# conjur policy load -b data/ansible -f app.yml
 
 - !group
   id: apps
   owner: !group admins
 
-# Create secrets safe (Aligned with AWX naming convention)
 - !policy
   id: apps/safe
   owner: !group admins
@@ -16,21 +15,18 @@
       - !variable api_key
       - !variable ssh_key
 
-    # Allow apps group to consume the secrets
     - !permit
-      role: !group ../../apps
+      role: !group /data/ansible/apps
       privileges: [ read, execute ]
       resource: *ansible-secrets
 
-# Create the Project identities for Conjur authentication
 - !host
   id: apps/conjur-demo
   owner: !group admins
   annotations:
-    authn/api-key: true # Required for Cloud, supported/recommended for On-Prem REST API
+    authn/api-key: true
     description: "Host identity for Ansible CLI automation workflows"
 
-# Grant the host identity membership to the apps group
 - !grant
   role: !group apps
   member: !host apps/conjur-demo
