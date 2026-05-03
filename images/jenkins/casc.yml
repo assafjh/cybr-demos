@@ -50,12 +50,10 @@ unclassified:
       account: "${CONJUR_ACCOUNT}"
       applianceURL: "https://${CONJUR_FQDN}"
     authWebServiceId: "authn-jwt/jenkins1"
-    jwtAudience: "conjur-jenkins-demo1"
     keyLifetimeInMinutes: 60
     tokenDurationInSeconds: 120
-    selectAuthenticator: "APIKey"
+    selectAuthenticator: "Jwt"
     identityFormatFieldsFromToken: "jenkins_full_name"
     selectIdentityFormatToken: "jenkins_full_name"
     selectIdentityFieldsSeparator: "-"
-    identityFieldName: "sub"
     enableIdentityFormatFieldsFromToken: false
