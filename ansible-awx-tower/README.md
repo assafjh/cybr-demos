@@ -1,7 +1,6 @@
 # 🔐 Ansible AWX / Tower Integration with Conjur
 [![Package Status](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml)
 
-
 This repository demonstrates how to integrate CyberArk Conjur with Ansible AWX or Ansible Tower. The integration steps are identical for both platforms.
 
 This demo showcases two distinct secret consumption methods:
@@ -54,14 +53,14 @@ To adhere to the principle of least privilege, policies are split between **Base
 1. **Login as admin and load the Base policy:**
    ```bash
    conjur login -i admin
-   conjur policy update -b root -f policies/onprem-base.yml | tee -a base.log
+   conjur policy update -b root -f policies/conjur-onprem/01-base.yml | tee -a base.log
    conjur logout
    ```
 2. **Login as `ansible-admin01` and load the App policy:**
    *(Use the API key from `base.log`)*
    ```bash
    conjur login -i ansible-admin01
-   conjur policy update -b data/ansible -f policies/app.yml | tee -a app-policy.log
+   conjur policy update -b data/ansible -f policies/conjur-onprem/02-define-ansible-branch.yml | tee -a app-policy.log
    ```
 
 ### Option B: Conjur Cloud
@@ -69,14 +68,14 @@ To adhere to the principle of least privilege, policies are split between **Base
 1. **Login as your Cloud admin and load the Base policy:**
    ```bash
    conjur login -i <username>
-   conjur policy update -b data -f policies/cloud-base.yml | tee -a base.log
+   conjur policy update -b data -f policies/conjur-cloud/01-base.yml | tee -a base.log
    conjur logout
    ```
 2. **Login as `ansible-admin01` and load the App policy:**
    *(Use the API key from `base.log`)*
    ```bash
    conjur login -i ansible-admin01
-   conjur policy update -b data/ansible -f policies/app.yml | tee -a app-policy.log
+   conjur policy update -b data/ansible -f policies/conjur-cloud/02-define-ansible-branch.yml | tee -a app-policy.log
    ```
 
 ### Populate Conjur Variables
@@ -147,7 +146,7 @@ scripts/03-populate-variables.sh | tee -a populate.log
 2. Name: `Conjur Demo Project`.
 3. Organization: `Conjur Demo`.
 4. Source Control Type: `Git`.
-5. Source Control URL: `[https://github.com/assafjh/cybr-demos.git](https://github.com/assafjh/cybr-demos.git)`.
+5. Source Control URL: `https://github.com/assafjh/cybr-demos.git`.
 6. Source Control Branch: `ansible-awx-tower-playbooks` *(Change this to your actual branch name if different)*.
 7. Click **Save**.
 

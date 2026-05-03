@@ -1,0 +1,44 @@
+---
+# Load policy into data/ansible branch
+# This policy defines the demo branch ansible
+
+# apps is a group that will aggregate safe permissions for ansible project1
+- !group
+  id: apps
+  owner: !group admins
+
+# create secrets
+- !policy
+  id: apps/safe
+  owner: !group admins
+  body:
+  - &ansible-secrets
+    - !variable
+      id: db_password
+      owner: !group ../../admins
+    - !variable
+      id: api_key
+      owner: !group ../../admins
+    - !variable
+      id: ssh_key
+      owner: !group ../../admins
+
+ # Allow apps group to consume the secrets we have created
+  - !permit
+    role: !group ../../apps
+    privileges: [ read, execute ]
+    resource: *ansible-secrets
+
+# Create the Project identities that we will use to authenticate to Conjur 
+- !host
+  id: apps/conjur-demo
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+
+# Add the hosts we have created to their respective group
+- !grant
+  roles:
+    - !group apps
+  members:
+    - !host apps/conjur-demo
