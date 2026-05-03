@@ -1,5 +1,5 @@
 ---
-# Summon deployment manifest with empty centos application to consume the secrets
+# Deployment for a demo application that uses Summon to consume secrets at runtime
 apiVersion: apps/v1
 kind: Deployment
 metadata:

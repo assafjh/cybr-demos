@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # This script will:
 # If Conjur Enterprise
 #   1. Authenticate to Conjur using the API Key

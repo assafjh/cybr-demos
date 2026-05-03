@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 # This script will enable an Authenticator in Conjur.
 # For Conjur Enterprise - This script is meant to use at the Conjur Leader VM machine.
 # For Conjur Cloud - This script Needs access to Conjur Cloud CLI.
@@ -28,7 +31,7 @@ if [[ "${IS_CONJUR_CLOUD}" == "true" ]]; then
 else
     echo "Enabling $AUTHN_TO_ENABLE authn for Conjur"
     CONJUR_AUTHENTICATORS=$($SUDO $CONTAINER_MGR exec $CONTAINER_ID evoke variable list | grep CONJUR_AUTHENTICATORS)
-    CONJUR_AUTHENTICATORS=$(echo $CONJUR_AUTHENTICATORS | awk -F "=" '{print $2}')
+    CONJUR_AUTHENTICATORS=$(echo "$CONJUR_AUTHENTICATORS" | awk -F "=" '{print $2}')
     CONJUR_AUTHENTICATORS=$(sed -e 's/^"//' -e 's/"$//' <<< "$CONJUR_AUTHENTICATORS")
     IFS=','
     read -a array <<< "$CONJUR_AUTHENTICATORS"

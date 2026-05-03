@@ -9,14 +9,14 @@ spec:
   provider:
     conjur:
       # Service URL
-      url: "${CONJUR_APPLIANCE_URL}"
+      url: "<CONJUR_APPLIANCE_URL>"
       # [OPTIONAL] base64 encoded string of certificate, can comment out the below if not needed
-      caBundle: "${ONE_LINER_B64_CONJUR_CERTIFICATE}"
+      caBundle: "<ONE_LINER_B64_CONJUR_CERTIFICATE>"
       auth:
         apikey:
         jwt:
-          account: "${CONJUR_ACCOUNT}"
-          serviceID: "${CONJUR_AUTHENTICATOR_ID}"
+          account: "<CONJUR_ACCOUNT>"
+          serviceID: "<CONJUR_AUTHENTICATOR_ID>"
           serviceAccountRef:
             name: conjur-demo-acct
             # optional

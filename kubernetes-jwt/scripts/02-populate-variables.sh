@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 #============ Variables ===============
 # Path to our safe at Conjur, leave as is
 SAFE_PATH=data/kubernetes/applications/safe/
@@ -9,7 +12,7 @@ CONJUR_CLI=conjur
 # Postgres username and password details
 APPLICATION_DB_USER=reception
 APPLICATION_DB_PASSWORD=vet_123456
-APPLICATION_DB_HOST=$DB_HOSTNAME
+APPLICATION_DB_HOST=${DB_HOSTNAME:-"localhost"}
 APPLICATION_DB_PORT=5432
 #============ Script ===============
 

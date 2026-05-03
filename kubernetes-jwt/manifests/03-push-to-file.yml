@@ -88,7 +88,7 @@ spec:
               - path: "annotations"
                 fieldRef:
                   fieldPath: metadata.annotations
-        # This is where the sidecar keeps is authentiction token recieved from Conjur
+        # Shared memory volume used to pass secrets from the sidecar to the application container
         - name: conjur-secrets
           emptyDir:
             medium: Memory

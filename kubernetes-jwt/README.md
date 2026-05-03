@@ -2,15 +2,15 @@
 Demo for integration with Kubernetes using JWT authentication.
 
 Included Use-Cases:
-- Application that consume secret using the RESTful API.
+- Application that consumes secrets using the RESTful API.
 - Application that consumes secrets from files using Conjur Secrets Provider sidecar.
 - Application that consumes secrets from Kubernetes secrets using Conjur Secrets Provider init container.
 - Application that consumes secrets from environment parameters using Summon. 
 - Application that connects to a Postgres server using Secretless Broker.
 - Spring boot based application that refreshes connection when file injected password is changed.
 
-## How does the JWT Authenticator works?
-![Conjur JWT authenticator](https://github.com/assafjh/cybr-demos/blob/main/kubernetes-jwt/jwt-authenticator.png?raw=true)
+## How does the JWT Authenticator work?
+![Conjur JWT authenticator](jwt-authenticator.png)
 
 ## What is Summon?
 Summon is a command-line tool that reads a file in secrets.yml format and injects secrets as environment variables into any process. Once the process exits, the secrets are gone.
@@ -39,10 +39,10 @@ conjur policy update -b root -f policies/conjur-enterprise/01-base.yml | tee -a 
 conjur logout
 ```
 #### Kubernetes branch
-##### 1. Login as user k8s-admin01
-- Use the API key as a password from the 01-base.log file for the user k8s-admin01
+##### 1. Login as user kubernetes-admin01
+- Use the API key as a password from the 01-base.log file for the user kubernetes-admin01
 ```bash
-conjur login -i k8s-admin01
+conjur login -i kubernetes-admin01
 ```
 ##### 2. Load kubernetes policy
 ```bash
@@ -62,8 +62,8 @@ conjur login -i admin01
 ```Bash
 conjur policy update -b root -f policies/conjur-enterprise/03-define-jwt-auth.yml | tee -a 03-define-jwt-auth.log
 ```
-##### 4. Enable the authenticator
-- This step will work from the Conjur Leader VM only.
+##### 3. Enable the authenticator
+- This step must be run on the Conjur Leader VM.
 1. Modify the variables at enable authenticator script:
 ```bash 
 vi scripts/01-enable-authenticator.sh
@@ -72,7 +72,7 @@ vi scripts/01-enable-authenticator.sh
 ```bash
 scripts/01-enable-authenticator.sh
 ```
-##### 5. Populate secrets and JWT authenticator variables
+##### 4. Populate secrets and JWT authenticator variables
 - This step will need you to be logged-in to kubectl/oc CLI with admin permissions.
 1. Modify the variables at populate variables script:
 ```bash
@@ -82,7 +82,7 @@ vi  scripts/02-populate-variables.sh
 ```Bash
 scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```
-##### 6. Upload demo application binary to Conjur variable
+##### 5. Upload demo application binary to Conjur variable
 1. Modify the variables at populate go app script:
 ```bash
 vi  scripts/03-populate-go-app-variable.sh
@@ -91,7 +91,7 @@ vi  scripts/03-populate-go-app-variable.sh
 ```bash
 scripts/03-populate-go-app-variable.sh
 ```
-##### 7. Check that the authenticator is working properly
+##### 6. Check that the authenticator is working properly
 1. Modify the variables at check authenticator script:
 ```bash
 vi  scripts/04-check-authenticator.sh
@@ -100,7 +100,7 @@ vi  scripts/04-check-authenticator.sh
 ```bash
 scripts/04-check-authenticator.sh
 ```
-##### 8. Logout from Conjur CLI
+##### 7. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
@@ -108,7 +108,7 @@ conjur logout
 #### Root branch
 ##### 1. Login to Conjur as admin using the CLI
 ```bash
-conjur login -i admin
+conjur login -i <username>
 ```
 ##### 2. Update data policy
 ```bash
@@ -119,10 +119,10 @@ conjur policy update -b data -f policies/conjur-cloud/01-base.yml | tee -a 01-ba
 conjur logout
 ```
 #### Kubernetes branch
-##### 1. Login as user k8s-admin01
-- Use the API key as a password from the 01-base.log file for the user k8s-admin01
+##### 1. Login as user kubernetes-admin01
+- Use the API key as a password from the 01-base.log file for the user kubernetes-admin01
 ```bash
-conjur login -i k8s-admin01
+conjur login -i kubernetes-admin01
 ```
 ##### 2. Load kubernetes policy
 ```bash
@@ -141,8 +141,7 @@ conjur login -i <username>
 ```Bash
 conjur policy update -b conjur/authn-jwt -f policies/conjur-cloud/03-define-jwt-auth.yml | tee -a 03-define-jwt-auth.log
 ```
-##### 4. Enable the authenticator
-- This step will work from the Conjur Leader VM only.
+##### 3. Enable the authenticator
 1. Modify the variables at enable authenticator script:
 ```bash 
 vi scripts/01-enable-authenticator.sh
@@ -151,7 +150,7 @@ vi scripts/01-enable-authenticator.sh
 ```bash
 scripts/01-enable-authenticator.sh
 ```
-##### 5. Populate secrets and JWT authenticator variables
+##### 4. Populate secrets and JWT authenticator variables
 - This step will need you to be logged-in to kubectl/oc CLI with admin permissions.
 1. Modify the variables at populate variables script:
 ```bash
@@ -161,7 +160,7 @@ vi  scripts/02-populate-variables.sh
 ```Bash
 scripts/02-populate-variables.sh | tee -a 02-populate-variables.log
 ```
-##### 6. Upload demo application binary to Conjur variable
+##### 5. Upload demo application binary to Conjur variable
 1. Modify the variables at populate go app script:
 ```bash
 vi  scripts/03-populate-go-app-variable.sh
@@ -170,7 +169,7 @@ vi  scripts/03-populate-go-app-variable.sh
 ```bash
 scripts/03-populate-go-app-variable.sh
 ```
-##### 7. Check that the authenticator is working properly
+##### 6. Check that the authenticator is working properly
 1. Modify the variables at check authenticator script:
 ```bash
 vi  scripts/04-check-authenticator.sh
@@ -179,7 +178,7 @@ vi  scripts/04-check-authenticator.sh
 ```bash
 scripts/04-check-authenticator.sh
 ```
-##### 8. Logout from Conjur CLI
+##### 7. Logout from Conjur CLI
 ```Bash
 conjur logout
 ```
@@ -199,11 +198,11 @@ scripts/05-deploy-postgres-server.sh
 ### Test connectivity to the server
 1. Modify the variables at test connectivity script:
 ```bash
-vi  scripts/06-test-connectivity-to-postgres
+vi  scripts/06-test-connectivity-to-postgres.sh
 ```
 2. Run the script:
 ```bash
-scripts/06-test-connectivity-to-postgres
+scripts/06-test-connectivity-to-postgres.sh
 ```
 ## 3. Kubernetes
 - For the steps below we will need Kubernetes/OCP admin permissions.
@@ -264,10 +263,10 @@ kubectl exec -i -t -n conjur-jwt <pod_name> -c demo-application -- sh
 cat /opt/secrets/conjur/credentials.yaml
 ```
 #### Optional: If you'll update secret3 or secret7, after 10 seconds, the file will be updated
-##### 1. Login as user k8s-admin01
-- Use the API key as a password from the 01-base.log file for the user k8s-admin01
+##### 1. Login as user kubernetes-admin01
+- Use the API key as a password from the 01-base.log file for the user kubernetes-admin01
 ```bash
-conjur login -i k8s-admin01
+conjur login -i kubernetes-admin01
 ```
 ##### 2. To update secret3, for example, use the below:
 ```bash
@@ -333,7 +332,7 @@ echo $SECRET2
 ### Use Case: Postgres with Secretless Broker
 #### Deploy Manifest
 ```bash
-kubectl apply -f manifests/06-deploy-secretless
+kubectl apply -f manifests/06-deploy-secretless.yml
 ```
 #### Check the container log
 ```bash
@@ -341,10 +340,10 @@ kubectl get pods -n conjur-jwt --selector=app=demo-secretless
 kubectl logs -n conjur-jwt <pod_name> -c secretless-demo-app
 ```
 #### Optional: Simulate password rotation
-##### 1. Login as user k8s-admin01
-- Use the API key as a password from the 01-base.log file for the user k8s-admin01
+##### 1. Login as user kubernetes-admin01
+- Use the API key as a password from the 01-base.log file for the user kubernetes-admin01
 ```bash
-conjur login -i k8s-admin01
+conjur login -i kubernetes-admin01
 ```
 ##### 2. Modify rotate password script
 ```bash
@@ -400,10 +399,10 @@ kubectl logs -n conjur-jwt <pod_name> -c spring-boot-demo-app
 ```
 #### Optional: Simulate password rotation
 **Note:** Password refresh happens every 10 seconds.
-##### 1. Login as user k8s-admin01
-- Use the API key as a password from the 01-base.log file for the user k8s-admin01
+##### 1. Login as user kubernetes-admin01
+- Use the API key as a password from the 01-base.log file for the user kubernetes-admin01
 ```bash
-conjur login -i k8s-admin01
+conjur login -i kubernetes-admin01
 ```
 ##### 2. Modify rotate password script
 ```bash
@@ -436,4 +435,20 @@ kubectl logs -n conjur-jwt <pod_name> -c spring-boot-demo-app
 ##### 8. Logout from Conjur CLI
 ```Bash
 conjur logout
+```
+### Use Case: External Secrets Operator (ESO)
+This use case demonstrates fetching Conjur secrets via the [External Secrets Operator](https://external-secrets.io/) with the Conjur provider.
+#### 1. Install ESO
+```bash
+scripts/09-install-eso.sh
+```
+#### 2. Deploy the ESO SecretStore and ExternalSecret manifest
+The script reads connection details from the `conjur-connect` ConfigMap, builds a Kustomize overlay that patches them into the manifest, and applies it.
+```bash
+scripts/10-deploy-manifest-08.sh
+```
+#### 3. Verify the secret was synced to a Kubernetes Secret
+```bash
+kubectl get externalsecret -n conjur-jwt
+kubectl get secret -n conjur-jwt
 ```

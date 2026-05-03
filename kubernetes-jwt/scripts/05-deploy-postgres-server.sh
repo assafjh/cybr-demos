@@ -1,6 +1,9 @@
 #!/bin/bash
-# This script will check connection to the postgres server that was deployed at script #2
-# Deploy this at a VM that Conjur can communicate with
+
+set -euo pipefail
+
+# Deploys a demo PostgreSQL server for use with the Secretless Broker and Spring Boot use cases.
+# Run this on a VM that is reachable from the Kubernetes cluster.
 #============ Variables ===============
 # Is sudo required to run docker/podman - leave empty if no need
 SUDO=

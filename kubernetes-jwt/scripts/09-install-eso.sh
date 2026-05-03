@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -euo pipefail
+
 # This script installs eso using helm.
 # If helm is not installed, the script will install helm.
 
@@ -17,6 +20,6 @@ helm repo add external-secrets https://charts.external-secrets.io
 # Install ESO
 helm install external-secrets \
    external-secrets/external-secrets \
-    -n $NAMESPACE \
+    -n "$NAMESPACE" \
     --create-namespace \
     --set installCRDs=true
