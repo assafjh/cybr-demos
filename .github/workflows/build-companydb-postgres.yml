@@ -38,23 +38,21 @@ jobs:
       - name: Generate mTLS Certificates
         run: |
           cd images/postgres-companydb
-          chmod +x tools/*.sh
-          
-          export ROOT_CA_CN="Demo Root CA"
-          export POSTGRES_CN="localhost"
-          export POSTGRES_KEY_FILE_PATH="./certs/postgresdb.key"
-          export ROOT_CA_CERTIFICATE_PATH="./certs/rootCA.pem"
-          export ROOT_CA_KEY_PATH="./certs/rootCA.key"
-          export POSTGRES_CERTIFICATE_FILE_PATH="./certs/postgresdb.pem"
-          export POSTGRES_SUBJECT_ALT_NAMES="DNS:localhost,IP:127.0.0.1"
           
           mkdir -p certs
-          ./tools/01-create-root-ca.sh
-          ./tools/02-create-self-signed-certificate.sh
-          ./tools/03-generate-csr.sh
-          ./tools/04-sign-csr.sh
           
-          ls -l certs/
+          export CERT_DIR="$(pwd)/certs"
+          
+          source .env
+          
+          chmod +x tools/*.sh
+          BYPASS_ROOT_CA_CN="$ROOT_CA_CN" ./tools/01-create-root-ca.sh
+          BYPASS_SERVER_CN="$POSTGRES_CN" BYPASS_SERVER_KEY_FILE_PATH="$POSTGRES_KEY_FILE_PATH" ./tools/02-create-self-signed-certificate.sh
+          BYPASS_SERVER_KEY_FILE_PATH="$POSTGRES_KEY_FILE_PATH" BYPASS_SUBJECT_ALT_NAMES="$POSTGRES_SUBJECT_ALT_NAMES" ./tools/03-generate-csr.sh
+          BYPASS_CA_CERTIFICATE_FILE_PATH="$ROOT_CA_CERTIFICATE_PATH" BYPASS_CA_KEY_FILE_PATH="$ROOT_CA_KEY_PATH" BYPASS_SERVER_CERTIFICATE_FILE_PATH="$POSTGRES_CERTIFICATE_FILE_PATH" ./tools/04-sign-csr.sh
+          
+          echo "--- Verifying files exist in the Docker Context ---"
+          ls -la certs/
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

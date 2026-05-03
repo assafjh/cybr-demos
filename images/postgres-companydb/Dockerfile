@@ -18,7 +18,7 @@ COPY demo-db.sql /docker-entrypoint-initdb.d/
 RUN mkdir -p /etc/ssl/postgresql && chown -R postgres:postgres /etc/ssl/postgresql
 
 # Copy certificates from host
-COPY ./certs/postgresdb.key ./certs/postgresdb.pem ./certs/rootCA.pem /etc/ssl/postgresql/
+COPY certs/postgresdb.key certs/postgresdb.pem certs/rootCA.pem /etc/ssl/postgresql/
 
 # Enforce strict permissions (MANDATORY for PostgreSQL SSL)
 RUN chown postgres:postgres /etc/ssl/postgresql/* \
