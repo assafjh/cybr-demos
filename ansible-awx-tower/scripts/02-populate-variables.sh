@@ -30,10 +30,13 @@ for SECRET_NAME in "${SECRETS[@]}"; do
         # Fallback if openssl is not installed
         SECRET_VAL=$(head -c 16 /dev/urandom | od -An -tx1 | tr -d ' \n')
     fi
-    
+
     FULL_PATH="${SAFE_BASE_PATH}/${SECRET_NAME}"
     echo "Setting variable: ${FULL_PATH}"
-    "$CONJUR_CLI" variable set -i "$FULL_PATH" -v "$SECRET_VAL"
+    if ! "$CONJUR_CLI" variable set -i "$FULL_PATH" -v "$SECRET_VAL"; then
+        echo "Error: Failed to set ${FULL_PATH}"
+        exit 1
+    fi
 done
 
 echo "AWX secrets populated successfully."
