@@ -86,7 +86,7 @@ jobs:
           echo "Waiting for Jenkins to be ready..."
           TIMEOUT=12
           while [ $TIMEOUT -gt 0 ]; do
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login)
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login 2>/dev/null || echo "000")
             if [ "$HTTP_CODE" = "200" ]; then
               echo "✅ Jenkins is up and responding!"
               break
@@ -103,7 +103,7 @@ jobs:
           fi
 
           echo "Verifying JCasC configuration was applied..."
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u admin:Admin123 http://localhost:8080/api/json)
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u admin:Admin123 http://localhost:8080/api/json 2>/dev/null || echo "000")
           if [ "$HTTP_CODE" = "200" ]; then
             echo "✅ JCasC validation passed: admin user authenticated successfully."
           else
