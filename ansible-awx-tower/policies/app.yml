@@ -1,6 +1,6 @@
 # app.yml
 # Load this policy into the 'data/ansible' branch:
-# conjur policy load -b data/ansible -f awx-app-policy.yml
+# conjur policy load -b data/ansible -f app.yml
 
 - !group
   id: apps
@@ -19,7 +19,7 @@
 
     # Allow apps group to consume the AWX secrets
     - !permit
-      role: !group ../../apps
+      role: !group /data/ansible/apps
       privileges: [ read, execute ]
       resource: *awx-secrets
 
@@ -28,7 +28,7 @@
   id: apps/awx-node
   owner: !group admins
   annotations:
-    authn/api-key: true # Required for Cloud, recommended for On-Prem REST
+    authn/api-key: true
     description: "Machine identity for AWX Execution Environments"
 
 # Add the AWX host to the apps group
