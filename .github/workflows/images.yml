@@ -4,11 +4,13 @@ on:
   push:
     paths:
       - 'images/**'
+      - 'code/springboot-hot-reload/**'
       - '!**/*.md'
     branches: [ "main", "master" ]
   pull_request:
     paths:
       - 'images/**'
+      - 'code/springboot-hot-reload/**'
     branches: [ "main", "master" ]
   workflow_dispatch:
     inputs:
@@ -27,6 +29,7 @@ on:
           - secretless
           - rest_api_app
           - summon_demo
+          - springboot_hot_reload
 
 jobs:
   detect-changes:
@@ -39,6 +42,7 @@ jobs:
       secretless: ${{ steps.filter.outputs.secretless }}
       rest_api_app: ${{ steps.filter.outputs.rest_api_app }}
       summon_demo: ${{ steps.filter.outputs.summon_demo }}
+      springboot_hot_reload: ${{ steps.filter.outputs.springboot_hot_reload }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -62,6 +66,8 @@ jobs:
               - 'images/rest-api-app/**'
             summon_demo:
               - 'images/summon/**'
+            springboot_hot_reload:
+              - 'code/springboot-hot-reload/**'
 
   build-postgres-companydb:
     needs: detect-changes
@@ -275,3 +281,34 @@ jobs:
       context_path: images/summon
       platforms: linux/amd64,linux/arm64
       smoke_test_command: docker run --rm --entrypoint "" local-smoke-summon:test summon --version
+
+  build-springboot-hot-reload:
+    needs: detect-changes
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.springboot_hot_reload == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'springboot_hot_reload' || inputs.force_image == 'all')) }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: springboot-hot-reload
+      context_path: code/springboot-hot-reload
+      platforms: linux/amd64,linux/arm64
+      smoke_test_command: |
+        trap 'docker rm -f sb-pg sb-app 2>/dev/null || true; docker network rm sb-net 2>/dev/null || true' EXIT
+        docker network create sb-net
+        docker run -d --name sb-pg --network sb-net \
+          -e POSTGRES_USER=reporting_service_ro \
+          -e POSTGRES_PASSWORD=reporting123 \
+          -e POSTGRES_DB=postgres \
+          postgres:17-alpine
+        TIMEOUT=10
+        until docker exec sb-pg pg_isready -U reporting_service_ro -d postgres || [ $TIMEOUT -eq 0 ]; do
+          sleep 3; TIMEOUT=$((TIMEOUT-1))
+        done
+        docker run -d --name sb-app --network sb-net \
+          -p 8080:8080 \
+          -e DB_URL=jdbc:postgresql://sb-pg:5432/postgres \
+          local-smoke-springboot-hot-reload:test
+        TIMEOUT=20
+        until [ "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/actuator/health 2>/dev/null)" = "200" ] || [ $TIMEOUT -eq 0 ]; do
+          sleep 3; TIMEOUT=$((TIMEOUT-1))
+        done
+        [ $TIMEOUT -eq 0 ] && { echo "❌ App did not start in time"; docker logs sb-app; exit 1; }
+        echo "✅ App started and connected to database"

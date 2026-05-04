@@ -82,7 +82,7 @@ curl http://localhost:8080/api/status
 ## Running tests
 
 ```bash
-./mvnw test
+mvn test
 ```
 
 Tests use Testcontainers (Docker required). `HotReloadIntegrationTest` exercises the full
@@ -90,7 +90,8 @@ rotation cycle: rotate DB password → update credentials file → refresh → v
 
 ## Kubernetes deployment
 
-See the manifests in `../../kubernetes-*/` for a full example with the Conjur Secrets
-Provider sidecar. The sidecar template should emit a `.properties` file with keys
-`spring.datasource.username` and `spring.datasource.password` matching the format
-in `application.properties`.
+K8s manifests are not yet included in this directory. The application is designed for
+the Conjur Secrets Provider push-to-file pattern: configure the sidecar to emit a
+`.properties` file at `/etc/conjur/secrets/db-credentials.properties` with the keys
+`spring.datasource.username` and `spring.datasource.password`. The file watcher
+handles the rest automatically.
