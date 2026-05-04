@@ -1,9 +1,10 @@
 FROM postgres:17-alpine
 
 # OCI Labels
-LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.title="Hardened PostgreSQL (mTLS/SSL enabled)"
+LABEL org.opencontainers.image.authors="Assaf Hazan"
 LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
-LABEL org.opencontainers.image.description="Hardened PostgreSQL instance with enforced mTLS/SSL for secure demo environments"
+LABEL org.opencontainers.image.description="Hardened PostgreSQL image configured with enforced mTLS/SSL for secure demo and POC environments"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Environment variables

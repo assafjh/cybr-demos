@@ -1,8 +1,10 @@
 FROM alpine:latest
+
 # OCI Labels
-LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.title="Conjur REST API Demo (Secrets Retrieval)"
+LABEL org.opencontainers.image.authors="Assaf Hazan"
 LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
-LABEL org.opencontainers.image.description="REST API demo app for Conjur secret retrieval — supports pre-authenticated (sidecar) and self-authenticated (JWT) modes"
+LABEL org.opencontainers.image.description="REST API demo application for CyberArk Conjur secret retrieval supporting both pre-authenticated sidecar mode and self-authenticated JWT-based mode"
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Auth mode:

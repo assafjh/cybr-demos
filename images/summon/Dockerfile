@@ -1,8 +1,10 @@
 FROM alpine:latest
+
 # OCI Labels
-LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.title="Summon Secret Injection Demo"
+LABEL org.opencontainers.image.authors="Assaf Hazan"
 LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
-LABEL org.opencontainers.image.description="Demo application using Summon for secret injection"
+LABEL org.opencontainers.image.description="Demo application demonstrating secret injection using Summon for runtime credential provisioning"
 LABEL org.opencontainers.image.licenses="MIT"
 
 SHELL ["/bin/ash", "-eo", "pipefail", "-c"]

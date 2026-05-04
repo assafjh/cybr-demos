@@ -6,10 +6,14 @@ COPY src ./src
 RUN mvn package -DskipTests -q
 
 FROM eclipse-temurin:21-jre-alpine
-LABEL org.opencontainers.image.authors="assafjh"
+
+# OCI Labels
+LABEL org.opencontainers.image.title="Spring Boot Conjur Hot-Reload Demo"
+LABEL org.opencontainers.image.authors="Assaf Hazan"
 LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
-LABEL org.opencontainers.image.description="Spring Boot app demonstrating zero-restart database credential hot-reload via Conjur push-to-file"
+LABEL org.opencontainers.image.description="Spring Boot application demonstrating zero-restart database credential hot-reload using Conjur push-to-file mechanism"
 LABEL org.opencontainers.image.licenses="MIT"
+
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080

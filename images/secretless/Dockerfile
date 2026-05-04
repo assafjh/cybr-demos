@@ -1,8 +1,10 @@
 FROM alpine:latest
+
 # OCI Labels
-LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.title="Secretless Broker PostgreSQL Demo"
+LABEL org.opencontainers.image.authors="Assaf Hazan"
 LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
-LABEL org.opencontainers.image.description="Demo application using Secretless Broker to connect to PostgreSQL"
+LABEL org.opencontainers.image.description="Demo application demonstrating Secretless Broker for secure PostgreSQL connectivity without embedded credentials"
 LABEL org.opencontainers.image.licenses="MIT"
 
 ENV DB_HOST localhost

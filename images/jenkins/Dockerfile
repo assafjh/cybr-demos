@@ -1,7 +1,8 @@
 FROM jenkins/jenkins:2.541.3-lts-jdk17
 
 # OCI Metadata Labels
-LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.title="Jenkins Controller (JCasC + Conjur)"
+LABEL org.opencontainers.image.authors="Assaf Hazan"
 LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
 LABEL org.opencontainers.image.description="Custom Jenkins Controller with JCasC and CyberArk Conjur integration"
 LABEL org.opencontainers.image.licenses="MIT"

@@ -1,9 +1,10 @@
 FROM alpine:latest
 
 # OCI Labels
-LABEL org.opencontainers.image.authors="assafjh"
+LABEL org.opencontainers.image.title="Conjur Push-to-File Demo App"
+LABEL org.opencontainers.image.authors="Assaf Hazan"
 LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
-LABEL org.opencontainers.image.description="Demo application waiting for Conjur Secrets Provider (Push-to-File)"
+LABEL org.opencontainers.image.description="Demo application designed to demonstrate Conjur Secrets Provider using Push-to-File pattern"
 LABEL org.opencontainers.image.licenses="MIT"
 
 ENV INJECTED_FILES_PATH=/opt/secrets/conjur
