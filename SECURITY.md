@@ -13,7 +13,7 @@ Currently, this repository is maintained for personal portfolio and demonstratio
 
 As this repository focuses on security and secrets management (CyberArk Conjur), security is taken very seriously.
 
-If you discover a security vulnerability within this project, please do not disclose it publicly. Instead, please report it by reaching out to me directly on LinkedIn.
+If you discover a security vulnerability within this project, please do not disclose it publicly. Instead, please report it by reaching out to me directly on LinkedIn: [Assaf Hazan](https://www.linkedin.com/in/assafjh).
 
 Please include the following details in your report:
 * A description of the vulnerability.
