@@ -11,7 +11,7 @@ This repository contains self-contained scenarios used in real-world POCs, integ
 Each folder represents a standalone demo with its own instructions, prerequisites, and execution flow.
 
 Created and maintained by [Assaf Hazan](https://www.linkedin.com/in/assafjh)
-(Presales Architect, CyberArk / Palo Alto Networks)
+(Senior Presales Architect | Machine Identity & DevSecOps | Palo Alto Networks)
 
 ---
 
