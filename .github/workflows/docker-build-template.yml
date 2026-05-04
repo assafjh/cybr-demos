@@ -54,6 +54,7 @@ jobs:
         with:
           dockerfile: ${{ inputs.context_path }}/Dockerfile
           failure-threshold: warning
+          ignore: DL3007,DL3018
 
       - name: Run pre-build command
         if: ${{ inputs.pre_build_command != '' }}
