@@ -1,6 +1,6 @@
 # CyberArk Demo Images
 
-[!Images CI Status](https://github.com/assafjh/cybr-demos/actions/workflows/images.yml)
+[![Images CI Status](https://github.com/assafjh/cybr-demos/actions/workflows/images.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/images.yml)
 
 This directory contains the Dockerfiles and build contexts for all the custom container images used across the various demonstrations in this repository.
 
