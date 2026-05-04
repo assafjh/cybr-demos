@@ -20,6 +20,7 @@
             - push-to-k8s-secrets
             - secretless
             - rest-api-app
+            - summon
       steps:
         - name: Delete old package versions
           uses: actions/delete-package-versions@v5

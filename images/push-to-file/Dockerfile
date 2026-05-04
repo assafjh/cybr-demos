@@ -11,8 +11,7 @@ ENV RUN_MESSENGER=false
 ENV WAIT_TIMEOUT=5
 
 # Install dumb-init and clean up cache to keep image small
-RUN apk update \
-    && apk add --no-cache dumb-init \
+RUN apk add --no-cache dumb-init \
     && mkdir -p /scripts \
     && mkdir -p /opt/secrets/conjur \
     && chown -R 1000:1000 /opt/secrets

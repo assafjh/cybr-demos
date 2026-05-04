@@ -26,6 +26,7 @@ on:
           - push_to_k8s_secrets
           - secretless
           - rest_api_app
+          - summon_demo
 
 jobs:
   detect-changes:
@@ -37,6 +38,7 @@ jobs:
       push_to_k8s_secrets: ${{ steps.filter.outputs.push_to_k8s_secrets }}
       secretless: ${{ steps.filter.outputs.secretless }}
       rest_api_app: ${{ steps.filter.outputs.rest_api_app }}
+      summon_demo: ${{ steps.filter.outputs.summon_demo }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,6 +60,8 @@ jobs:
               - 'images/secretless/**'
             rest_api_app:
               - 'images/rest-api-app/**'
+            summon_demo:
+              - 'images/summon/**'
 
   build-postgres-companydb:
     needs: detect-changes
@@ -233,3 +237,13 @@ jobs:
           echo "❌ Self-authenticated mode: JWT file not found."
           exit 1
         fi
+
+  build-summon-image:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.summon_demo == 'true' || github.event.inputs.force_image == 'summon_demo' || github.event.inputs.force_image == 'all' }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: summon
+      context_path: images/summon
+      platforms: linux/amd64,linux/arm64
+      smoke_test_command: docker run --rm local-smoke-summon:test summon --version

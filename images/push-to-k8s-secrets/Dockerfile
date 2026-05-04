@@ -7,8 +7,7 @@ LABEL org.opencontainers.image.description="Demo application for Conjur Kubernet
 LABEL org.opencontainers.image.licenses="MIT"
 
 # Install dumb-init
-RUN apk update \
-    && apk add --no-cache dumb-init \
+RUN apk add --no-cache dumb-init \
     && mkdir -p /scripts
 
 COPY ./scripts/entry-point.sh /scripts/

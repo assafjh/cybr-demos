@@ -16,8 +16,7 @@ ENV AUTH_MODE=pre-authenticated
 
 ENV CONJUR_VARIABLE_PATH=data/kubernetes/applications/safe/secret1
 
-RUN  apk update \
-  && apk add --no-cache curl dumb-init \
+RUN apk add --no-cache curl dumb-init \
   && mkdir -p /scripts
 
 COPY ./scripts/entry-point.sh /scripts/
