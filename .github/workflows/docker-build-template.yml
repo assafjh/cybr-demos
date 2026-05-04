@@ -44,6 +44,7 @@ env:
 
 jobs:
   build-lint-push:
+    name: Build & Push ${{ inputs.image_name }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

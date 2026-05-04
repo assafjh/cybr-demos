@@ -11,6 +11,21 @@ on:
       - 'images/**'
     branches: [ "main", "master" ]
   workflow_dispatch:
+    inputs:
+      force_image:
+        description: 'Force build a specific image (Manual run)'
+        required: true
+        default: 'none'
+        type: choice
+        options:
+          - none
+          - all
+          - postgres_companydb
+          - push_to_file
+          - jenkins_demo
+          - push_to_k8s_secrets
+          - secretless
+          - rest_api_app
 
 jobs:
   detect-changes:
@@ -46,7 +61,7 @@ jobs:
 
   build-postgres-companydb:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.postgres_companydb == 'true' }}
+    if: ${{ needs.detect-changes.outputs.postgres_companydb == 'true' || github.event.inputs.force_image == 'postgres_companydb' || github.event.inputs.force_image == 'all' }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: postgres-companydb
@@ -89,7 +104,7 @@ jobs:
 
   build-push-to-file:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.push_to_file == 'true' }}
+    if: ${{ needs.detect-changes.outputs.push_to_file == 'true' || github.event.inputs.force_image == 'push_to_file' || github.event.inputs.force_image == 'all' }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: push-to-file
@@ -105,11 +120,15 @@ jobs:
         sleep 2
         docker exec app-test-success sh -c "mkdir -p /opt/secrets/conjur && echo 'db_pass: SecretYAML123' > /opt/secrets/conjur/credentials.yaml && echo 'db_pass=SecretPROP123' > /opt/secrets/conjur/credentials.properties"
         sleep 2
-        if ! docker logs app-test-success | grep -q "Secrets successfully injected by Sidecar"; then exit 1; fi
+        if ! docker logs app-test-success | grep -q "Secrets successfully injected by Sidecar"; then
+          echo "❌ Positive test failed: Container did not detect the files."
+          docker logs app-test-success
+          exit 1
+        fi
 
   build-jenkins-image:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.jenkins_demo == 'true' }}
+    if: ${{ needs.detect-changes.outputs.jenkins_demo == 'true' || github.event.inputs.force_image == 'jenkins_demo' || github.event.inputs.force_image == 'all' }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: jenkins-demo
@@ -121,20 +140,33 @@ jobs:
       smoke_test_command: |
         trap 'docker rm -f jenkins-test 2>/dev/null || true' EXIT
         docker run -d --name jenkins-test -p 8080:8080 -e JENKINS_ADMIN_ID=admin -e JENKINS_ADMIN_PASSWORD=Admin123 -e JENKINS_ADDRESS=localhost -e JENKINS_PORT=8080 -e CONJUR_FQDN=conjur.example.com -e CONJUR_ACCOUNT=conjur local-smoke-jenkins-demo:test
-        TIMEOUT=12
+        TIMEOUT=18
         while [ $TIMEOUT -gt 0 ]; do
           HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login 2>/dev/null || echo "000")
-          if [ "$HTTP_CODE" = "200" ]; then break; fi
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo "✅ Jenkins is up and responding!"
+            break
+          fi
           sleep 5
           TIMEOUT=$((TIMEOUT-1))
         done
-        if [ $TIMEOUT -eq 0 ]; then exit 1; fi
+        if [ $TIMEOUT -eq 0 ]; then
+          echo "❌ Smoke Test Failed: Jenkins didn't respond in time."
+          docker logs jenkins-test
+          exit 1
+        fi
         HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u admin:Admin123 http://localhost:8080/api/json 2>/dev/null || echo "000")
-        if [ "$HTTP_CODE" != "200" ]; then exit 1; fi
+        if [ "$HTTP_CODE" != "200" ]; then
+          echo "❌ JCasC validation failed: could not authenticate as admin (HTTP $HTTP_CODE)."
+          docker logs jenkins-test
+          exit 1
+        else
+          echo "✅ JCasC validation passed: admin user authenticated successfully."
+        fi
 
   build-push-to-k8s-secrets:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.push_to_k8s_secrets == 'true' }}
+    if: ${{ needs.detect-changes.outputs.push_to_k8s_secrets == 'true' || github.event.inputs.force_image == 'push_to_k8s_secrets' || github.event.inputs.force_image == 'all' }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: push-to-k8s-secrets
@@ -145,12 +177,18 @@ jobs:
         docker run -d --name k8s-test-secret -e MY_DUMMY_SECRET=CyberArk123 local-smoke-push-to-k8s-secrets:test
         sleep 3
         LOGS=$(docker logs k8s-test-secret)
-        if ! echo "$LOGS" | grep -q "MY_DUMMY_SECRET=CyberArk123"; then exit 1; fi
-        if ! echo "$LOGS" | grep -q "Filtered Secrets"; then exit 1; fi
+        if ! echo "$LOGS" | grep -q "MY_DUMMY_SECRET=CyberArk123"; then
+          echo "❌ ERROR: Secret not found in logs."
+          exit 1
+        fi
+        if ! echo "$LOGS" | grep -q "Filtered Secrets"; then
+          echo "❌ ERROR: Script output is missing expected headers."
+          exit 1
+        fi
 
   build-secretless:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.secretless == 'true' }}
+    if: ${{ needs.detect-changes.outputs.secretless == 'true' || github.event.inputs.force_image == 'secretless' || github.event.inputs.force_image == 'all' }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: secretless
@@ -159,7 +197,7 @@ jobs:
 
   build-rest-api-app:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.rest_api_app == 'true' }}
+    if: ${{ needs.detect-changes.outputs.rest_api_app == 'true' || github.event.inputs.force_image == 'rest_api_app' || github.event.inputs.force_image == 'all' }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: rest-api-app
@@ -173,13 +211,25 @@ jobs:
         docker run -d --name app-pre-auth -v "$MOCK_TOKEN_DIR:/run/conjur:ro" -e AUTH_MODE=pre-authenticated -e CONJUR_APPLIANCE_URL=http://localhost:8080 -e CONJUR_ACCOUNT=conjur -e CONJUR_VARIABLE_PATH=data/test/secret1 local-smoke-rest-api-app:test
         sleep 3
         LOGS=$(docker logs app-pre-auth 2>&1)
-        if ! echo "$LOGS" | grep -q "pre-authenticated"; then exit 1; fi
-        if ! echo "$LOGS" | grep -q "access-token"; then exit 1; fi
+        if ! echo "$LOGS" | grep -q "pre-authenticated"; then
+          echo "❌ Pre-authenticated mode: wrong mode or script didn't start."
+          exit 1
+        fi
+        if ! echo "$LOGS" | grep -q "access-token"; then
+          echo "❌ Pre-authenticated mode: token file not found."
+          exit 1
+        fi
         
         MOCK_SA_DIR=$(mktemp -d)
         echo 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.mock.token' > "$MOCK_SA_DIR/token"
         docker run -d --name app-self-auth -v "$MOCK_SA_DIR:/var/run/secrets/kubernetes.io/serviceaccount:ro" -e AUTH_MODE=self-authenticated -e CONJUR_APPLIANCE_URL=http://localhost:8080 -e CONJUR_ACCOUNT=conjur -e CONJUR_VARIABLE_PATH=data/test/secret1 -e CONJUR_AUTHN_URL=http://localhost:8080/authn-jwt/k8s local-smoke-rest-api-app:test
         sleep 3
         LOGS=$(docker logs app-self-auth 2>&1)
-        if ! echo "$LOGS" | grep -q "self-authenticated"; then exit 1; fi
-        if ! echo "$LOGS" | grep -q "token"; then exit 1; fi
+        if ! echo "$LOGS" | grep -q "self-authenticated"; then
+          echo "❌ Self-authenticated mode: wrong mode or script didn't start."
+          exit 1
+        fi
+        if ! echo "$LOGS" | grep -q "token"; then
+          echo "❌ Self-authenticated mode: JWT file not found."
+          exit 1
+        fi
