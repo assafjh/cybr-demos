@@ -65,7 +65,7 @@ jobs:
 
   build-postgres-companydb:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.postgres_companydb == 'true' || github.event.inputs.force_image == 'postgres_companydb' || github.event.inputs.force_image == 'all' }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.postgres_companydb == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'postgres_companydb' || inputs.force_image == 'all')) }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: postgres-companydb
@@ -108,7 +108,7 @@ jobs:
 
   build-push-to-file:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.push_to_file == 'true' || github.event.inputs.force_image == 'push_to_file' || github.event.inputs.force_image == 'all' }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.push_to_file == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'push_to_file' || inputs.force_image == 'all')) }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: push-to-file
@@ -139,7 +139,7 @@ jobs:
 
   build-jenkins-image:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.jenkins_demo == 'true' || github.event.inputs.force_image == 'jenkins_demo' || github.event.inputs.force_image == 'all' }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.jenkins_demo == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'jenkins_demo' || inputs.force_image == 'all')) }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: jenkins-demo
@@ -177,7 +177,7 @@ jobs:
 
   build-push-to-k8s-secrets:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.push_to_k8s_secrets == 'true' || github.event.inputs.force_image == 'push_to_k8s_secrets' || github.event.inputs.force_image == 'all' }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.push_to_k8s_secrets == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'push_to_k8s_secrets' || inputs.force_image == 'all')) }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: push-to-k8s-secrets
@@ -208,7 +208,7 @@ jobs:
 
   build-secretless:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.secretless == 'true' || github.event.inputs.force_image == 'secretless' || github.event.inputs.force_image == 'all' }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.secretless == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'secretless' || inputs.force_image == 'all')) }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: secretless
@@ -217,7 +217,7 @@ jobs:
 
   build-rest-api-app:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.rest_api_app == 'true' || github.event.inputs.force_image == 'rest_api_app' || github.event.inputs.force_image == 'all' }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.rest_api_app == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'rest_api_app' || inputs.force_image == 'all')) }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: rest-api-app
@@ -268,7 +268,7 @@ jobs:
 
   build-summon-image:
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.summon_demo == 'true' || github.event.inputs.force_image == 'summon_demo' || github.event.inputs.force_image == 'all' }}
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.summon_demo == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'summon_demo' || inputs.force_image == 'all')) }}
     uses: ./.github/workflows/docker-build-template.yml
     with:
       image_name: summon
