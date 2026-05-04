@@ -118,7 +118,11 @@ jobs:
         trap 'docker rm -f app-test-fail app-test-success 2>/dev/null || true' EXIT
         echo "--- Test 1: Negative Test (Expecting Timeout) ---"
         docker run --name app-test-fail local-smoke-push-to-file:test || EXIT_CODE=$?
-        if [ "$EXIT_CODE" != "1" ]; then exit 1; fi
+        if [ "$EXIT_CODE" != "1" ]; then
+          echo "❌ Container should have failed with exit code 1 due to timeout, but got $EXIT_CODE"
+          exit 1
+        fi
+        echo "✅ Negative test passed: Container timed out correctly."
         echo "--- Test 2: Positive Test (Simulating Sidecar Injection) ---"
         docker run -d --name app-test-success -e WAIT_TIMEOUT=30 local-smoke-push-to-file:test
         sleep 2
@@ -128,6 +132,9 @@ jobs:
           echo "❌ Positive test failed: Container did not detect the files."
           docker logs app-test-success
           exit 1
+        else
+          echo "✅ Positive test passed: Container detected injected files!"
+          docker logs app-test-success
         fi
 
   build-jenkins-image:
@@ -178,16 +185,25 @@ jobs:
       platforms: linux/amd64,linux/arm64
       smoke_test_command: |
         trap 'docker rm -f k8s-test-secret 2>/dev/null || true' EXIT
+        echo "--- Starting Container with Mock Secret ---"
         docker run -d --name k8s-test-secret -e MY_DUMMY_SECRET=CyberArk123 local-smoke-push-to-k8s-secrets:test
         sleep 3
         LOGS=$(docker logs k8s-test-secret)
+        echo "Container Logs Output:"
+        echo "----------------------"
+        echo "$LOGS"
+        echo "----------------------"
         if ! echo "$LOGS" | grep -q "MY_DUMMY_SECRET=CyberArk123"; then
           echo "❌ ERROR: Secret not found in logs."
           exit 1
+        else
+          echo "✅ SUCCESS: Secret detected in environment output!"
         fi
         if ! echo "$LOGS" | grep -q "Filtered Secrets"; then
           echo "❌ ERROR: Script output is missing expected headers."
           exit 1
+        else
+          echo "✅ SUCCESS: Script internal logic executed correctly."
         fi
 
   build-secretless:
@@ -210,32 +226,44 @@ jobs:
       smoke_test_command: |
         trap 'docker rm -f app-pre-auth app-self-auth 2>/dev/null || true; rm -rf $MOCK_TOKEN_DIR $MOCK_SA_DIR 2>/dev/null || true' EXIT
         
+        echo "--- Test 1: Pre-authenticated mode (mock sidecar token) ---"
         MOCK_TOKEN_DIR=$(mktemp -d)
         echo '{"protected":"...","payload":"...","signature":"..."}' > "$MOCK_TOKEN_DIR/access-token"
         docker run -d --name app-pre-auth -v "$MOCK_TOKEN_DIR:/run/conjur:ro" -e AUTH_MODE=pre-authenticated -e CONJUR_APPLIANCE_URL=http://localhost:8080 -e CONJUR_ACCOUNT=conjur -e CONJUR_VARIABLE_PATH=data/test/secret1 local-smoke-rest-api-app:test
         sleep 3
         LOGS=$(docker logs app-pre-auth 2>&1)
+        echo "$LOGS"
         if ! echo "$LOGS" | grep -q "pre-authenticated"; then
           echo "❌ Pre-authenticated mode: wrong mode or script didn't start."
           exit 1
+        else
+          echo "✅ Pre-authenticated mode: correct mode detected."
         fi
         if ! echo "$LOGS" | grep -q "access-token"; then
           echo "❌ Pre-authenticated mode: token file not found."
           exit 1
+        else
+          echo "✅ Pre-authenticated mode: token file was found."
         fi
         
+        echo "--- Test 2: Self-authenticated mode (mock JWT) ---"
         MOCK_SA_DIR=$(mktemp -d)
         echo 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.mock.token' > "$MOCK_SA_DIR/token"
         docker run -d --name app-self-auth -v "$MOCK_SA_DIR:/var/run/secrets/kubernetes.io/serviceaccount:ro" -e AUTH_MODE=self-authenticated -e CONJUR_APPLIANCE_URL=http://localhost:8080 -e CONJUR_ACCOUNT=conjur -e CONJUR_VARIABLE_PATH=data/test/secret1 -e CONJUR_AUTHN_URL=http://localhost:8080/authn-jwt/k8s local-smoke-rest-api-app:test
         sleep 3
         LOGS=$(docker logs app-self-auth 2>&1)
+        echo "$LOGS"
         if ! echo "$LOGS" | grep -q "self-authenticated"; then
           echo "❌ Self-authenticated mode: wrong mode or script didn't start."
           exit 1
+        else
+          echo "✅ Self-authenticated mode: correct mode detected."
         fi
         if ! echo "$LOGS" | grep -q "token"; then
           echo "❌ Self-authenticated mode: JWT file not found."
           exit 1
+        else
+          echo "✅ Self-authenticated mode: JWT file was found."
         fi
 
   build-summon-image:

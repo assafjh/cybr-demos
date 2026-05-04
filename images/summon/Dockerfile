@@ -5,15 +5,15 @@ LABEL org.opencontainers.image.source="https://github.com/assafjh/cybr-demos"
 LABEL org.opencontainers.image.description="Demo application using Summon for secret injection"
 LABEL org.opencontainers.image.licenses="MIT"
 
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+
 RUN apk add --no-cache curl tar dumb-init \
   && mkdir -p /usr/local/lib/summon \
   && mkdir -p /scripts \
-  && cd /usr/local/bin \
   && curl -sSL https://github.com/cyberark/summon/releases/download/v0.11.0/summon-linux-amd64.tar.gz \
-      | tar xz \
-  && cd /usr/local/lib/summon \
+      | tar xz -C /usr/local/bin \
   && curl -sSL https://github.com/cyberark/summon-conjur/releases/download/v0.9.2/summon-conjur-linux-amd64.tar.gz \
-      | tar xz
+      | tar xz -C /usr/local/lib/summon
 
 # Fix for summon-conjur dynamically linking to libc
 RUN  mkdir -p /lib64 \
