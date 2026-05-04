@@ -2,11 +2,11 @@
 
 # ====== CONFIG ======
 REGION="eu-west-2"
-USER_POOL_ID="eu-west-2_fDn0jCiEv"
-COGNITO_DOMAIN="eu-west-2fdn0jciev"  
-CLIENT_ID="7j03g529sdski9nde886qac460"
-CLIENT_SECRET="15i4e2p9qtpictt1n31f782c9c65m3jquq57jkijhd9cehu3i5gk"
-SCOPE="default-m2m-resource-server-di4ppx/read"
+USER_POOL_ID="<your-cognito-user-pool-id>"
+COGNITO_DOMAIN="<your-cognito-domain>"  
+CLIENT_ID="<your-cognito-client-id>"
+CLIENT_SECRET="<your-cognito-client-secret>"
+SCOPE="<your-cognito-scope>"
 # ====================
 
 TOKEN_ENDPOINT="https://${COGNITO_DOMAIN}.auth.${REGION}.amazoncognito.com/oauth2/token"

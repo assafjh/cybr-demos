@@ -7,7 +7,7 @@
 
 #======== Variables ===========
 # Conjur URL
-conjur_url=https://assaf-lab.secretsmgr.cyberark.cloud/api
+conjur_url=https://<your-tenant>.secretsmgr.cyberark.cloud/api
 # Conjur account
 conjur_account=conjur
 # User with read permissions to the status endpoint

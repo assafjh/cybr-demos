@@ -13,10 +13,10 @@ fi
 CP_INSTALLER_PATH="/path/to/CyberArk-Credential-Provider-Linux-x86_64.tar.gz"
 INSTALL_DIR="/opt/CARKaim"
 LOG_FILE="/var/log/cyberark_cp_install.log"
-VAULT_IP="your_vault_ip"
-VAULT_PORT="your_vault_port"
-VAULT_USERNAME="your_vault_username"
-VAULT_PASSWORD="your_vault_password"
+VAULT_IP="<your-vault-ip>"
+VAULT_PORT="<your-vault-port>"
+VAULT_USERNAME="<your-vault-username>"
+VAULT_PASSWORD="<your-vault-password>"
 
 # Functions
 function check_prerequisites {

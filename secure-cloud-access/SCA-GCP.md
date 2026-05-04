@@ -2,7 +2,7 @@
 Select New GCP organization!
 
 # Login to gcloud
-gcloud config set account assaf.hazan@cyberark.com
+gcloud config set account <your-email@example.com>
 gcloud auth login
 
 # Set project
@@ -12,7 +12,7 @@ gcloud config get-value project
 
 # GET CEM deployment script
 curl --request GET \
-  --url https://assaf-lab-cem.cyberark.cloud/api/new_account/get-deployment-script \
+  --url https://<your-cem-tenant>.cyberark.cloud/api/new_account/get-deployment-script \
   --header 'accept: application/json, text/plain, */*'
   --header 'Authorization: Bearer <authorization-parameters>'
 

@@ -15,5 +15,6 @@ COPY ./scripts/entry-point.sh /scripts/
 RUN chmod +x /scripts/entry-point.sh
 
 WORKDIR /scripts
+USER 1000:1000
 
 ENTRYPOINT [ "dumb-init", "--", "/scripts/entry-point.sh" ]

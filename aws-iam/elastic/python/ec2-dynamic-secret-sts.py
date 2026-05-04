@@ -10,9 +10,9 @@ from conjur import Client
 from conjur_iam_client import create_conjur_iam_client_from_env
 
 # Load environment variables
-environ["CONJUR_APPLIANCE_URL"] = "https://assaf-lab.secretsmgr.cyberark.cloud/api"
+environ["CONJUR_APPLIANCE_URL"] = "https://<your-tenant>.secretsmgr.cyberark.cloud/api"
 environ["AUTHN_IAM_SERVICE_ID"] = "demo"
-environ["CONJUR_AUTHN_LOGIN"] = "host/data/aws/179196310045/ajh-ec2-pub-lab-role"
+environ["CONJUR_AUTHN_LOGIN"] = "host/data/aws/<your-account-id>/ajh-ec2-pub-lab-role"
 environ["CONJUR_ACCOUNT"] = "conjur"
 
 # Create Conjur client

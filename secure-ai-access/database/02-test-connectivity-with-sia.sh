@@ -3,16 +3,16 @@
 
 #============ SIA Variables (UPDATE THESE!) ===============
 # Your CyberArk Tenant Subdomain (e.g., "mycompany")
-TENANT_SUBDOMAIN="tiger-prod"
+TENANT_SUBDOMAIN="<your-tenant-subdomain>"
 
 # Your CyberArk Identity Username (e.g., "ajh@mycompany.com")
-CYBERARK_USER="ahazan@tiger.com"
+CYBERARK_USER="<your-identity-username>"
 
 # Postgres target FQDN as defined in SIA
-TARGET_FQDN="ec2-13-135-62-241.eu-west-2.compute.amazonaws.com"
+TARGET_FQDN="<your-postgres-fqdn>"
 
 # MFA cached password - this is the value that SIA will return when the MFA challenge is completed successfully. You can get this value from the SIA logs, or by running the SIA connector locally and checking the output after completing the MFA challenge.
-MFA_TOKEN=cybrsso90oEkm1CogAkp+Rqa7JDPK3juKDp5Ec7hW7Ed6i0kyw=
+MFA_TOKEN="<your-cached-mfa-token>"
 
 #============ System Variables ===============
 SUDO=

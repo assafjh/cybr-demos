@@ -14,7 +14,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Variables - Use environment variables or defaults
-VAULT_IP="${VAULT_IP:-"10.0.0.1"}"
+VAULT_IP="${VAULT_IP:-"<your-vault-ip>"}"
 VAULT_USER="${VAULT_USER:-"prov_user"}"
 # Never hardcode the password; provide it via env var before running
 VAULT_PASSWORD="${VAULT_PASSWORD:? "Error: VAULT_PASSWORD environment variable is not set."}"

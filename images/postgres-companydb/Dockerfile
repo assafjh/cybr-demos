@@ -8,6 +8,8 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 # Environment variables
 ENV POSTGRES_USER=admin
+# INTENTIONAL HARDCODED PASSWORD for public demo ease of use.
+# Do not use this pattern in production!
 ENV POSTGRES_PASSWORD="123456" 
 ENV POSTGRES_DB=postgres
 

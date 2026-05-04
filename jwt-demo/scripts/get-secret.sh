@@ -8,7 +8,7 @@ CLIENT_ID="7j03g529sdski9nde886qac460"
 CLIENT_SECRET="15i4e2p9qtpictt1n31f782c9c65m3jquq57jkijhd9cehu3i5gk"
 SCOPE="default-m2m-resource-server-di4ppx/read"
 
-CONJUR_BASE_URL="https://assaf-lab.secretsmgr.cyberark.cloud/api"
+CONJUR_BASE_URL="https://<your-tenant>.secretsmgr.cyberark.cloud/api"
 CONJUR_ACCOUNT="conjur"
 CONJUR_AUTHN_ID="intro-demo-authn"
 CONJUR_LOGIN="host/data/intro-demo/apps/demo-webapp"

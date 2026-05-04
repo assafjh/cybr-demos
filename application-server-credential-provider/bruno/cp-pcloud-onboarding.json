@@ -503,7 +503,7 @@
               "req": [
                 {
                   "name": "memberName",
-                  "value": "assaf@assaflab",
+                  "value": "<your-identity-username>",
                   "enabled": true,
                   "local": false
                 },
@@ -815,21 +815,21 @@
       "variables": [
         {
           "name": "identityURL",
-          "value": "assaflab.id.cyberark.cloud",
+          "value": "<your-tenant>.id.cyberark.cloud",
           "enabled": true,
           "secret": false,
           "type": "text"
         },
         {
           "name": "pCloudURL",
-          "value": "assaf-lab.privilegecloud.cyberark.cloud",
+          "value": "<your-tenant>.privilegecloud.cyberark.cloud",
           "enabled": true,
           "secret": false,
           "type": "text"
         },
         {
           "name": "clientID",
-          "value": "assaf-sa@assaflab",
+          "value": "<your-service-account>",
           "enabled": true,
           "secret": false,
           "type": "text"

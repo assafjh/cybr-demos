@@ -1,3 +1,15 @@
 **/*.log
 node_modules/
-**/*.claude
+.claude/
+CLAUDE.md
+claude.md
+*.env
+!*.env.example
+*.dbc
+*.war
+*.jar
+*.class
+target/
+compiled/
+__pycache__/
+.DS_Store
