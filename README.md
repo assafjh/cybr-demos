@@ -25,7 +25,9 @@ Most demo folders follow a standard structure for predictability:
 ---
 
 ## ⚠️ Disclaimer
-This is a personal repository containing demonstrations and proof-of-concept integrations. It is **not** officially affiliated with, endorsed by, or supported by CyberArk. All environments are isolated, personal lab tenants containing no real customer data or contractual risk. Scripts and configurations are provided "as-is" for educational purposes.
+This is a personal repository created for demonstration and proof-of-concept purposes. While I am currently an employee of Palo Alto Networks, the views, code, and configurations presented here are strictly my own. This project is not an official company product and is **not** officially endorsed, maintained, or supported by the company. 
+
+All environments are isolated, personal lab tenants containing no real customer data or contractual risk. Scripts and configurations are provided "as-is" for educational purposes and should be properly reviewed before any production use.
 
 ---
 
