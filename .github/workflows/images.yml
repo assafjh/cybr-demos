@@ -16,7 +16,7 @@ on:
     inputs:
       force_image:
         description: 'Force build a specific image (Manual run)'
-        required: true
+        required: false
         default: 'none'
         type: choice
         options:
@@ -289,7 +289,6 @@ jobs:
     with:
       image_name: springboot-hot-reload
       context_path: code/springboot-hot-reload
-      platforms: linux/amd64,linux/arm64
       smoke_test_command: |
         trap 'docker rm -f sb-pg sb-app 2>/dev/null || true; docker network rm sb-net 2>/dev/null || true' EXIT
         docker network create sb-net
