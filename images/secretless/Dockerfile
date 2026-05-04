@@ -10,9 +10,9 @@ ENV DB_PORT 5432
 ENV DB_NAME postgres
 ENV TABLE_NAME customers
 
-RUN  apk update \
-  && apk add --no-cache dumb-init postgresql \
-  && mkdir -p /scripts
+RUN apk add --no-cache dumb-init postgresql \
+  && mkdir -p /scripts \
+  && adduser -D -u 1000 appuser
 
 COPY ./scripts/entry-point.sh /scripts/
 COPY ./scripts/query-database.sh /scripts/

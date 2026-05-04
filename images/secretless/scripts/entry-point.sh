@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# If arguments are passed to the container (e.g. for smoke tests), execute them and exit
+if [ "$#" -gt 0 ]; then
+  exec "$@"
+fi
+
 echo "=========================================================="
 echo " Starting Secretless Broker Demo App                      "
 echo " Connection: postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}"
