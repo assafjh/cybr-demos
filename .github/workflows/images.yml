@@ -274,4 +274,4 @@ jobs:
       image_name: summon
       context_path: images/summon
       platforms: linux/amd64,linux/arm64
-      smoke_test_command: docker run --rm local-smoke-summon:test summon --version
+      smoke_test_command: docker run --rm --entrypoint "" local-smoke-summon:test summon --version
