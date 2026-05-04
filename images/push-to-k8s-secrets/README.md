@@ -1,7 +1,5 @@
 # Conjur Kubernetes Secrets Demo App
 
-[![Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/build-push-to-k8s-secrets.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/build-push-to-k8s-secrets.yml)
-
 This demo application is designed to verify and demonstrate the **CyberArk Conjur Secrets Provider** when running in **Kubernetes Secrets** mode.
 
 It simply inspects and logs its environment variables, making it easy to confirm that Conjur has successfully synchronized secrets into the Pod's environment.

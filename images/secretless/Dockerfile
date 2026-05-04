@@ -7,8 +7,8 @@ LABEL org.opencontainers.image.licenses="MIT"
 
 ENV DB_HOST localhost
 ENV DB_PORT 5432
-ENV DB_NAME vet
-ENV TABLE_NAME zoo
+ENV DB_NAME postgres
+ENV TABLE_NAME customers
 
 RUN  apk update \
   && apk add --no-cache dumb-init postgresql \

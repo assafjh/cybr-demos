@@ -1,27 +1,29 @@
-name: Cleanup Old Container Images
+  name: Cleanup Old Container Images
 
-on:
-  schedule:
-    - cron: '0 2 * * 0'  # Every Sunday at 2am UTC
-  workflow_dispatch:
+  on:
+    schedule:
+      - cron: '0 2 * * 0'  # Every Sunday at 2am UTC
+    workflow_dispatch:
 
-jobs:
-  cleanup:
-    name: Delete old versions of ${{ matrix.package }}
-    runs-on: ubuntu-latest
-    permissions:
-      packages: write
-    strategy:
-      matrix:
-        package:
-          - jenkins-demo
-          - postgres-companydb
-          - push-to-file
-          - push-to-k8s-secrets
-    steps:
-      - name: Delete old package versions
-        uses: actions/delete-package-versions@v5
-        with:
-          package-name: ${{ matrix.package }}
-          package-type: container
-          min-versions-to-keep: 2
+  jobs:
+    cleanup:
+      name: Delete old versions of ${{ matrix.package }}
+      runs-on: ubuntu-latest
+      permissions:
+        packages: write
+      strategy:
+        matrix:
+          package:
+            - jenkins-demo
+            - postgres-companydb
+            - push-to-file
+            - push-to-k8s-secrets
+            - secretless
+            - rest-api-app
+      steps:
+        - name: Delete old package versions
+          uses: actions/delete-package-versions@v5
+          with:
+            package-name: ${{ matrix.package }}
+            package-type: container
+            min-versions-to-keep: 2

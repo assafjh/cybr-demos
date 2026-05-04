@@ -1,7 +1,5 @@
 # Conjur Push-to-File Demo Application
 
-[![Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/build-push-to-file.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/build-push-to-file.yml)
-
 This repository contains a lightweight, Alpine-based container designed specifically to demonstrate the **CyberArk Conjur Secrets Provider (Push-to-File)** pattern. 
 
 It acts as a "dummy" application that halts its initialization process and waits for an external Sidecar/Init-Container to inject secrets into a shared volume before proceeding.

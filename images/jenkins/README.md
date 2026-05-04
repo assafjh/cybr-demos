@@ -1,7 +1,5 @@
 # Jenkins JCasC Demo Environment
 
-[![Build Status](https://github.com/assafjh/cybr-demos/actions/workflows/build-jenkins-image.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/build-jenkins-image.yml)
-
 This repository provides a custom Jenkins Docker image tailored for demonstrating dynamic secrets management and Identity integrations. It utilizes **Jenkins Configuration as Code (JCasC)** to spin up a fully configured, secure, and ready-to-use controller with zero manual UI setup.
 
 ## 📁 Repository Contents

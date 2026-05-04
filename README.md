@@ -1,4 +1,6 @@
 # CYBR-Demos
+[![Images CI Status](https://github.com/assafjh/cybr-demos/actions/workflows/images.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/images.yml)
+
 Hi, I'm Assaf! 👋 Welcome to my personal demos repository.
 
 This repository serves as a portfolio of my work and contains various demonstrations of integrating CyberArk Tools with a wide range of DevOps tools and platforms.

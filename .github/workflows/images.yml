@@ -1,0 +1,185 @@
+name: CI - Build & Push All Images
+
+on:
+  push:
+    paths:
+      - 'images/**'
+      - '!**/*.md'
+    branches: [ "main", "master" ]
+  pull_request:
+    paths:
+      - 'images/**'
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      postgres_companydb: ${{ steps.filter.outputs.postgres_companydb }}
+      push_to_file: ${{ steps.filter.outputs.push_to_file }}
+      jenkins_demo: ${{ steps.filter.outputs.jenkins_demo }}
+      push_to_k8s_secrets: ${{ steps.filter.outputs.push_to_k8s_secrets }}
+      secretless: ${{ steps.filter.outputs.secretless }}
+      rest_api_app: ${{ steps.filter.outputs.rest_api_app }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Filter changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            postgres_companydb:
+              - 'images/postgres-companydb/**'
+            push_to_file:
+              - 'images/push-to-file/**'
+            jenkins_demo:
+              - 'images/jenkins/**'
+            push_to_k8s_secrets:
+              - 'images/push-to-k8s-secrets/**'
+            secretless:
+              - 'images/secretless/**'
+            rest_api_app:
+              - 'images/rest-api-app/**'
+
+  build-postgres-companydb:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.postgres_companydb == 'true' }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: postgres-companydb
+      context_path: images/postgres-companydb
+      platforms: linux/amd64,linux/arm64
+      image_tags: |
+        type=raw,value=17-alpine
+        type=sha,format=short
+      pre_build_command: |
+        cd images/postgres-companydb
+        mkdir -p certs
+        export SCRIPT_DIR="$(pwd)"
+        export CERT_DIR="$(pwd)/certs"
+        source .env
+        chmod +x tools/*.sh
+        BYPASS_ROOT_CA_CN="$ROOT_CA_CN" ./tools/01-create-root-ca.sh
+        BYPASS_SERVER_CN="$POSTGRES_CN" BYPASS_SERVER_KEY_FILE_PATH="$POSTGRES_KEY_FILE_PATH" ./tools/02-create-self-signed-certificate.sh
+        BYPASS_SERVER_KEY_FILE_PATH="$POSTGRES_KEY_FILE_PATH" BYPASS_SUBJECT_ALT_NAMES="$POSTGRES_SUBJECT_ALT_NAMES" ./tools/03-generate-csr.sh
+        BYPASS_CA_CERTIFICATE_FILE_PATH="$ROOT_CA_CERTIFICATE_PATH" BYPASS_CA_KEY_FILE_PATH="$ROOT_CA_KEY_PATH" BYPASS_SERVER_CERTIFICATE_FILE_PATH="$POSTGRES_CERTIFICATE_FILE_PATH" ./tools/04-sign-csr.sh
+        echo "--- Verifying files exist in the Docker Context ---"
+        ls -la certs/
+      smoke_test_command: |
+        trap 'docker rm -f pg-test 2>/dev/null || true' EXIT
+        docker run -d --name pg-test -e POSTGRES_PASSWORD=testpass -p 5432:5432 local-smoke-postgres-companydb:test
+        TIMEOUT=10
+        until docker exec pg-test pg_isready -U admin || [ $TIMEOUT -eq 0 ]; do
+          sleep 3
+          ((TIMEOUT--))
+        done
+        echo "Checking SSL..."
+        docker exec -e PGPASSWORD=testpass pg-test psql -h 127.0.0.1 -t -U admin -d postgres -c "SELECT ssl FROM pg_stat_ssl WHERE pid = pg_backend_pid();" | grep -q "t"
+        echo "Checking Data..."
+        CUSTOMER_COUNT=$(docker exec -e PGPASSWORD=testpass pg-test psql -t -U admin -d postgres -c "SELECT count(*) FROM customers;" | xargs)
+        if [[ "$CUSTOMER_COUNT" =~ ^[0-9]+$ ]]; then
+          echo "✅ Data verified: 'customers' table exists and contains $CUSTOMER_COUNT rows."
+        else
+          echo "❌ Functional Test Failed: 'customers' table not found or error occurred."
+          exit 1
+        fi
+
+  build-push-to-file:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.push_to_file == 'true' }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: push-to-file
+      context_path: images/push-to-file
+      platforms: linux/amd64,linux/arm64
+      smoke_test_command: |
+        trap 'docker rm -f app-test-fail app-test-success 2>/dev/null || true' EXIT
+        echo "--- Test 1: Negative Test (Expecting Timeout) ---"
+        docker run --name app-test-fail local-smoke-push-to-file:test || EXIT_CODE=$?
+        if [ "$EXIT_CODE" != "1" ]; then exit 1; fi
+        echo "--- Test 2: Positive Test (Simulating Sidecar Injection) ---"
+        docker run -d --name app-test-success -e WAIT_TIMEOUT=30 local-smoke-push-to-file:test
+        sleep 2
+        docker exec app-test-success sh -c "mkdir -p /opt/secrets/conjur && echo 'db_pass: SecretYAML123' > /opt/secrets/conjur/credentials.yaml && echo 'db_pass=SecretPROP123' > /opt/secrets/conjur/credentials.properties"
+        sleep 2
+        if ! docker logs app-test-success | grep -q "Secrets successfully injected by Sidecar"; then exit 1; fi
+
+  build-jenkins-image:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.jenkins_demo == 'true' }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: jenkins-demo
+      context_path: images/jenkins
+      platforms: linux/amd64,linux/arm64
+      image_tags: |
+        type=raw,value=latest,enable={{is_default_branch}}
+        type=sha,format=short
+      smoke_test_command: |
+        trap 'docker rm -f jenkins-test 2>/dev/null || true' EXIT
+        docker run -d --name jenkins-test -p 8080:8080 -e JENKINS_ADMIN_ID=admin -e JENKINS_ADMIN_PASSWORD=Admin123 -e JENKINS_ADDRESS=localhost -e JENKINS_PORT=8080 -e CONJUR_FQDN=conjur.example.com -e CONJUR_ACCOUNT=conjur local-smoke-jenkins-demo:test
+        TIMEOUT=12
+        while [ $TIMEOUT -gt 0 ]; do
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/login 2>/dev/null || echo "000")
+          if [ "$HTTP_CODE" = "200" ]; then break; fi
+          sleep 5
+          TIMEOUT=$((TIMEOUT-1))
+        done
+        if [ $TIMEOUT -eq 0 ]; then exit 1; fi
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -u admin:Admin123 http://localhost:8080/api/json 2>/dev/null || echo "000")
+        if [ "$HTTP_CODE" != "200" ]; then exit 1; fi
+
+  build-push-to-k8s-secrets:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.push_to_k8s_secrets == 'true' }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: push-to-k8s-secrets
+      context_path: images/push-to-k8s-secrets
+      platforms: linux/amd64,linux/arm64
+      smoke_test_command: |
+        trap 'docker rm -f k8s-test-secret 2>/dev/null || true' EXIT
+        docker run -d --name k8s-test-secret -e MY_DUMMY_SECRET=CyberArk123 local-smoke-push-to-k8s-secrets:test
+        sleep 3
+        LOGS=$(docker logs k8s-test-secret)
+        if ! echo "$LOGS" | grep -q "MY_DUMMY_SECRET=CyberArk123"; then exit 1; fi
+        if ! echo "$LOGS" | grep -q "Filtered Secrets"; then exit 1; fi
+
+  build-secretless:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.secretless == 'true' }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: secretless
+      context_path: images/secretless
+      smoke_test_command: docker run --rm local-smoke-secretless:test sh -c "psql --version"
+
+  build-rest-api-app:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.rest_api_app == 'true' }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: rest-api-app
+      context_path: images/rest-api-app
+      platforms: linux/amd64,linux/arm64
+      smoke_test_command: |
+        trap 'docker rm -f app-pre-auth app-self-auth 2>/dev/null || true; rm -rf $MOCK_TOKEN_DIR $MOCK_SA_DIR 2>/dev/null || true' EXIT
+        
+        MOCK_TOKEN_DIR=$(mktemp -d)
+        echo '{"protected":"...","payload":"...","signature":"..."}' > "$MOCK_TOKEN_DIR/access-token"
+        docker run -d --name app-pre-auth -v "$MOCK_TOKEN_DIR:/run/conjur:ro" -e AUTH_MODE=pre-authenticated -e CONJUR_APPLIANCE_URL=http://localhost:8080 -e CONJUR_ACCOUNT=conjur -e CONJUR_VARIABLE_PATH=data/test/secret1 local-smoke-rest-api-app:test
+        sleep 3
+        LOGS=$(docker logs app-pre-auth 2>&1)
+        if ! echo "$LOGS" | grep -q "pre-authenticated"; then exit 1; fi
+        if ! echo "$LOGS" | grep -q "access-token"; then exit 1; fi
+        
+        MOCK_SA_DIR=$(mktemp -d)
+        echo 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.mock.token' > "$MOCK_SA_DIR/token"
+        docker run -d --name app-self-auth -v "$MOCK_SA_DIR:/var/run/secrets/kubernetes.io/serviceaccount:ro" -e AUTH_MODE=self-authenticated -e CONJUR_APPLIANCE_URL=http://localhost:8080 -e CONJUR_ACCOUNT=conjur -e CONJUR_VARIABLE_PATH=data/test/secret1 -e CONJUR_AUTHN_URL=http://localhost:8080/authn-jwt/k8s local-smoke-rest-api-app:test
+        sleep 3
+        LOGS=$(docker logs app-self-auth 2>&1)
+        if ! echo "$LOGS" | grep -q "self-authenticated"; then exit 1; fi
+        if ! echo "$LOGS" | grep -q "token"; then exit 1; fi
