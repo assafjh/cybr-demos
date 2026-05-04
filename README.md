@@ -17,7 +17,7 @@ Most demo folders follow a standard structure for predictability:
 * `code/` & `images/`: Source code for the demo applications and multi-stage Dockerfiles (published to GHCR).
 
 ## 🛠️ Technologies Used
-- **Secrets Management**: CyberArk Conjur
+- **CyberArk Platform**: Privilege Cloud (PCloud), Conjur, Credential Providers (CP/CCP), Secure Cloud Access (SCA), Secure Access (SIA), Secure AI Agents
 - **CI/CD**: Jenkins, GitHub Actions, GitLab CI, CircleCI, TeamCity, Azure DevOps
 - **Orchestration & Infrastructure**: Kubernetes (K8s), OpenShift (OCP), Terraform, Ansible, AWS (EC2, Lambda)
 - **Languages & Frameworks**: Java (Spring Boot, Tomcat), Node.js, Shell Scripting, Python
@@ -67,10 +67,10 @@ This is a personal repository containing demonstrations and proof-of-concept int
 * `springboot-sdk`: Spring Boot integration using the Conjur SDK.
 * `python-conjur-sdk`: Utilities and demos for the Python Conjur SDK.
 
-**🌩️ Cloud, AI & Advanced Use Cases**
+**🌩️ Cloud, AI & Advanced SaaS Integrations**
 * `aws-iam`: Passwordless authentication for AWS Lambda and EC2 using IAM roles.
 * `databricks`: Databricks integration with Conjur.
-* `secure-cloud-access`: Secure Cloud Access (SCA) demo.
-* `secure-ai-access`: Secure AI Access (SIA) demo.
-* `dynamic-privileged-access`: RDS Postgres ephemeral access via DPA.
+* `secure-cloud-access`: Secure Cloud Access (SCA) demo for zero-standing privileges.
+* `secure-ai-access`: Secure AI Access demo for securing AI agents and LLM interactions.
+* `dynamic-privileged-access`: RDS Postgres ephemeral access via SIA.
 * `custom-certificates`: Using Conjur Enterprise with 3rd-party certificates.
