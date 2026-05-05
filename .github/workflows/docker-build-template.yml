@@ -31,8 +31,8 @@ on:
         required: false
         type: string
         default: |
-          type=raw,value=latest,enable={{is_default_branch}}
-          type=sha
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master' }}
+          type=sha,format=short
 
 permissions:
   contents: read
@@ -75,6 +75,7 @@ jobs:
           context: ${{ inputs.context_path }}
           load: true
           tags: local-smoke-${{ inputs.image_name }}:test
+          provenance: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -108,5 +109,6 @@ jobs:
           platforms: ${{ inputs.platforms }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
