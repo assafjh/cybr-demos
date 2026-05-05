@@ -4,115 +4,105 @@
 [![Ansible Package Status](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml)
 [![ASCP Package Status](https://github.com/assafjh/cybr-demos/actions/workflows/ascp-demo.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/ascp-demo.yml)
 
-Hands-on demos and reference implementations for CyberArk Identity Security use cases.
+Hands-on, end-to-end demos and reference implementations for CyberArk Identity Security use cases.
 
-This repository contains self-contained scenarios used in real-world POCs, integrations, and customer environments across cloud, DevOps, and traditional infrastructure.
+This repository contains real-world POC scenarios across cloud-native platforms, CI/CD pipelines, and traditional infrastructure. Each folder represents a standalone, end-to-end integration flow with its own instructions, prerequisites, and architectural details.
 
-Each folder represents a standalone demo with its own instructions, prerequisites, and execution flow.
-
-Created and maintained by [Assaf Hazan](https://www.linkedin.com/in/assafjh)
-(Senior Presales Architect | Machine Identity & DevSecOps | Palo Alto Networks)
+Created and maintained by [Assaf Hazan](https://www.linkedin.com/in/assafjh)  
+*(Senior Presales Architect | Machine Identity & DevSecOps, Palo Alto Networks)*
 
 ---
 
 ## 📂 Repository Structure
 
-Most demo folders follow a consistent structure:
+Most demo folders follow a consistent structure for predictability:
 
-* `policies/` – Conjur RBAC policies (YAML)
-* `scripts/` – Step-by-step execution scripts (e.g., `01-install.sh`, `02-run.sh`)
-* `manifests/` – Kubernetes, Terraform, or Ansible configurations
-* `code/` / `images/` – Demo application code and Dockerfiles
+* `policies/` – Conjur RBAC policies (YAML) defining hosts, variables, and entitlements
+* `scripts/` – Numbered bash scripts (e.g., `01-install.sh`, `02-run.sh`) to execute the demo steps in order
+* `manifests/` – Kubernetes YAML files or Terraform/Ansible configurations
+* `code/` & `images/` – Source code for the demo applications and multi-stage Dockerfiles (published to GHCR)
 
 ---
 
 ## 🧭 Choosing a Demo
 
-There is no single entry point — each demo is independent.
+There is no single entry point — each demo is independent and represents a full end-to-end scenario.
 
 Pick a scenario based on your use case:
 
-* **General flow / end-to-end example** → `intro-demo`
+* **Core integration / app secret retrieval** → `intro-demo`
 * **Local Conjur setup** → `deploy-conjur`
 * **Kubernetes integrations** → `kubernetes-*`
-* **CI/CD pipelines** → `jenkins`, `github-actions`, `gitlab-ci`, `azure-devops`
-* **Infrastructure as Code** → `terraform`, `ansible`, `argocd`
-* **Traditional apps / servers** → `credential-provider`, `central-credential-provider`
-* **Cloud & advanced use cases** → `aws-iam`, `secure-cloud-access`, `secure-ai-access`
+* **CI/CD pipelines** → `jenkins`, `github-actions`, `gitlab-ci`, `azure-devops`, `circleci`, `teamcity`
+* **Infrastructure as Code** → `terraform`, `ansible`, `ansible-awx-tower`, `argocd`
+* **Traditional apps / servers** → `credential-provider`, `central-credential-provider`, `application-server-credential-provider` (Tomcat, WebLogic, WebSphere, IIS)
+* **Cloud & advanced use cases** → `aws-iam`, `secure-cloud-access`, `secure-ai-access`, `dynamic-privileged-access`
 
-Each demo includes its own instructions.
+Each demo includes its own instructions and execution flow.
 
 ---
 
 ## 🛠️ Technologies Covered
 
-* **CyberArk Platform**: Conjur, Privilege Cloud (PCloud), Credential Providers (CP/CCP), Secure Cloud Access (SCA), Secure Access (SIA), Secure AI Agents
-* **CI/CD**: Jenkins, GitHub Actions, GitLab CI, CircleCI, TeamCity, Azure DevOps
-* **Infrastructure**: Kubernetes, OpenShift, Terraform, Ansible, AWS
-* **Languages**: Java, Node.js, Python, Bash
+* **CyberArk Platform:** Conjur, Privilege Cloud (PCloud), Credential Providers (CP/CCP), Application Server Credential Provider (ASCP), Secure Cloud Access (SCA), Secure Access (SIA), Secure AI Agents
+* **CI/CD:** Jenkins, GitHub Actions, GitLab CI, CircleCI, TeamCity, Azure DevOps
+* **Infrastructure:** Kubernetes, OpenShift, Terraform, Ansible, AWS (EC2, Lambda)
+* **Languages & Frameworks:** Java (Spring Boot, Tomcat), Node.js, Python, Shell scripting
 
 ---
 
 ## 🚀 Scenarios & Demonstrations
 
-### Getting Started & Core
+**Getting Started & Core**
+* `deploy-conjur`: Scripts to quickly deploy a local Conjur environment
+* `intro-demo`: Core Conjur integration demonstrating standard application secret retrieval
+* `rest-api`: REST API call examples for Conjur
+* `upgrade-conjur-enterprise-version`: Upgrade a demo Conjur Enterprise server version
 
-* `deploy-conjur` – Local Conjur deployment
-* `intro-demo` – End-to-end demo (web app, Lambda, Ansible)
-* `rest-api` – Conjur REST API examples
-* `upgrade-conjur-enterprise-version` – Version upgrade flow
+**☁️ Cloud Native & Kubernetes**
+* `kubernetes-jwt`: Integration with Kubernetes using the JWT Authenticator
+* `kubernetes-jwt-priv-cloud`: Kubernetes JWT authentication tailored for private cloud environments
+* `kubernetes-cert`: Integration with Kubernetes using the Certificate Authenticator
+* `kubernetes-follower`: Conjur Enterprise follower deployment inside Kubernetes clusters
+* `kubernetes-external-secrets-operator`: Using Kubernetes ESO with the Conjur provider
 
-### ☁️ Cloud Native & Kubernetes
+**🔄 CI/CD Pipeline Security**
+* `jenkins`: Integration with Jenkins using the Conjur plugin (JWT and Default authenticators)
+* `github-actions`: Integration with GitHub Actions using the CyberArk Conjur Secret Fetcher
+* `gitlab-ci`: Integration with GitLab CI using JWT authentication via REST and Summon
+* `circleci`: Integration with CircleCI using JWT authentication
+* `azure-devops`: Integration with Azure DevOps using Azure IMDS OAuth2
+* `teamcity`: Conjur integration with TeamCity
 
-* `kubernetes-jwt`
-* `kubernetes-jwt-priv-cloud`
-* `kubernetes-cert`
-* `kubernetes-follower`
-* `kubernetes-external-secrets-operator`
+**🏗️ Infrastructure as Code (IaC) & GitOps**
+* `ansible`: Secure dynamic secret retrieval with Ansible
+* `ansible-awx-tower`: Integration with Ansible AWX/Tower
+* `terraform`: Integration with HashiCorp Terraform
+* `argocd`: GitOps secrets management integration with ArgoCD
 
-### 🔄 CI/CD Pipeline Security
+**🏢 Traditional Infrastructure & Application Servers**
+* `credential-provider`: CP agent deployed on Linux and Plain Old Java app demo
+* `central-credential-provider`: CCP demo (REST, SOAP)
+* `application-server-credential-provider`: Integration pattern for traditional application servers (Tomcat, WebLogic, WebSphere, IIS) using JDBC Driver Proxy
 
-* `jenkins`
-* `github-actions`
-* `gitlab-ci`
-* `circleci`
-* `azure-devops`
-* `teamcity`
+**💻 Developer Tools & SDKs**
+* `springboot-sdk`: Spring Boot integration using the Conjur SDK
+* `python-conjur-sdk`: Utilities and demos for the Python Conjur SDK
 
-### 🏗️ Infrastructure as Code (IaC) & GitOps
-
-* `ansible`
-* `ansible-awx-tower`
-* `terraform`
-* `argocd`
-
-### 🏢 Traditional Infrastructure & Application Servers
-
-* `credential-provider`
-* `central-credential-provider`
-* `application-server-credential-provider`
-
-### 💻 Developer Tools & SDKs
-
-* `springboot-sdk`
-* `python-conjur-sdk`
-
-### 🌩️ Cloud, AI & Advanced Integrations
-
-* `aws-iam`
-* `databricks`
-* `secure-cloud-access`
-* `secure-ai-access`
-* `dynamic-privileged-access`
-* `custom-certificates`
+**🌩️ Cloud, AI & Advanced Integrations**
+* `aws-iam`: Passwordless authentication for AWS Lambda and EC2 using IAM roles
+* `databricks`: Databricks integration with Conjur
+* `secure-cloud-access`: Secure Cloud Access (SCA) demo for zero-standing privileges
+* `secure-ai-access`: Secure AI Access (SIA) demo for securing AI agents and LLM interactions
+* `dynamic-privileged-access`: RDS Postgres ephemeral access via DPA
+* `custom-certificates`: Using Conjur Enterprise with 3rd-party certificates
 
 ---
 
 ## ⚠️ Disclaimer
 
-This repository is an unofficial project created for demo and POC purposes by a Palo Alto Networks employee.
+This repository is an unofficial project created for demonstration and POC purposes by a CyberArk / Palo Alto Networks employee.
 
 It is not an official product and is not endorsed or supported by CyberArk or Palo Alto Networks.
 
-All environments referenced are lab environments with no customer data.
-Content is provided "as-is" and should be reviewed before any production use.
+All environments referenced are isolated lab tenants containing no customer data. Scripts and configurations are provided "as-is" and should be reviewed before any production use.
