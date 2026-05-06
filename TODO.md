@@ -194,6 +194,7 @@
 - [x] `ansible`
 - [x] `application-server-credential-provider`
 - [x] `argocd`
+- [x] `aws-dynamic-secrets`
 - [ ] `kubernetes-cert`
 - [ ] `jenkins`
 - [ ] `github-actions`

@@ -1,18 +1,18 @@
 #!/bin/bash
+set -euo pipefail
+
 #============ Variables ===============
-# If needed, modify the below to configure Conjur CLI location
-#CONJUR_CLI=conjur
-CONJUR_CLI=/Applications/ConjurCloudCLI.app/Contents/Resources/conjur/conjur
+CONJUR_CLI="${CONJUR_CLI:-conjur}"   # override: export CONJUR_CLI=/path/to/conjur
 
 # Issuer parameters
 ISSUER=aws-demo-issuer
 MAX_TTL=900
 TYPE=aws
 
-# AWS Region and Role/User
-AWS_POLICY_NAME="dynamic-ajh-secrets-ec2-policy"
-AWS_ROLE_NAME="dynamic-ajh-secrets-ec2-role"
-AWS_USER_NAME="dynamic-ajh-secrets-ec2-user"
+# AWS resource names — customize to avoid collisions in shared accounts
+AWS_POLICY_NAME="dynamic-demo-secrets-ec2-policy"
+AWS_ROLE_NAME="dynamic-demo-secrets-ec2-role"
+AWS_USER_NAME="dynamic-demo-secrets-ec2-user"
 
 #============ functions ===============
 
@@ -174,16 +174,12 @@ cleanup_aws() {
 # ========================
 check_conjur_login() {
   echo "[INFO] Checking Conjur login status"
-  LOGIN_STATUS=$("$CONJUR_CLI" whoami 2>/dev/null)
-
-  if [ -z "$LOGIN_STATUS" ]; then
+  if ! "$CONJUR_CLI" whoami > /dev/null 2>&1; then
     echo "[INFO] Not logged into Conjur. Prompting for login."
-    read -p "Enter Conjur Username: " CONJUR_USERNAME
-    read -s -p "Enter Conjur Password: " CONJUR_PASSWORD
+    read -rp "Enter Conjur Username: " CONJUR_USERNAME
+    read -s -rp "Enter Conjur Password: " CONJUR_PASSWORD
     echo
-    echo "$CONJUR_PASSWORD" | "$CONJUR_CLI" login -i "$CONJUR_USERNAME" -p- > /dev/null 2>&1
-
-    if [ $? -ne 0 ]; then
+    if ! echo "$CONJUR_PASSWORD" | "$CONJUR_CLI" login -i "$CONJUR_USERNAME" -p- > /dev/null 2>&1; then
       echo "[ERROR] Failed to log into Conjur. Please check your credentials."
       exit 1
     fi
@@ -207,7 +203,7 @@ setup_conjur_issuer() {
       --output text)
 
     if [ -n "$USER_KEYS" ]; then
-    ACCESS_KEY_ID=$(echo "$USER_KEYS" | jq -r '.AccessKeyId')
+    ACCESS_KEY_ID="$USER_KEYS"
     echo "[INFO] Found existing access key: $ACCESS_KEY_ID"
     
     echo "[WARNING] SecretAccessKey cannot be retrieved for an existing access key."

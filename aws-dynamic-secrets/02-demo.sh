@@ -1,14 +1,15 @@
 #!/bin/bash
+set -euo pipefail
+
 #============ Variables ===============
-# If needed, modify the below to configure Conjur CLI location
-CONJUR_CLI=${CONJUR_CLI:-/Applications/ConjurCloudCLI.app/Contents/Resources/conjur/conjur}
+CONJUR_CLI="${CONJUR_CLI:-conjur}"   # override: export CONJUR_CLI=/path/to/conjur
 
 # Issuer parameters
 ISSUER=aws-demo-issuer
 
-# AWS Region and Role
+# AWS Region and Role — must match names used in 01-create-issuer.sh
 AWS_REGION=eu-west-2
-AWS_ROLE_NAME="dynamic-ajh-secrets-ec2-role"
+AWS_ROLE_NAME="dynamic-demo-secrets-ec2-role"
 
 #============ functions ===============
 
@@ -46,16 +47,10 @@ EOF
 
   echo "[INFO] Loading Conjur policy from temporary file: $TEMP_POLICY_FILE"
 
-  $CONJUR_CLI policy update -b data/dynamic -f "$TEMP_POLICY_FILE"
-
-  if [ $? -ne 0 ]; then
-    echo "[ERROR] Failed to load Conjur policy"
-    rm -f "$TEMP_POLICY_FILE" # Clean up the temporary file
-    exit 1
-  fi
+  "$CONJUR_CLI" policy update -b data/dynamic -f "$TEMP_POLICY_FILE"
 
   echo "[INFO] Conjur policy loaded successfully"
-  rm -f "$TEMP_POLICY_FILE" # Clean up the temporary file
+  rm -f "$TEMP_POLICY_FILE"
 }
 
 # ========================
@@ -64,11 +59,7 @@ EOF
 demo_dynamic_secret() {
   echo "[INFO] Retrieving AWS dynamic secret"
 
-  AWS_CREDS=$($CONJUR_CLI variable get -i data/dynamic/aws-demo-dynamic-secret)
-  if [ $? -ne 0 ]; then
-    echo "[ERROR] Failed to retrieve AWS dynamic secret"
-    exit 1
-  fi
+  AWS_CREDS=$("$CONJUR_CLI" variable get -i data/dynamic/aws-demo-dynamic-secret)
 
   echo "[INFO] AWS dynamic secret retrieved: $AWS_CREDS"
 
@@ -90,10 +81,6 @@ demo_ec2_access() {
   echo "[INFO] Verifying access to AWS EC2 instances"
   AWS_PAGER="" aws sts get-caller-identity --query "{Account: Account, Arn: Arn, UserId: UserId}" --output table
   AWS_PAGER="" aws ec2 describe-instances --query 'Reservations[*].Instances[*].{ID:InstanceId,Type:InstanceType,PublicIP:PublicIpAddress,State:State.Name}' --output table --region "$AWS_REGION"
-  if [ $? -ne 0 ]; then
-    echo "[ERROR] Failed to access AWS EC2 instances"
-    exit 1
-  fi
   echo "[INFO] Successfully accessed AWS EC2 instances"
 }
 
@@ -102,16 +89,12 @@ demo_ec2_access() {
 # ========================
 check_conjur_login() {
   echo "[INFO] Checking Conjur login status"
-  command -p $CONJUR_CLI whoami > /dev/null 2>&1
-
-  if [ -z "$LOGIN_STATUS" ]; then
+  if ! "$CONJUR_CLI" whoami > /dev/null 2>&1; then
     echo "[INFO] Not logged into Conjur. Prompting for login."
     read -rp "Enter Conjur Username: " CONJUR_USERNAME
     read -s -rp "Enter Conjur Password: " CONJUR_PASSWORD
     echo
-    echo "$CONJUR_PASSWORD" | $CONJUR_CLI login -i "$CONJUR_USERNAME" -p- > /dev/null 2>&1
-
-    if [ $? -ne 0 ]; then
+    if ! echo "$CONJUR_PASSWORD" | "$CONJUR_CLI" login -i "$CONJUR_USERNAME" -p- > /dev/null 2>&1; then
       echo "[ERROR] Failed to log into Conjur. Please check your credentials."
       exit 1
     fi
