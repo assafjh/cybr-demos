@@ -776,7 +776,7 @@
                 },
                 {
                   "name": "username",
-                  "value": "reception",
+                  "value": "reporting_service_ro",
                   "enabled": true,
                   "local": false
                 },
@@ -788,7 +788,7 @@
                 },
                 {
                   "name": "secret",
-                  "value": "vet_123456",
+                  "value": "reporting123",
                   "enabled": true,
                   "local": false
                 }
@@ -843,7 +843,7 @@
         },
         {
           "name": "providerName",
-          "value": "Prov_ip-172-16-0-128.eu-west-2.compute.internal",
+          "value": "<your-provider-hostname>",
           "enabled": true,
           "secret": false,
           "type": "text"
@@ -870,7 +870,7 @@
           "type": "text"
         }
       ],
-      "name": "Assaf Lab"
+      "name": "Default"
     }
   ]
 }

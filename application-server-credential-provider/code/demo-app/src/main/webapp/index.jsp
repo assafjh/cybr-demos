@@ -21,8 +21,8 @@
         <h1>ASCP Demo App</h1>
         <p>Select a method to retrieve database credentials:</p>
         
-        <a href="zoo" class="btn btn-secondary">Standard Postgres DS</a>
-        <a href="zoo?source=cyberark" class="btn">CyberArk Managed DS</a>
+        <a href="customers" class="btn btn-secondary">Standard Postgres DS</a>
+        <a href="customers?source=cyberark" class="btn">CyberArk Managed DS</a>
         
         <div class="footer">
             <p>Demonstrating zero-code-changes secret retrieval via CyberArk Application Server Credential Provider.</p>

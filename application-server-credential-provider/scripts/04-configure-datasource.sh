@@ -16,9 +16,9 @@ POSTGRES_JDBC_URL="https://jdbc.postgresql.org/download/${POSTGRES_JDBC_JAR}"
 # -- Database Connection Details --
 POSTGRES_DB_HOST="localhost"
 POSTGRES_DB_PORT=5433
-POSTGRES_DB_NAME="vet"
-POSTGRES_DB_USER="reception"
-POSTGRES_DB_PASSWORD="vet_123456"
+POSTGRES_DB_NAME="postgres"
+POSTGRES_DB_USER="reporting_service_ro"
+POSTGRES_DB_PASSWORD="reporting123"
 
 # -- CyberArk ASCP Configuration --
 # Paths aligned with standard CyberArk CP Linux installation

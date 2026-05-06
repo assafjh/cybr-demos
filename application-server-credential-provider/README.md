@@ -17,11 +17,11 @@ The primary goal of this demo is to prove that moving to a vault-less architectu
 
 ## 🏗️ Architecture Overview
 The demo environment consists of:
-*   **Application**: A Jakarta Servlet (`ZooServlet.java`) querying a PostgreSQL database.
+*   **Application**: A Jakarta Servlet (`CustomerServlet.java`) querying a PostgreSQL database.
 *   **Frontend**: A modern Dashboard (`index.jsp`) to compare standard vs. managed connections.
 *   **Infrastructure**: 
     *   **Apache Tomcat 10+**: Supporting Jakarta EE and Java 17.
-    *   **PostgreSQL 11**: Running in a Docker container.
+    *   **PostgreSQL 17**: Running in a Docker container (`ghcr.io/assafjh/postgres-companydb`).
     *   **CyberArk ASCP Agent**: Providing the secure bridge to the Vault.
 *   **CI/CD**: GitHub Actions pipeline for automated builds and releases.
 

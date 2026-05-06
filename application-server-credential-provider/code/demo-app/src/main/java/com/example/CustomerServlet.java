@@ -15,9 +15,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.util.logging.Logger;
 
-@WebServlet("/zoo")
-public class ZooServlet extends HttpServlet {
-    private static final Logger logger = Logger.getLogger(ZooServlet.class.getName());
+@WebServlet("/customers")
+public class CustomerServlet extends HttpServlet {
+    private static final Logger logger = Logger.getLogger(CustomerServlet.class.getName());
     private DataSource postgresDS;
     private DataSource cyberArkDS;
 
@@ -52,7 +52,6 @@ public class ZooServlet extends HttpServlet {
         
         logger.info("Processing request using DataSource: " + dataSourceName);
 
-        // Start HTML Output with basic CSS for a modern look
         out.println("<!DOCTYPE html><html><head>");
         out.println("<style>");
         out.println("body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f4f7f6; }");
@@ -68,38 +67,39 @@ public class ZooServlet extends HttpServlet {
 
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM zoo")) {
+             ResultSet rs = stmt.executeQuery("SELECT id, first_name, last_name, email, country, signup_date, tier FROM customers LIMIT 50")) {
 
-            out.println("<h1>🦁 Zoo Management System</h1>");
+            out.println("<h1>Company Customer Report</h1>");
             out.println("<div class='info-box'><strong>Active DataSource:</strong> " + dataSourceName + "</div>");
-            
+
             out.println("<table>");
-            out.println("<thead><tr><th>ID</th><th>Animal Type</th><th>Caregiver</th><th>Email</th></tr></thead><tbody>");
+            out.println("<thead><tr><th>ID</th><th>First Name</th><th>Last Name</th><th>Email</th><th>Country</th><th>Signup Date</th><th>Tier</th></tr></thead><tbody>");
 
             while (rs.next()) {
                 out.println("<tr>");
                 out.println("<td>" + rs.getInt("id") + "</td>");
-                out.println("<td>" + rs.getString("type") + "</td>");
-                out.println("<td>" + rs.getString("caregiver") + "</td>");
+                out.println("<td>" + rs.getString("first_name") + "</td>");
+                out.println("<td>" + rs.getString("last_name") + "</td>");
                 out.println("<td>" + rs.getString("email") + "</td>");
+                out.println("<td>" + rs.getString("country") + "</td>");
+                out.println("<td>" + rs.getDate("signup_date") + "</td>");
+                out.println("<td>" + rs.getString("tier") + "</td>");
                 out.println("</tr>");
             }
 
             out.println("</tbody></table>");
-            out.println("<a href='index.jsp' class='back-link'>← Back to Home</a>");
+            out.println("<a href='index.jsp' class='back-link'>Back to Home</a>");
             out.println("</body></html>");
 
         } catch (Exception e) {
-            // Log the actual error for the admin
             logger.severe("Database Error: " + e.getMessage());
-            
-            // Security: Show a sanitized message to the user
+
             out.println("<div style='color: #721c24; background: #f8d7da; padding: 20px; border: 1px solid #f5c6cb; border-radius: 4px;'>");
             out.println("<h2>Database Connection Error</h2>");
             out.println("<p>The system was unable to retrieve data. This might be due to incorrect credential provider configuration or network issues.</p>");
             out.println("<p>Please refer to the server logs for more details.</p>");
             out.println("</div>");
-            out.println("<a href='index.jsp' class='back-link'>← Back to Home</a>");
+            out.println("<a href='index.jsp' class='back-link'>Back to Home</a>");
             out.println("</body></html>");
         }
     }

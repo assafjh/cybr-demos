@@ -1,5 +1,5 @@
 #!/bin/bash
-# This Script deploys a demo PostgreSQL server for the Zoo Application
+# This Script deploys the companydb demo PostgreSQL server
 
 set -euo pipefail
 
@@ -7,13 +7,13 @@ set -euo pipefail
 CONTAINER_MGR="docker"
 SUDO="" # Set to 'sudo' if required
 REMOTE_DB_PORT=5433
-CONTAINER_NAME="zoo-demo-db"
-IMAGE_NAME="docker.io/assafhazan/postgres-zoo-demo:v11.2"
+CONTAINER_NAME="companydb-demo"
+IMAGE_NAME="ghcr.io/assafjh/postgres-companydb:latest"
 
-# DB Credentials (Aligned with ZooServlet demo)
-DB_USER="reception"
-DB_PASS="vet_123456"
-DB_NAME="vet"
+# DB Credentials (aligned with companydb schema — reporting_service_ro is read-only)
+DB_USER="reporting_service_ro"
+DB_PASS="reporting123"
+DB_NAME="postgres"
 
 #================ Script ==============
 
@@ -23,7 +23,6 @@ $SUDO $CONTAINER_MGR rm -f $CONTAINER_NAME > /dev/null 2>&1 || true
 echo "🚀 Starting PostgreSQL container ($CONTAINER_NAME)..."
 $SUDO $CONTAINER_MGR run --name $CONTAINER_NAME \
     -p ${REMOTE_DB_PORT}:5432 \
-    -e POSTGRES_PASSWORD=$DB_PASS \
     -d $IMAGE_NAME
 
 # Improved Health Check
@@ -42,11 +41,11 @@ if [ $COUNT -eq $MAX_RETRIES ]; then
 fi
 
 # Final Table Verification
-echo "🔍 Verifying 'zoo' table structure..."
+echo "🔍 Verifying 'customers' table structure..."
 $SUDO $CONTAINER_MGR run --rm --network host \
     -e PGPASSWORD=$DB_PASS \
-    postgres:11.2-alpine \
-    psql -h localhost -p $REMOTE_DB_PORT -U $DB_USER -d $DB_NAME -c "\d zoo"
+    postgres:17-alpine \
+    psql -h localhost -p $REMOTE_DB_PORT -U $DB_USER -d $DB_NAME -c "\d customers"
 
-echo "✅ PostgreSQL server is running and the Zoo table is ready."
+echo "✅ PostgreSQL server is running and the customers table is ready."
 echo "   Access it at: localhost:$REMOTE_DB_PORT"
