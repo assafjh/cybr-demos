@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status
-set -e
+set -euo pipefail
 
 # Variables
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -28,12 +27,12 @@ function check_java_version() {
 
 function download_tomcat() {
     local version=$1
-    local major_version=$(echo $version | cut -d. -f1)
-    # Using the archive URL as it's more stable for specific versions
-    local url="https://archive.apache.org/dist/tomcat/tomcat-$major_version/v$version/bin/apache-tomcat-$version.tar.gz"
-    
+    local major_version
+    major_version=$(echo "$version" | cut -d. -f1)
+    local url="https://archive.apache.org/dist/tomcat/tomcat-${major_version}/v${version}/bin/apache-tomcat-${version}.tar.gz"
+
     echo "Downloading Tomcat version $version from $url..."
-    wget -q --show-progress $url -O /tmp/apache-tomcat-$version.tar.gz
+    wget -q --show-progress "$url" -O "/tmp/apache-tomcat-${version}.tar.gz"
 }
 
 function install_tomcat() {
@@ -41,9 +40,9 @@ function install_tomcat() {
     local install_dir=$2
     
     echo "Installing Tomcat into $install_dir..."
-    rm -rf "$install_dir" # Clean previous install if exists
+    rm -rf "$install_dir"
     mkdir -p "$install_dir"
-    tar -xzf /tmp/apache-tomcat-$version.tar.gz -C "$install_dir" --strip-components=1
+    tar -xzf "/tmp/apache-tomcat-${version}.tar.gz" -C "$install_dir" --strip-components=1
     chmod +x "$install_dir"/bin/*.sh
 }
 
@@ -70,4 +69,3 @@ fi
 download_tomcat "$TOMCAT_VERSION"
 install_tomcat "$TOMCAT_VERSION" "$INSTALL_DIR"
 configure_ascp_sdk
-# (The rest of your configuration functions: set_java_home, configure_tomcat, etc.)

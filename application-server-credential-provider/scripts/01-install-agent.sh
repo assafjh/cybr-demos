@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
+set -euo pipefail
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Logging setup
 LOG_FILE="/var/log/cyberark_cp_install.log"
 exec > >(tee -a "$LOG_FILE") 2>&1
 
-# Check if the user is running the script as root
 if [[ $EUID -ne 0 ]]; then
-   echo "❌ Error: This script must be run as root" 
+   echo "❌ Error: This script must be run as root"
    exit 1
 fi
 
@@ -17,17 +17,17 @@ fi
 VAULT_IP="${VAULT_IP:-"<your-vault-ip>"}"
 VAULT_USER="${VAULT_USER:-"prov_user"}"
 # Never hardcode the password; provide it via env var before running
-VAULT_PASSWORD="${VAULT_PASSWORD:? "Error: VAULT_PASSWORD environment variable is not set."}"
+VAULT_PASSWORD="${VAULT_PASSWORD:?"Error: VAULT_PASSWORD environment variable is not set."}"
 
-# Locate installer in current or parent directory
+# Locate installer relative to the script directory
 INSTALLER_NAME="CyberArk-Credential-Provider-Linux-x86_64.tar.gz"
-CP_INSTALLER_PATH=$(find . -name "$INSTALLER_NAME" -print -quit)
+CP_INSTALLER_PATH=$(find "$SCRIPT_DIR" -name "$INSTALLER_NAME" -print -quit)
 
 # Functions
 function check_prerequisites {
     echo "🔍 Checking prerequisites..."
     for cmd in tar curl rpm; do
-        if ! command -v $cmd &> /dev/null; then
+        if ! command -v "$cmd" &> /dev/null; then
             echo "❌ Error: $cmd is not installed."
             exit 1
         fi

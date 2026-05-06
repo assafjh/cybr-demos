@@ -40,7 +40,7 @@ Follow the numbered scripts in order:
 2.  **`./02-install-tomcat.sh`**: Downloads and extracts Tomcat 10+.
 3.  **`./03-deploy-postgres-server.sh`**: Provisions the demo database.
 4.  **`./04-configure-datasource.sh`**: Injects JNDI resources into Tomcat's `context.xml`.
-5.  **`./05-deploy-app.sh`**: Pulls the latest build from GitHub Releases or uses a local build.
+5.  **`./05-pull-app.sh`**: Pulls the latest build from GitHub Releases or uses a local build.
 6.  **`./06-start-tomcat.sh`**: Boots the server.
 
 ---
@@ -61,8 +61,8 @@ The application is automatically built and packaged using GitHub Actions.
 
 ## 🛠️ Local Development
 If you need to make changes to the code during a demo:
-*   **Compile Locally**: Use `./optional-compile-app.sh` to rebuild the WAR file using Maven and Java 17.
-*   **Re-deploy**: Run `./05-deploy-app.sh` to update the application in Tomcat.
+*   **Compile Locally**: Use `./optional-compile-demo.sh` to rebuild the WAR file using Maven and Java 17.
+*   **Re-deploy**: Run `./05-pull-app.sh` to update the application in Tomcat.
 
 ---
 

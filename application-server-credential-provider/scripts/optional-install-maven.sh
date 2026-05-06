@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 MAVEN_VERSION=3.9.7
 INSTALL_DIR=/opt/maven
@@ -19,12 +19,11 @@ MAVEN_URL="https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries
 wget -q "$MAVEN_URL" -O /tmp/maven.tar.gz
 
 echo "🏗️  Installing Maven to $INSTALL_DIR..."
-mkdir -p $INSTALL_DIR
-tar -xzf /tmp/maven.tar.gz -C $INSTALL_DIR --strip-components=1
+mkdir -p "$INSTALL_DIR"
+tar -xzf /tmp/maven.tar.gz -C "$INSTALL_DIR" --strip-components=1
 rm /tmp/maven.tar.gz
 
-# Link to bin for immediate availability
-ln -sf $INSTALL_DIR/bin/mvn /usr/bin/mvn
+ln -sf "$INSTALL_DIR/bin/mvn" /usr/bin/mvn
 
 echo "📝 Setting up environment variables..."
 cat <<EOL > /etc/profile.d/maven.sh

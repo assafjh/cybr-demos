@@ -31,6 +31,7 @@
 - Spring Boot hot-reload rewrite: `code/springboot-hot-reload/` — new module with `SecretFileWatcher`, `@RefreshScope` DataSource, Testcontainers integration test, multi-stage Dockerfile, CI workflow (`4fead42`, `41b74f8`)
 - Policies `README.md` + PNG diagrams removed from all demo `policies/` subfolders — 14 READMEs, 13 PNGs (`d4db373`)
 - Image retention policy added to CI
+- **`application-server-credential-provider` full polish:** `ZooServlet` → `CustomerServlet` (`/customers`, companydb schema), postgres image → `ghcr.io/assafjh/postgres-companydb`, credentials updated, Bruno collection sanitized, all scripts hardened (`set -euo pipefail`, quoted variables, `SCRIPT_DIR`, `find` fix), empty test removed, README updated (PostgreSQL version note + ASCP support matrix caveat)
 
 ---
 
@@ -78,50 +79,6 @@
 
 **Acceptance:**
 - [ ] Summon binaries are at current upstream versions.
-
----
-
-### TASK-204b: Re-route ZooServlet to companydb
-**Priority:** MEDIUM · **Category:** Code · **Effort:** S
-**Files:**
-- [application-server-credential-provider/code/demo-app/src/main/java/com/example/ZooServlet.java](application-server-credential-provider/code/demo-app/src/main/java/com/example/ZooServlet.java)
-- [application-server-credential-provider/code/demo-app/src/test/java/com/example/ZooTest.java](application-server-credential-provider/code/demo-app/src/test/java/com/example/ZooTest.java)
-- [application-server-credential-provider/code/demo-app/src/main/webapp/index.jsp](application-server-credential-provider/code/demo-app/src/main/webapp/index.jsp)
-- [application-server-credential-provider/scripts/03-deploy-postgres-server.sh](application-server-credential-provider/scripts/03-deploy-postgres-server.sh)
-- [application-server-credential-provider/scripts/04-configure-datasource.sh](application-server-credential-provider/scripts/04-configure-datasource.sh)
-
-**Context:** Servlet still queries the `zoo` schema. `companydb` is now the canonical demo database. Servlet code itself is well-structured — only the SQL and column references need updating; no rewrite.
-
-**Action:**
-1. Replace `SELECT * FROM zoo` with companydb equivalent (verify schema in [images/postgres-companydb/demo-db.sql](images/postgres-companydb/demo-db.sql)).
-2. Update column references in ZooServlet.java and table headers in HTML output.
-3. Update ZooTest.java queries.
-4. Update postgres deployment scripts to use companydb.
-5. Optional rename: `ZooServlet` → `CustomerServlet`, `/zoo` → `/customers`.
-6. Apply multi-stage Maven build — drop committed WAR.
-
-**Acceptance:**
-- [ ] No `zoo`/`vet` references in `application-server-credential-provider/`.
-- [ ] WAR is built by CI, not committed.
-- [ ] Side-by-side `CyberArkDS` vs `PostgresDS` comparison still works.
-
----
-
-### TASK-204c: Reposition ASCP demo README
-**Priority:** MEDIUM · **Category:** Docs · **Effort:** S
-**Files:** [application-server-credential-provider/README.md](application-server-credential-provider/README.md), [README.md](README.md)
-
-**Context:** "Legacy" framing is imprecise — ASCP is current/supported; it's the *deployment scenario* (traditional Java app servers) that's the legacy story. The ASCP demo + new Spring Boot hot-reload demo form a strong contrast pair if positioned correctly.
-
-**Action:**
-1. Open README with the "traditional Java app servers" framing (Tomcat, WebSphere, WebLogic, JBoss).
-2. Add "Modern equivalent" callout linking to `code/springboot-hot-reload`.
-3. One-line note that the WebLogic Credential Mapper was deprecated 2023 → Driver Proxy is now supported path.
-4. Update root README scenario blurb accordingly.
-
-**Acceptance:**
-- [ ] README opens with traditional-app-server framing, not "legacy".
-- [ ] Cross-link to Spring Boot hot-reload demo present.
 
 ---
 
@@ -235,7 +192,7 @@
 - [x] `kubernetes-jwt`
 - [x] `ansible-awx-tower`
 - [x] `ansible`
-- [x] `application-server-credential-provider` *(pending TASK-204b/c)*
+- [x] `application-server-credential-provider`
 - [ ] `kubernetes-cert`
 - [ ] `jenkins`
 - [ ] `github-actions`

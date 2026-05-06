@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # Default to Java 17 as required for our Jakarta Servlet
 JAVA_VERSION=${1:-17}
@@ -24,15 +24,13 @@ if check_java_version; then
 fi
 
 echo "📦 Installing OpenJDK $JAVA_VERSION Development Kit..."
-sudo yum install -y java-$JAVA_VERSION-openjdk-devel
+sudo yum install -y "java-${JAVA_VERSION}-openjdk-devel"
 
-# Set as default and configure JAVA_HOME for the session
-sudo alternatives --set java /usr/lib/jvm/java-$JAVA_VERSION-openjdk/bin/java
-sudo alternatives --set javac /usr/lib/jvm/java-$JAVA_VERSION-openjdk/bin/javac
+sudo alternatives --set java "/usr/lib/jvm/java-${JAVA_VERSION}-openjdk/bin/java"
+sudo alternatives --set javac "/usr/lib/jvm/java-${JAVA_VERSION}-openjdk/bin/javac"
 
-# Create a global JAVA_HOME environment variable
 echo "export JAVA_HOME=$(readlink -f /usr/bin/java | sed 's:/bin/java::')" | sudo tee /etc/profile.d/jdk_home.sh
-source /etc/profile.d/jdk_home.sh
+# Re-login or run: source /etc/profile.d/jdk_home.sh
 
 echo "✨ JDK installation successful. Current version:"
 java -version
