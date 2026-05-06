@@ -21,7 +21,7 @@ The demo environment consists of:
 *   **Frontend**: A modern Dashboard (`index.jsp`) to compare standard vs. managed connections.
 *   **Infrastructure**: 
     *   **Apache Tomcat 10+**: Supporting Jakarta EE and Java 17.
-    *   **PostgreSQL 17**: Running in a Docker container (`ghcr.io/assafjh/postgres-companydb`).
+    *   **PostgreSQL 17**: Running in a Docker container (`ghcr.io/assafjh/postgres-companydb`). Note: ASCP officially certifies PostgreSQL 11.x; the JDBC driver is compatible with newer versions in practice, but this is outside the supported matrix.
     *   **CyberArk ASCP Agent**: Providing the secure bridge to the Vault.
 *   **CI/CD**: GitHub Actions pipeline for automated builds and releases.
 
