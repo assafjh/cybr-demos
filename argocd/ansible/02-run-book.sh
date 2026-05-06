@@ -1,12 +1,15 @@
 #!/bin/bash
+set -euo pipefail
 
-# Set environment variables
 export CLIENT_ID=""
 export CLIENT_SECRET=""
 
-# Run the Ansible playbook
+if [[ -z "$CLIENT_ID" || -z "$CLIENT_SECRET" ]]; then
+    echo "Error: CLIENT_ID and CLIENT_SECRET must be set before running this script."
+    exit 1
+fi
+
 ansible-playbook safe-onboarding.yml
 
-# Unset environment variables
 unset CLIENT_ID
 unset CLIENT_SECRET

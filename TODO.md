@@ -193,6 +193,7 @@
 - [x] `ansible-awx-tower`
 - [x] `ansible`
 - [x] `application-server-credential-provider`
+- [x] `argocd`
 - [ ] `kubernetes-cert`
 - [ ] `jenkins`
 - [ ] `github-actions`
@@ -210,7 +211,6 @@
 - [ ] `teamcity`
 - [ ] `credential-provider`
 - [ ] `central-credential-provider`
-- [ ] `argocd`
 - [ ] `springboot-sdk`
 - [ ] `secure-ai-access`
 - [ ] `secure-cloud-access`

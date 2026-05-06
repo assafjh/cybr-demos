@@ -1,9 +1,9 @@
 #!/bin/bash
+set -euo pipefail
+
 #============ Variables ===============
-# Using kubectl/oc
-COP_CLI=kubectl
-# If needed, modify the below to configure Conjur CLI location
-CONJUR_CLI=conjur
+COP_CLI=kubectl        # Kubernetes CLI; change to oc for OpenShift
+CONJUR_CLI=conjur      # Conjur CLI; change to conjur-cloud if using Cloud edition
 
 #============ Script ===============
 

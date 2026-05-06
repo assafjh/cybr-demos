@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: demo-application
-        image: assafhazan/push-to-k8s-secrets:latest
+        image: ghcr.io/assafjh/push-to-k8s-secrets:latest
         imagePullPolicy: IfNotPresent
         env:
           - name: SECRET4

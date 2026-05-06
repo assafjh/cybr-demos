@@ -7,6 +7,7 @@ resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
   - cmp-plugin.yml
 
-patchesStrategicMerge:
-  - argocd-repo-server-patch.yml
-  - admin-password-patch.yml
+patches:
+  - path: argocd-repo-server-patch.yml
+  - path: admin-password-patch.yml
+  - path: argocd-service-patch.yml
