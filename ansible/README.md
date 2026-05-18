@@ -40,14 +40,14 @@ To demonstrate proper Role-Based Access Control (RBAC) and the principle of leas
 1. **Login as admin and load the base policy:**
    ```bash
    conjur login -i admin
-   conjur policy update -b root -f policies/conjur-onprem/01-base.yml | tee -a base.log
+   conjur policy update -b root -f policies/conjur-enterprise/01-base.yml | tee -a base.log
    conjur logout
    ```
 2. **Login as the newly created Ansible admin and load the app policy:**
    *(Use the API key for `ansible-admin01` retrieved from `base.log`)*
    ```bash
    conjur login -i ansible-admin01
-   conjur policy update -b data/ansible -f policies/conjur-onprem/02-define-ansible-branch.yml | tee -a app-policy.log
+   conjur policy update -b data/ansible -f policies/conjur-enterprise/02-define-ansible-branch.yml | tee -a app-policy.log
    ```
 
 ### Option B: Conjur Cloud

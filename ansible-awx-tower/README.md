@@ -96,39 +96,30 @@ scripts/03-populate-variables.sh | tee -a populate.log
    ```yaml
    ---
    fields:
-     - id: conjur_url
-       type: string
-       label: Conjur Appliance URL
-     - id: conjur_account
-       type: string
-       label: Conjur Account
-     - id: conjur_authn_login
-       type: string
-       label: Conjur Host Login
-     - id: conjur_api_key
-       type: string
-       label: Conjur API Key
-       secret: true
-     - id: db_password_path
+     - id: db_password
        type: string
        label: DB Password Path
+       secret: true
+     - id: api_key
+       type: string
+       label: API Key Path
+       secret: true
+     - id: ssh_key
+       type: string
+       label: SSH Key Path
+       secret: true
    required:
-     - conjur_url
-     - conjur_account
-     - conjur_authn_login
-     - conjur_api_key
-     - db_password_path
+     - db_password
+     - api_key
+     - ssh_key
    ```
 5. **Injector Configuration (YAML):**
    ```yaml
    ---
    extra_vars:
-     db_password: '{{ db_password_path }}'
-   env:
-     CONJUR_APPLIANCE_URL: '{{ conjur_url }}'
-     CONJUR_ACCOUNT: '{{ conjur_account }}'
-     CONJUR_AUTHN_LOGIN: '{{ conjur_authn_login }}'
-     CONJUR_AUTHN_API_KEY: '{{ conjur_api_key }}'
+     db_password: '{{ db_password }}'
+     api_key: '{{ api_key }}'
+     ssh_key: '{{ ssh_key }}'
    ```
 6. Click **Save**.
 

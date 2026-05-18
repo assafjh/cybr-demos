@@ -4,8 +4,6 @@
   gather_facts: false
 
   vars:
-    # Aggregating the injected variables into a dictionary for clean looping.
-    # We use 'default' to prevent the playbook from crashing if a variable is missing.
     demo_secrets:
       db_pass: "{{ db_password | default('NOT_SET') }}"
       api_key: "{{ api_key | default('NOT_SET') }}"
@@ -18,7 +16,6 @@
           This playbook demonstrates dynamic variable injection via the custom
           AWX Conjur Credential Type.
 
-    # DRY Principle: One task, looping over all secrets
     - name: Display injected variables (DEMO ONLY - Remove in production)
       ansible.builtin.debug:
         msg: "Secret for '{{ item.key }}' successfully injected. Value: '{{ item.value }}'"

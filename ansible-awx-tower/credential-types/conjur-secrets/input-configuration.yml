@@ -1,40 +1,18 @@
 ---
 fields:
-  # --- Conjur Connection Details ---
-  - id: conjur_url
+  - id: db_password
     type: string
-    label: Conjur Appliance URL
-    secret: false
-  - id: conjur_account
-    type: string
-    label: Conjur Account
-    secret: false
-  - id: conjur_authn_login
-    type: string
-    label: Conjur Host Login (e.g., host/ansible-node)
-    secret: false
-  - id: conjur_api_key
-    type: string
-    label: Conjur API Key
+    label: DB Password Path
     secret: true
-
-  # --- Secret Paths in Conjur ---
-  - id: db_password_path
+  - id: api_key
     type: string
-    label: DB Password Conjur Path
-    secret: false # The path itself isn't a secret, the value it points to is!
-  - id: api_key_path
+    label: API Key Path
+    secret: true
+  - id: ssh_key
     type: string
-    label: API Key Conjur Path
-    secret: false
-  - id: ssh_key_path
-    type: string
-    label: SSH Key Conjur Path
-    secret: false
-
+    label: SSH Key Path
+    secret: true
 required:
-  - conjur_url
-  - conjur_account
-  - conjur_authn_login
-  - conjur_api_key
-  - db_password_path
+  - db_password
+  - api_key
+  - ssh_key
