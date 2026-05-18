@@ -3,6 +3,8 @@
 [![Images CI Status](https://github.com/assafjh/cybr-demos/actions/workflows/images.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/images.yml)
 [![Ansible Package Status](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/ansible-aws-demo.yml)
 [![ASCP Package Status](https://github.com/assafjh/cybr-demos/actions/workflows/ascp-demo.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/ascp-demo.yml)
+[![Conjur-Lambda Package Status](https://github.com/assafjh/cybr-demos/actions/workflows/lambda-package.yml/badge.svg)](https://github.com/assafjh/cybr-demos/actions/workflows/lambda-package.yml)
+
 
 Hands-on, end-to-end demos and reference implementations for CyberArk Identity Security use cases.
 
