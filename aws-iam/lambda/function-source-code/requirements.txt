@@ -1,3 +1,3 @@
 conjur==7.1.0
 requests==2.34.0
-conjur-authn-iam-client @ git+https://github.com/cyberark/conjur-authn-iam-client-python.git
+conjur-iam-client @ git+https://github.com/cyberark/conjur-authn-iam-client-python.git
