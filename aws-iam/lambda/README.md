@@ -5,10 +5,10 @@ It is assumed that you can create a new lambda function and that an IAM role is 
 For more information on lambda functions: [AWS Docs - lambda](https://docs.aws.amazon.com/lambda/latest/dg/getting-started.html)
 
 ## 1. Configure Lambda function
-### Create a new lambda function with runtime Python v3.10
-**Note**: The packaging script supports the latest lambda python runtime env, currently it is v3.10
+### Create a new lambda function with runtime Python v3.12
 ### Package the function
-**Note**: You can skip this phase by downloading a pre-packaged function from: [Releases - packaged Lambda function](https://github.com/assafjh/cybr-demos/releases/tag/built-lambda-function-python-v3.10)
+The deployment package is built automatically via GitHub Actions on every push to `function-source-code/`.
+Download `conjur-lambda-package.zip` from the [Actions artifacts](../../actions/workflows/lambda-package.yml), or build locally:
 ```bash
 scripts/01-package-function.sh
 ```
@@ -59,7 +59,7 @@ conjur login -i aws-admin01
 - Before running the export commands below, modify them with the correct values.
 ```bash
 # ROLE_ARN structure is: $ACCOUNT_NUMBER/$ROLE_NAME
-# Example: arn:aws:iam::1234:role/service-role/ajh-elastic-conjur-role-123 -> export ROLE_ARN=1234/ajh-elastic-conjur-role-123
+# Example: arn:aws:iam::1234:role/service-role/123456789012/your-lambda-role-name -> export ROLE_ARN=1234/123456789012/your-lambda-role-name
 export ROLE_ARN=<ROLE_ARN>
 envsubst < policies/conjur-enterprise/02-define-aws-branch.yml > 02-define-aws-branch.yml
 conjur policy update -b data/aws -f 02-define-aws-branch.yml | tee -a 02-define-aws-branch.log
@@ -124,7 +124,7 @@ conjur login -i aws-admin01
 - Before running the export commands below, modify them with the correct values.
 ```bash
 # ROLE_ARN structure is: $ACCOUNT_NUMBER/$ROLE_NAME
-# Example: arn:aws:iam::1234:role/service-role/ajh-elastic-conjur-role-123 -> export ROLE_ARN=1234/ajh-elastic-conjur-role-123
+# Example: arn:aws:iam::1234:role/service-role/123456789012/your-lambda-role-name -> export ROLE_ARN=1234/123456789012/your-lambda-role-name
 export ROLE_ARN=<ROLE_ARN>
 envsubst < policies/conjur-cloud/02-define-aws-branch.yml > 02-define-aws-branch.yml
 conjur policy update -b data/aws -f 02-define-aws-branch.yml | tee -a 02-define-aws-branch.log

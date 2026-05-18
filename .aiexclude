@@ -1,0 +1,13 @@
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.token
+secrets/
+credentials/
+.aws/
+*service-account*
+*-credentials.json
+config.yml
+config.yaml

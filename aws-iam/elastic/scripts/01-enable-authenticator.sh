@@ -1,4 +1,5 @@
 #!/bin/bash
+set -euo pipefail
 # This script will enable an Authenticator in Conjur.
 # For Conjur Enterprise - This script is meant to use at the Conjur Leader VM machine.
 # For Conjur Cloud - This script Needs access to Conjur Cloud CLI.
@@ -19,15 +20,14 @@ SUDO=
 CONTAINER_MGR=docker
 # Conjur Leader port
 CONJUR_LEADER_PORT=443
-# Conjur Leader container ID
-CONTAINER_ID=$(curl -s -k "https://127.0.0.1:$CONJUR_LEADER_PORT/info" | awk '/container/ {print $2}' | tr -d '",')
 
 #============ Script ===============
 if [[ "${IS_CONJUR_CLOUD}" == "true" ]]; then
-    "$CONJUR_CLI" authenticator enable --id  "${AUTHN_TO_ENABLE}"
+    "$CONJUR_CLI" authenticator enable --id "${AUTHN_TO_ENABLE}"
 else
+    CONTAINER_ID=$(curl -s -k "https://127.0.0.1:$CONJUR_LEADER_PORT/info" | awk '/container/ {print $2}' | tr -d '",')
     echo "Enabling $AUTHN_TO_ENABLE authn for Conjur"
-    CONJUR_AUTHENTICATORS=$($SUDO $CONTAINER_MGR exec $CONTAINER_ID evoke variable list | grep CONJUR_AUTHENTICATORS)
+    CONJUR_AUTHENTICATORS=$($SUDO $CONTAINER_MGR exec $CONTAINER_ID evoke variable list | grep CONJUR_AUTHENTICATORS || true)
     CONJUR_AUTHENTICATORS=$(echo $CONJUR_AUTHENTICATORS | awk -F "=" '{print $2}')
     CONJUR_AUTHENTICATORS=$(sed -e 's/^"//' -e 's/"$//' <<< "$CONJUR_AUTHENTICATORS")
     IFS=','

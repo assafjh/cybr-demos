@@ -1,0 +1,52 @@
+name: CI - Package Lambda Function
+
+on:
+  push:
+    paths:
+      - 'aws-iam/lambda/function-source-code/**'
+      - '!**/*.md'
+    branches: [ "main", "master" ]
+  pull_request:
+    paths:
+      - 'aws-iam/lambda/function-source-code/**'
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Build & Package Lambda
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build deployment package
+        run: |
+          cd aws-iam/lambda/function-source-code
+          docker run --rm \
+            -v "$PWD":/var/task \
+            --entrypoint /bin/bash \
+            amazon/aws-lambda-python:3.12 \
+            /var/task/entrypoint.sh
+
+      - name: Verify package contents
+        run: |
+          ZIP=aws-iam/lambda/function-source-code/conjur-lambda-package.zip
+          echo "Package contents:"
+          unzip -l "$ZIP"
+          unzip -l "$ZIP" | grep -q "lambda_function.py" \
+            && echo "✅ lambda_function.py found" \
+            || { echo "❌ lambda_function.py missing"; exit 1; }
+          unzip -l "$ZIP" | grep -q "conjur_iam_client" \
+            && echo "✅ conjur_iam_client found" \
+            || { echo "❌ conjur_iam_client missing"; exit 1; }
+
+      - name: Upload deployment package
+        uses: actions/upload-artifact@v4
+        with:
+          name: conjur-lambda-package
+          path: aws-iam/lambda/function-source-code/conjur-lambda-package.zip
+          retention-days: 30

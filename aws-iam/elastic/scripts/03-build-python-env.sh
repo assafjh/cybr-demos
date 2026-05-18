@@ -1,6 +1,6 @@
 #!/bin/bash
-if ! command -v "pip3" &> /dev/null
-then
+set -euo pipefail
+if ! command -v "pip3" &>/dev/null; then
     echo "Please install pip3 and re-run the script"
     exit 1
 fi
