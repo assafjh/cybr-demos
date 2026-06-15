@@ -1,0 +1,38 @@
+# =============================================================================
+# scanner.conf  -  single source of truth for the CyberArk Secure AI Agents
+#                  Azure scanner deployment.
+#
+# Copy this file to "scanner.conf" and fill in your values ONCE.
+# preflight.sh reads it automatically and validates these instead of prompting.
+#
+#   cp scanner.conf.example scanner.conf
+#   # edit scanner.conf
+#   bash preflight.sh
+#
+# Rules to remember (preflight enforces them):
+#   STORAGE_ACCOUNT  3-24 chars, lowercase letters + digits ONLY, no hyphens. GLOBAL.
+#   FUNCTION_APP     2-60 chars, alphanumeric + hyphens, no leading/trailing hyphen. GLOBAL.
+#   KEY_VAULT        3-24 chars, start with a letter, no consecutive hyphens. GLOBAL.
+#   SUBSCRIPTION_ID  ALWAYS the GUID, never the display name (two subs can share a name).
+# =============================================================================
+
+# Target subscription - use the ID (GUID), found via:  az account list -o table
+# REQUIRED. If left empty: preflight will ask you to confirm the active sub, and
+# run-deploy/status will warn before using whatever subscription is active.
+SUBSCRIPTION_ID=""
+
+# Region (must support Flex Consumption - preflight checks this)
+LOCATION="eastus"
+
+# Common prefix for scanner resources. Used by discover.sh to sweep for leftovers
+# whose exact names may have drifted between attempts (e.g. <prefix>-fa, <prefix>-fa-v2).
+NAME_PREFIX="cyberarkscanner"
+
+# Resource names (these are EXAMPLE defaults - change as needed)
+RESOURCE_GROUP="cyberark-agents-scanner"
+FUNCTION_APP="cyberarkscanner-fa"        # GLOBAL & unique - change if taken (preflight checks)
+STORAGE_ACCOUNT="cyberarkscanstg"        # GLOBAL & unique, lowercase a-z0-9, no hyphens
+APP_SERVICE_PLAN="cyberarkscanner-plan"
+KEY_VAULT="cyberarkscanner-kv"           # GLOBAL & unique
+APP_INSIGHTS="cyberarkscanner-ai"
+APP_REGISTRATION="cyberarkscanner-app"
