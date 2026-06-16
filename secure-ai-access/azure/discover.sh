@@ -45,6 +45,8 @@ trap restore EXIT
 
 printf "${BLD}Looking for: RG='%s', func='%s', KV='%s', app-reg='%s'${RST}\n" \
   "$RESOURCE_GROUP" "$FUNCTION_APP" "$KEY_VAULT" "$APP_REGISTRATION"
+printf "${YLW}Note:${RST} results depend on your RBAC. A subscription you can't act on shows '(no access)',\n"
+printf "      and resources you can't read won't appear - set up permissions BEFORE relying on this.\n"
 
 RG_SUBS=()
 SUBS="$(az account list --query "[].id" -o tsv | tr -d '\r')"
@@ -53,7 +55,7 @@ for s in $SUBS; do
   sname="$(az account list --query "[?id=='$s'].name | [0]" -o tsv 2>/dev/null | tr -d '\r')"
   printf "\n${BLD}== %s (%s) ==${RST}\n" "${sname:-?}" "$s"
   if ! az account set --subscription "$s" >/dev/null 2>&1; then
-    printf "  ${YLW}(no access)${RST}\n"; continue
+    printf "  ${YLW}(no access - not in your tenant scope, or no RBAC on this subscription)${RST}\n"; continue
   fi
 
   # Resource group + its contents

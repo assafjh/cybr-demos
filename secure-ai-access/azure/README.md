@@ -13,12 +13,6 @@ single config file, and gives you a clean uninstall and a post-deploy status che
 > Nothing here modifies the vendor's `deploy.sh`, `main.bicep`, or the function zip.
 > You can drop in vendor updates freely.
 
-Fix Permission - Access management for Azure resources
-https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Properties
-
-Git Bash AZ Cert error:
-export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
-
 ---
 
 ## Contents
@@ -84,11 +78,28 @@ because for a customer tenant the region is a data-residency decision.
 ## Procedure
 
 ```
-cleanup  ->  preflight  ->  preflight --validate  ->  (CyberArk Identity)  ->  run-deploy  ->  status
+permissions  ->  cleanup  ->  preflight  ->  preflight --validate  ->  (CyberArk Identity)  ->  run-deploy  ->  status
 ```
 
 ### 0. Prep (once)
 Put the toolkit + vendor package in one folder, then create and edit `scanner.conf`.
+
+### 0.5 Permissions (do this FIRST)
+`discover.sh` and `uninstall.sh` can only see and delete what your RBAC allows -
+without an effective role they silently report "(no access)" / "not found", which
+looks like a clean environment when it isn't. So establish permissions before the
+cleanup step:
+
+- You need **Owner** (or Contributor + User Access Administrator) on the target
+  subscription. Inherited/group-based or PIM-eligible roles may not be effective -
+  prefer a **direct** assignment at the subscription scope.
+- No PIM and only "inherited" owner? A Global Admin can use **Elevate access**
+  (Entra ID -> Properties -> "Access management for Azure resources" -> Yes) to grant
+  themselves User Access Administrator at root, then assign a direct Owner, then turn
+  Elevate back off.
+- Behind corporate SSL inspection, point the CLI at your corporate CA first
+  (`REQUESTS_CA_BUNDLE` / `CURL_CA_BUNDLE`), or every `az` call fails with
+  "certificate verify failed".
 
 ### 1. Cleanup (only if a previous attempt left resources)
 Sweep every subscription you can see for leftovers, then remove them. Resource

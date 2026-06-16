@@ -447,13 +447,16 @@ section "Deployment dry-run (what-if)"
   elif [[ -z "${OID:-}" ]]; then
     warn "Skipping what-if - could not resolve your object id (deployerObjectId) earlier"
   else
+    RG_TEMP=0
     if ! az group show -n "$RESOURCE_GROUP" >/dev/null 2>&1; then
-      warn "RG '$RESOURCE_GROUP' does not exist; what-if needs it."
-      read -rp "  Create an EMPTY RG '$RESOURCE_GROUP' in '$LOC' just for the preview? [y/N]: " MKRG
+      warn "RG '$RESOURCE_GROUP' does not exist; what-if is RG-scoped and needs it."
+      read -rp "  Create a TEMPORARY empty RG '$RESOURCE_GROUP' in '$LOC' for the preview (removed afterwards)? [y/N]: " MKRG
       if [[ "$MKRG" =~ ^[Yy]$ ]]; then
-        az group create -n "$RESOURCE_GROUP" -l "$LOC" --only-show-errors >/dev/null 2>&1 \
-          && pass "Empty RG created for preview" \
-          || fail "Could not create RG (policy on allowed-locations? check the error)"
+        if az group create -n "$RESOURCE_GROUP" -l "$LOC" --only-show-errors >/dev/null 2>&1; then
+          pass "Temporary RG created for the preview"; RG_TEMP=1
+        else
+          fail "Could not create RG (policy on allowed-locations? check the error)"
+        fi
       fi
     fi
     if az group show -n "$RESOURCE_GROUP" >/dev/null 2>&1; then
@@ -466,6 +469,18 @@ section "Deployment dry-run (what-if)"
         pass "what-if completed - review the change preview above (a clean preview = ARM should accept it)"
       else
         fail "what-if reported errors above (policy / quota / template) - fix before deploying"
+      fi
+    fi
+    # Leave no trace: if WE created the RG only for the preview and it is still
+    # empty, remove it. (Deploying into a pre-existing empty RG is fine either way -
+    # az group create is idempotent - but preflight should not leave state behind.)
+    if [[ "$RG_TEMP" -eq 1 ]]; then
+      cnt="$(az resource list -g "$RESOURCE_GROUP" --query "length(@)" -o tsv 2>/dev/null)"
+      if [[ "${cnt:-0}" -eq 0 ]]; then
+        az group delete -n "$RESOURCE_GROUP" --yes --no-wait >/dev/null 2>&1 \
+          && echo "  removed the temporary preview RG (preflight leaves nothing behind)"
+      else
+        warn "Temporary RG is not empty (what-if shouldn't create resources) - left it for you to inspect."
       fi
     fi
   fi
