@@ -11,7 +11,7 @@ Hands-on, end-to-end demos and reference implementations for CyberArk Identity S
 This repository contains real-world POC scenarios across cloud-native platforms, CI/CD pipelines, and traditional infrastructure. Each folder represents a standalone, end-to-end integration flow with its own instructions, prerequisites, and architectural details.
 
 Created and maintained by [Assaf Hazan](https://www.linkedin.com/in/assafjh)  
-*(Senior Presales Architect | Machine Identity & DevSecOps, Palo Alto Networks)*
+*(Senior Solutions Engineer | DevSecOps, Palo Alto Networks)*
 
 ---
 
