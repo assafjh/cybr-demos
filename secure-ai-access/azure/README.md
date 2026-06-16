@@ -10,6 +10,10 @@ registration, region/SKU availability, global name collisions) rather than the
 script itself. This toolkit checks all of that up front, drives the deploy from a
 single config file, and gives you a clean uninstall and a post-deploy status check.
 
+>Fix Permission - Access management for Azure resources https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Properties
+
+>Git Bash AZ Cert error: export AZURE_CLI_DISABLE_CONNECTION_VERIFICATION=1
+
 > Nothing here modifies the vendor's `deploy.sh`, `main.bicep`, or the function zip.
 > You can drop in vendor updates freely.
 
