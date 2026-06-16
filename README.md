@@ -95,7 +95,7 @@ Each demo includes its own instructions and execution flow.
 * `aws-iam`: Passwordless authentication for AWS Lambda and EC2 using IAM roles
 * `databricks`: Databricks integration with Conjur
 * `secure-cloud-access`: Secure Cloud Access (SCA) demo for zero-standing privileges
-* `secure-ai-access`: Secure AI Access (SIA) demo for securing AI agents and LLM interactions
+* `secure-ai-access`: Secure AI Access (SAI) demo for securing AI agents and LLM interactions
 * `dynamic-privileged-access`: RDS Postgres ephemeral access via DPA
 * `custom-certificates`: Using Conjur Enterprise with 3rd-party certificates
 
