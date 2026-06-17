@@ -1,0 +1,24 @@
+---
+- name: Retrieve SSH keys from Secrets Manager (SaaS) and connect
+  hosts: all
+  gather_facts: false
+
+  vars:
+    conjur_appliance_url: "https://<SUBDOMAIN>.secretsmgr.cyberark.cloud/api"  # UPDATE: tenant URL (keep /api)
+    conjur_account: "conjur"                                                   # UPDATE: account name
+    conjur_authn_login: "host/data/ansible/ansible-control"                    # UPDATE: host identity from UC1
+
+  pre_tasks:
+    - name: Resolve key path from FQDN and fetch the key
+      no_log: true
+      vars:
+        host_domain: "{{ inventory_hostname.split('.', 1)[1] }}"               # everything after the first dot
+        conjur_key_path: "data/ansible/{{ host_domain }}/ssh-key"              # UPDATE: path convention if different
+      set_fact:
+        ansible_ssh_private_key_file: >-
+          {{ lookup('cyberark.conjur.conjur_variable', conjur_key_path,
+                    validate_certs=false, as_file=true) }}
+
+  tasks:
+    - name: Verify connectivity over SSH
+      ansible.builtin.ping:
