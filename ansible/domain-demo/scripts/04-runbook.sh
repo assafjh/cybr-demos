@@ -18,4 +18,4 @@ fi
 cd ../playbook || { echo "Error: cannot cd to ../playbook"; exit 1; }
 
 echo "Running domain-based retrieval playbook..."
-ansible-playbook playbook.yml -vv
+ansible-playbook domain-retrieve.yml -vv
