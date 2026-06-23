@@ -6,7 +6,7 @@
   vars:
     conjur_appliance_url: "https://<SUBDOMAIN>.secretsmgr.cyberark.cloud/api"  # UPDATE: tenant URL (keep /api)
     conjur_account: "conjur"                                                   # UPDATE: account name
-    conjur_authn_login: "host/data/ansible/ansible-control"                    # UPDATE: host identity from UC1
+    conjur_authn_login: "host/data/ansible/ansible-control"                    # UPDATE: host identity
 
   pre_tasks:
     - name: Resolve key path from FQDN and fetch the key

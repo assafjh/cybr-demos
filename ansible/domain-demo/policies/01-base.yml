@@ -1,0 +1,18 @@
+---
+# Load into: data
+# Top-level ansible branch + admins
+- !policy
+  id: ansible
+
+- !group
+  id: ansible/admins
+
+- !permit
+  role: !group ansible/admins
+  privileges: [ read, update, create ]
+  resource: !policy ansible
+
+- !permit
+  role: !group ansible/admins
+  privileges: [ read, update, create ]
+  resource: !group ansible/admins

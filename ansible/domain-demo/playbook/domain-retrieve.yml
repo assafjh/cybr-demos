@@ -1,0 +1,21 @@
+---
+- name: Dynamic credential retrieval from Secrets Manager by domain
+  hosts: all
+  gather_facts: false
+  vars:
+    host_domain: "{{ inventory_hostname.split('.', 1)[1] }}"
+    cred_base: "data/ansible/domains/{{ host_domain }}"
+  tasks:
+    - name: Retrieve credential for this host's domain
+      no_log: true
+      ansible.builtin.set_fact:
+        domain_username: "{{ lookup('cyberark.conjur.conjur_variable', cred_base ~ '/username') }}"
+        domain_password: "{{ lookup('cyberark.conjur.conjur_variable', cred_base ~ '/password') }}"
+
+    - name: Validate retrieval (presence only — no secret value printed)
+      ansible.builtin.debug:
+        msg: >-
+          host={{ inventory_hostname }}
+          domain={{ host_domain }}
+          username_retrieved={{ (domain_username | length) > 0 }}
+          password_retrieved={{ (domain_password | length) > 0 }}

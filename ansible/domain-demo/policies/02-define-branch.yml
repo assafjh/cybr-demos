@@ -1,0 +1,57 @@
+---
+# Load into: data/ansible
+# Consumer group + per-domain credential branches
+
+# Group that aggregates read/execute for the Ansible consumer
+- !group
+  id: apps
+  owner: !group admins
+
+# One branch per domain. Each holds that domain's credential.
+- !policy
+  id: domains/domain1.corp          # UPDATE to real domain (must match FQDN suffix)
+  owner: !group admins
+  body:
+  - &domain1-secrets
+    - !variable
+      id: username
+      owner: !group ../../admins
+    - !variable
+      id: password
+      owner: !group ../../admins
+
+- !policy
+  id: domains/domain2.corp          # UPDATE to real domain
+  owner: !group admins
+  body:
+  - &domain2-secrets
+    - !variable
+      id: username
+      owner: !group ../../admins
+    - !variable
+      id: password
+      owner: !group ../../admins
+
+# Let the apps group consume every domain's secrets
+- !permit
+  role: !group apps
+  privileges: [ read, execute ]
+  resource: *domain1-secrets
+
+- !permit
+  role: !group apps
+  privileges: [ read, execute ]
+  resource: *domain2-secrets
+
+# The identity the Ansible control node authenticates as
+- !host
+  id: apps/domain-retrieve
+  owner: !group admins
+  annotations:
+    authn/api-key: true
+
+- !grant
+  roles:
+    - !group apps
+  members:
+    - !host apps/domain-retrieve
