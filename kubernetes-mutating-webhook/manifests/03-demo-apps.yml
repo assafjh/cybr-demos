@@ -1,0 +1,230 @@
+---
+# Plain application manifests. What is NOT here: no Secrets Provider container, no summon,
+# no volumes, no Conjur URL/certificate/ConfigMap. Each app declares WHICH secrets it needs
+# and HOW it consumes them - with the Secrets Provider's own annotations, or summon.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: conjur-webhook-demo
+  labels:
+    # Opt the namespace in to the Conjur injector
+    conjur.org/injection: enabled
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: webhook-demo-app
+  namespace: conjur-webhook-demo
+---
+# =====================================================================
+# 1. Secrets Provider, file, sidecar (the defaults) - files refreshed every 10s
+# =====================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-file-sidecar
+  namespace: conjur-webhook-demo
+  labels: {app: demo-file-sidecar}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: demo-file-sidecar}
+  template:
+    metadata:
+      labels: {app: demo-file-sidecar}
+      annotations:
+        # --- injector ---
+        conjur.org/inject: "true"
+        conjur.org/inject-mount-path: /opt/secrets/conjur   # where this app reads its files
+        # --- standard Secrets Provider annotations ---
+        conjur.org/secrets-refresh-interval: 10s
+        conjur.org/secrets-refresh-enabled: "true"
+        conjur.org/conjur-secrets-policy-path.yaml1: data/kubernetes/applications/safe/
+        conjur.org/conjur-secrets.yaml1: |
+          - secret3: secret3
+          - secret7: secret7
+        conjur.org/secret-file-path.yaml1: "./credentials.yaml"
+        conjur.org/secret-file-format.yaml1: "yaml"
+        conjur.org/conjur-secrets-policy-path.template1: data/kubernetes/applications/safe/
+        conjur.org/conjur-secrets.template1: |
+          - secret3: secret3
+          - secret5: secret5
+        conjur.org/secret-file-template.template1: |
+            property.safe.secret3={{ secret "secret3" }}
+            property.safe.secret5={{ secret "secret5" }}
+        conjur.org/secret-file-path.template1: "./credentials.properties"
+    spec:
+      serviceAccountName: webhook-demo-app
+      containers:
+      - name: demo-application
+        image: assafhazan/push-to-file:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - {name: WAIT_TIMEOUT, value: "60"}   # sidecar starts alongside the app
+---
+# =====================================================================
+# 2. Secrets Provider, file, init - files written once, before the app starts
+# =====================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-file-init
+  namespace: conjur-webhook-demo
+  labels: {app: demo-file-init}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: demo-file-init}
+  template:
+    metadata:
+      labels: {app: demo-file-init}
+      annotations:
+        conjur.org/inject: "true"
+        conjur.org/inject-mount-path: /opt/secrets/conjur
+        conjur.org/container-mode: init                     # standard provider annotation
+        conjur.org/conjur-secrets-policy-path.yaml1: data/kubernetes/applications/safe/
+        conjur.org/conjur-secrets.yaml1: |
+          - secret1: secret1
+          - secret2: secret2
+        conjur.org/secret-file-path.yaml1: "./credentials.yaml"
+        conjur.org/secret-file-format.yaml1: "yaml"
+        conjur.org/conjur-secrets-policy-path.template1: data/kubernetes/applications/safe/
+        conjur.org/conjur-secrets.template1: |
+          - secret1: secret1
+        conjur.org/secret-file-template.template1: |
+            property.safe.secret1={{ secret "secret1" }}
+        conjur.org/secret-file-path.template1: "./credentials.properties"
+    spec:
+      serviceAccountName: webhook-demo-app
+      containers:
+      - name: demo-application
+        image: assafhazan/push-to-file:latest
+        imagePullPolicy: IfNotPresent
+---
+# =====================================================================
+# 3. Secrets Provider, k8s_secrets (init by default) - fills an existing K8s Secret, app reads it as usual
+#    Prerequisites (platform side, the webhook cannot create objects): the target Secret
+#    with a conjur-map, and a Role letting the pod's SA get/update that one Secret.
+# =====================================================================
+apiVersion: v1
+kind: Secret
+metadata:
+  name: webhook-demo-credentials
+  namespace: conjur-webhook-demo
+type: Opaque
+stringData:
+  conjur-map: |-
+    secret4: data/kubernetes/applications/safe/secret4
+    secret8: data/kubernetes/applications/safe/secret8
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: conjur-provider-update-secrets
+  namespace: conjur-webhook-demo
+rules:
+- apiGroups: [""]
+  resources: ["secrets"]
+  resourceNames: ["webhook-demo-credentials"]   # only this Secret
+  verbs: ["get", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: conjur-provider-update-secrets
+  namespace: conjur-webhook-demo
+subjects:
+- kind: ServiceAccount
+  name: webhook-demo-app
+  namespace: conjur-webhook-demo
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: conjur-provider-update-secrets
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-k8s-secrets
+  namespace: conjur-webhook-demo
+  labels: {app: demo-k8s-secrets}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: demo-k8s-secrets}
+  template:
+    metadata:
+      labels: {app: demo-k8s-secrets}
+      annotations:
+        conjur.org/inject: "true"
+        conjur.org/secrets-destination: k8s_secrets         # standard provider annotations
+        conjur.org/k8s-secrets: |
+          - webhook-demo-credentials
+    spec:
+      serviceAccountName: webhook-demo-app
+      containers:
+      - name: demo-application
+        image: assafhazan/push-to-k8s-secrets:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SECRET4
+          valueFrom: {secretKeyRef: {name: webhook-demo-credentials, key: secret4}}
+        - name: SECRET8
+          valueFrom: {secretKeyRef: {name: webhook-demo-credentials, key: secret8}}
+---
+# =====================================================================
+# 4. summon - secrets as env vars, image untouched (no summon inside it)
+#    Same image as #3. The injector copies summon in and wraps the command.
+# =====================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-summon
+  namespace: conjur-webhook-demo
+  labels: {app: demo-summon}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: demo-summon}
+  template:
+    metadata:
+      labels: {app: demo-summon}
+      annotations:
+        conjur.org/inject: "true"
+        conjur.org/inject-type: summon
+        # secrets.yml - env var name -> Conjur variable
+        conjur.org/summon-secrets: |
+          SECRET2: !var data/kubernetes/applications/safe/secret2
+          SECRET6: !var data/kubernetes/applications/safe/secret6
+        # The manifest has no command, and the webhook cannot see the image ENTRYPOINT,
+        # so we state it here (same as the image's ENTRYPOINT)
+        conjur.org/summon-command: '["dumb-init", "--", "/scripts/entry-point.sh"]'
+    spec:
+      serviceAccountName: webhook-demo-app
+      containers:
+      - name: demo-application
+        image: assafhazan/push-to-k8s-secrets:latest
+        imagePullPolicy: IfNotPresent
+---
+# =====================================================================
+# 5. Control - same namespace, no conjur.org/inject: left untouched
+# =====================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-not-injected
+  namespace: conjur-webhook-demo
+  labels: {app: demo-not-injected}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: demo-not-injected}
+  template:
+    metadata:
+      labels: {app: demo-not-injected}
+    spec:
+      serviceAccountName: webhook-demo-app
+      containers:
+      - name: demo-application
+        image: busybox:latest
+        command: ["sh", "-c", "echo 'No injection here'; sleep infinity"]

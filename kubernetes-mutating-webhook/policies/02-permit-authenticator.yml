@@ -1,0 +1,10 @@
+---
+# Only needed if scripts/00-preflight.sh reports that the applications/jwt group
+# cannot authenticate (the CONJ00006E / 403 we hit in the lab).
+# Load as admin into the authenticator branch:
+#   Enterprise: conjur policy update -b conjur/authn-jwt/k8s-cluster1 -f policies/02-permit-authenticator.yml
+#   Cloud:      conjur policy update -b conjur/authn-jwt/k8s-cluster1 -f policies/02-permit-authenticator.yml
+- !permit
+  role: !group /data/kubernetes/applications/jwt
+  privilege: [ read, authenticate ]
+  resource: !webservice

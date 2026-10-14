@@ -1,0 +1,87 @@
+---
+# Conjur Injector - mutating admission webhook
+# Applied by scripts/01-deploy-injector.sh (it also creates the TLS secret,
+# the connection ConfigMap and the MutatingWebhookConfiguration)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: conjur-injector
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: conjur-injector
+  namespace: conjur-injector
+# The injector never calls the Kubernetes API, so no Role/ClusterRole is needed.
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conjur-injector
+  namespace: conjur-injector
+  labels:
+    app: conjur-injector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: conjur-injector
+  template:
+    metadata:
+      labels:
+        app: conjur-injector
+    spec:
+      serviceAccountName: conjur-injector
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: injector
+        image: ghcr.io/assafjh/conjur-injector:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8443
+          name: https
+        envFrom:
+        - configMapRef:
+            # Cluster-wide Conjur connection details - app teams never see these
+            name: conjur-injector-config
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: https
+            scheme: HTTPS
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 10m
+            memory: 16Mi
+          limits:
+            memory: 64Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+        - name: certs
+          mountPath: /etc/webhook/certs
+          readOnly: true
+      volumes:
+      - name: certs
+        secret:
+          secretName: conjur-injector-tls
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conjur-injector
+  namespace: conjur-injector
+spec:
+  selector:
+    app: conjur-injector
+  ports:
+  - port: 443
+    targetPort: https

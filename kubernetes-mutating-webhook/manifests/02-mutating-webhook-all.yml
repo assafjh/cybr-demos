@@ -1,0 +1,33 @@
+---
+# INJECT_SCOPE=all (demo environments): every namespace except system ones and the
+# injector's own (it must never depend on itself to start). The pod annotation
+# conjur.org/inject: "true" is the only opt-in - pods without it are untouched.
+# $CA_BUNDLE and $FAILURE_POLICY are replaced by scripts/01-deploy-injector.sh
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: conjur-injector
+webhooks:
+- name: inject.conjur.org
+  admissionReviewVersions: ["v1"]
+  sideEffects: None
+  timeoutSeconds: 5
+  failurePolicy: $FAILURE_POLICY
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name     # set automatically on every namespace
+      operator: NotIn
+      values: [kube-system, kube-public, kube-node-lease, conjur-injector]
+  rules:
+  - operations: ["CREATE"]
+    apiGroups: [""]
+    apiVersions: ["v1"]
+    resources: ["pods"]
+    scope: Namespaced
+  clientConfig:
+    service:
+      name: conjur-injector
+      namespace: conjur-injector
+      path: /mutate
+      port: 443
+    caBundle: $CA_BUNDLE

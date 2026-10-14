@@ -1,0 +1,23 @@
+---
+# Load policy into data/kubernetes branch (as kubernetes-admin01)
+# Prerequisite: the kubernetes-jwt demo policies (01-03) are loaded and the
+# k8s-cluster1 JWT authenticator is enabled and populated.
+#
+# The injector does NOT create Conjur identities - it only wires pods to Conjur.
+# Every ServiceAccount that gets injected still needs a host here, named after the
+# JWT "sub" claim: system:serviceaccount:<namespace>:<serviceaccount>
+# (the injector stamps the expected id on each pod as conjur.org/inject-identity)
+
+- !host
+  id: applications/system:serviceaccount:conjur-webhook-demo:webhook-demo-app
+  owner: !group admins
+  annotations:
+    authn-jwt/k8s-cluster1/kubernetes.io/namespace: conjur-webhook-demo
+    authn-jwt/k8s-cluster1/kubernetes.io/serviceaccount/name: webhook-demo-app
+
+# applications/jwt already has read/execute on the safe and authenticate on k8s-cluster1
+- !grant
+  roles:
+    - !group applications/jwt
+  members:
+    - !host applications/system:serviceaccount:conjur-webhook-demo:webhook-demo-app
