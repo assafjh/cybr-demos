@@ -30,6 +30,8 @@ on:
           - rest_api_app
           - summon_demo
           - springboot_hot_reload
+          - conjur_injector
+          - conjur_summon_bin
 
 jobs:
   detect-changes:
@@ -43,6 +45,8 @@ jobs:
       rest_api_app: ${{ steps.filter.outputs.rest_api_app }}
       summon_demo: ${{ steps.filter.outputs.summon_demo }}
       springboot_hot_reload: ${{ steps.filter.outputs.springboot_hot_reload }}
+      conjur_injector: ${{ steps.filter.outputs.conjur_injector }}
+      conjur_summon_bin: ${{ steps.filter.outputs.conjur_summon_bin }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -68,6 +72,10 @@ jobs:
               - 'images/summon/**'
             springboot_hot_reload:
               - 'code/springboot-hot-reload/**'
+            conjur_injector:
+              - 'images/conjur-injector/**'
+            conjur_summon_bin:
+              - 'images/conjur-summon-bin/**'
 
   build-postgres-companydb:
     needs: detect-changes
@@ -308,3 +316,33 @@ jobs:
         done
         [ $TIMEOUT -eq 0 ] && { echo "❌ App did not start in time"; docker logs sb-app; exit 1; }
         echo "✅ App started and connected to database"
+
+  build-conjur-injector:
+    needs: detect-changes
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.conjur_injector == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'conjur_injector' || inputs.force_image == 'all')) }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: conjur-injector
+      context_path: images/conjur-injector
+      platforms: linux/amd64,linux/arm64
+      # Unit tests run inside the Dockerfile build stage; here we check the binary refuses to start without config
+      smoke_test_command: |
+        if docker run --rm local-smoke-conjur-injector:test 2>&1 | grep -q "CONJUR_APPLIANCE_URL and CONJUR_AUTHN_URL are required"; then
+          echo "✅ Injector binary runs and validates its configuration"
+        else
+          echo "❌ Injector did not start as expected"; exit 1
+        fi
+
+  build-conjur-summon-bin:
+    needs: detect-changes
+    if: ${{ (github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.conjur_summon_bin == 'true') || (github.event_name == 'workflow_dispatch' && (inputs.force_image == 'conjur_summon_bin' || inputs.force_image == 'all')) }}
+    uses: ./.github/workflows/docker-build-template.yml
+    with:
+      image_name: conjur-summon-bin
+      context_path: images/conjur-summon-bin
+      platforms: linux/amd64
+      # busybox has no glibc - if these run, the binaries are static and will run in any app image
+      smoke_test_command: |
+        docker run --rm local-smoke-conjur-summon-bin:test /summon/summon --version
+        docker run --rm local-smoke-conjur-summon-bin:test /summon/summon-conjur --version
+        echo "✅ summon and summon-conjur run inside busybox (static binaries)"

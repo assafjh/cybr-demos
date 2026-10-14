@@ -22,6 +22,8 @@ jobs:
           - rest-api-app
           - summon
           - springboot-hot-reload
+          - conjur-injector
+          - conjur-summon-bin
     steps:
       - name: Delete old package versions
         uses: actions/delete-package-versions@v5

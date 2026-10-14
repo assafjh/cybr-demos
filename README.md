@@ -67,6 +67,7 @@ Each demo includes its own instructions and execution flow.
 * `kubernetes-cert`: Integration with Kubernetes using the Certificate Authenticator
 * `kubernetes-follower`: Conjur Enterprise follower deployment inside Kubernetes clusters
 * `kubernetes-external-secrets-operator`: Using Kubernetes ESO with the Conjur provider
+* `kubernetes-mutating-webhook`: Zero-touch onboarding - a mutating admission webhook that injects the Conjur Secrets Provider into pods
 
 **🔄 CI/CD Pipeline Security**
 * `jenkins`: Integration with Jenkins using the Conjur plugin (JWT and Default authenticators)
