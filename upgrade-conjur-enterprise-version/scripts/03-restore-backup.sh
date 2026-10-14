@@ -13,6 +13,7 @@ else
 fi
 NAME="${CONTAINER_NAME}-${TAG}"
 echo "Version: ${TAG}"
+cm container inspect "$NAME" &>/dev/null || die "Container ${NAME} not found - run 02-deploy-new-version.sh first"
 BACKUP_DIR=$(ls -td "$BACKUPS_DIR"/*/ 2>/dev/null | head -n 1 || true)
 [ -n "$BACKUP_DIR" ] || die "No backup in ${BACKUPS_DIR} - run 01-prepare-upgrade.sh first"
 ARCHIVE=$(cd "$BACKUP_DIR" && ls *.tar.xz.gpg 2>/dev/null || true)
@@ -40,4 +41,4 @@ fi
 step "Waiting for health"
 wait_for_health
 echo "Old container is kept stopped - remove it once you're happy:"
-cm ps -a --format '{{.Names}}' | grep -- '-pre-upgrade-' | sed "s/^/  ${SUDO:+$SUDO }${CONTAINER_MGR} rm /"
+cm ps -a --format '{{.Names}}' | awk -v rm="${SUDO:+$SUDO }${CONTAINER_MGR} rm" '/-pre-upgrade-/ { print "  " rm, $0 }'

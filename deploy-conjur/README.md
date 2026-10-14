@@ -1,113 +1,40 @@
 # Deploy Conjur Enterprise
 
-This folder contains scripts to deploy a **CyberArk Conjur Enterprise** cluster using Docker or Podman. The setup provisions one Leader and two Standby nodes, following CyberArk's recommended high-availability architecture.
+Deploy a **single-node demo** Conjur Enterprise (Secrets Manager Self-Hosted) Leader with Docker or Podman, for demos and POCs.
 
----
+Containers use the same layout as [`upgrade-conjur-enterprise-version`](../upgrade-conjur-enterprise-version), so a node deployed here can be upgraded with it. For Followers, see [`kubernetes-follower`](../kubernetes-follower) - they fetch their seed from this Leader through the seed generation service.
 
-## Architecture
-
-```
-┌─────────────┐     Replication     ┌─────────────┐
-│   Leader    │ ──────────────────► │  Standby 1  │
-│  (conjur01) │                     │  (conjur02) │
-└─────────────┘                     └─────────────┘
-       │            Replication     ┌─────────────┐
-       └────────────────────────── ►│  Standby 2  │
-                                    │  (conjur03) │
-                                    └─────────────┘
-```
-
----
-
-## Prerequisites
-
-- Docker or Podman installed on each node
-- SSH access between the Leader and Standby VMs (required for script 03)
-- Access to the CyberArk Conjur Enterprise container image
-- All nodes resolvable by hostname
-
----
-
-## Configuration
-
-All scripts share a single configuration file: `scripts.properties`.
-
-Update this file before running any script.
-
-| Parameter | Description |
-|-----------|-------------|
-| `SUDO` | Set to `sudo` if required; leave empty to run as current user |
-| `CONTAINER_MGR` | Container runtime: `docker` or `podman` |
-| `CONTAINER_IMG` | Conjur Enterprise image URL (e.g., `registry.example.com/conjur-appliance`) |
-| `CONTAINER_TAG` | Image version tag (e.g., `13.2.0`) |
-| `CONTAINER_NAME` | Base name for the container |
-| `CONTAINER_VOLUME_PATH` | Host path for persistent volume directories |
-| `CONJUR_ADM_PWD` | Admin password for the Conjur account |
-| `CONJUR_ORG` | Conjur account name (default: `conjur`) |
-| `IS_CREATE_AUTO_START` | Set to `true` to create a systemd service (Podman only) |
-| `CONJUR_STANDBY_HOST_1` | Hostname or IP of Standby 1 |
-| `CONJUR_STANDBY_HOST_2` | Hostname or IP of Standby 2 |
-| `SERVER_PORT` | Conjur API and UI port (default: `443`) |
-| `LB_VERIFICATION_PORT` | Load balancer health check port (default: `444`) |
-| `DB_PORT` | Database replication port for Followers and Standbys (default: `5432`) |
-| `AUDIT_REPLICATION_PORT` | Port for shipping audit logs from Followers to the Leader (default: `1999`) |
-
----
-
-## Deployment Steps
-
-### Step 1 — Deploy and Configure the Leader
-
-Run the following on the **Leader VM**:
+## Usage
 
 ```bash
-# 1. Start the Conjur container
-./01_deploy_conjur.sh
+cd scripts
+vi deploy.properties                                     # registry, docker/podman, hostname, altnames
 
-# 2. Initialize the Leader and generate a standby seed file
-./02_configure_leader.sh
+./00-load-image.sh conjur-appliance_13.10.0.tar.gz      # load the tarball, push it to CONTAINER_IMG
+./01-deploy-container.sh                                 # start the container (newest local version)
+./02-configure-leader.sh                                 # configure as Leader, wait for /health
 ```
 
-### Step 2 — Distribute the Seed File to Standbys
+`02` prompts for the admin password unless `CONJUR_ADMIN_PASSWORD` is set. Don't commit it to `deploy.properties`.
 
-Still on the **Leader VM**, copy the seed file to both standbys:
+The Leader comes up with self-signed certificates. To use your own CA instead (Leader certificate, and the Follower certificate for Kubernetes followers - which can be loaded any time later), run [`custom-certificates/conjur`](../custom-certificates) after step 02.
 
-```bash
-./03_copy_keys_to_standbys.sh
-```
+## Configuration (`scripts/deploy.properties`)
 
-### Step 3 — Deploy and Configure Each Standby
+| Setting | Default | Notes |
+|---|---|---|
+| `SUDO`, `CONTAINER_MGR`, `CONTAINER_IMG`, `CONTAINER_NAME`, `CONTAINER_VOLUME_PATH` | | Same as in the upgrade scripts - keep them in sync |
+| `CONJUR_ACCOUNT` | `conjur` | |
+| `CONJUR_ADMIN_PASSWORD` | empty | Empty = prompt |
+| `CONJUR_HOSTNAME` | `hostname -f` | Name clients use to reach Conjur |
+| `LEADER_ALTNAMES` | empty | Extra certificate names, comma separated. This host's FQDN/short name and `localhost` are added automatically |
 
-Repeat the following on **Standby 1**, then **Standby 2**:
+**Set the names right the first time.** The hostname and altnames given at configure time survive every backup/restore and upgrade, and nginx host validation stays pinned to them. On a long-lived demo node, the only way around a name you didn't list is the bypass in the upgrade scripts.
 
-```bash
-# 1. Start the Conjur container
-./01_deploy_conjur.sh
+## What each step does
 
-# 2. Unpack the seed and join the cluster
-./04_configure_standby.sh
-```
+- **00** - `load`s the image tarball, tags it as `$CONTAINER_IMG:<tag>` (tag from the image name, or from the file name if the tarball has none) and pushes it to the registry.
+- **01** - creates volumes under `$CONTAINER_VOLUME_PATH/<name>-<tag>`, extracts the seccomp profile shipped in the image (falls back to unconfined), starts `<name>-<tag>`. With Podman, also installs a `conjur.service` systemd unit so Conjur comes back after a reboot.
+- **02** - `evoke configure leader` with the hostname and altnames, waits for `/health`.
 
-### Step 4 — Enable Synchronous Replication
-
-Back on the **Leader VM**:
-
-```bash
-./05_enable_synchronous_replication.sh
-```
-
----
-
-## Volume Structure
-
-Script 01 creates the following directory layout on each node under `CONTAINER_VOLUME_PATH`:
-
-```
-<CONTAINER_VOLUME_PATH>/<CONTAINER_NAME>_<CONTAINER_TAG>/
-├── config/     # Conjur configuration files
-├── security/   # Encryption keys and certificates
-├── backups/    # Database backups
-├── seeds/      # Standby seed files
-├── logs/       # Conjur application logs
-└── certs/      # TLS certificates
-```
+Server keys are not encrypted with a master key - demo setup.
