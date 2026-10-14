@@ -1,113 +1,58 @@
 #!/bin/bash
+# Step 2: start a fresh, role-less Conjur container on the new version.
+# Usage: 02-deploy-new-version.sh [version-tag]   (default: highest local version of CONTAINER_IMG)
 set -euo pipefail
+source "$(dirname -- "${BASH_SOURCE[0]}")/common.sh"
+start_logging 02-deploy-new-version
 
-# This script will deploy a new role-less Conjur node
+TAG=${1:-$(latest_local_tag)}
+[ -n "$TAG" ] || die "No local ${CONTAINER_IMG} image - run 00-load-image.sh or pass a tag"
+echo "Version: ${TAG}"
 
-#================ Internal =======================
-SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-LOGS_FOLDER="${SCRIPT_DIR}/../logs"
-LOG_FILE="${LOGS_FOLDER}/02-deploy-new-version-$(date +%Y-%m-%d).log"
+NAME="${CONTAINER_NAME}-${TAG}"
+IMAGE="${CONTAINER_IMG}:${TAG}"
+DIR="${CONTAINER_VOLUME_PATH}/${NAME}"
 
-mkdir -p "${LOGS_FOLDER}"
+mkdir -p "$DIR"/{config,security,backups,seeds,logs}
 
-#================ Clean Output Handler (No-Enter Fix) =======================
-exec 3>&1 4>&2
-cleanup() {
-    local exit_code=$?
-    exec 1>&3 2>&4 3>&- 4>&-
-    wait "${LOG_PID:-}" 2>/dev/null || true
-    exit $exit_code
-}
-trap cleanup EXIT
-
-exec > >(while read -r line; do echo "$(date +'%Y-%m-%d %H:%M:%S') | $line"; done | tee -a "${LOG_FILE}") 2>&1
-LOG_PID=$!
-
-echo "[ Script started ]"
-
-#================ Variables =======================
-SUDO="${SUDO:-}"
-CONTAINER_MGR="${CONTAINER_MGR:-docker}"
-CONTAINER_IMG="${CONTAINER_IMG:-aws-pub-lab:5443/conjur-appliance}"
-CONTAINER_NAME="conjur"
-
-# Read version tag from command line argument ($1) or fallback to 13.10.0 default
-CONTAINER_TAG="${1:-13.10.0}"
-
-CONTAINER_VOLUME_PATH="${HOME}/conjur"
-IS_CREATE_AUTO_START=false
-
-SERVER_PORT=443
-LB_VERIFICATION_PORT=444
-DB_PORT=5432
-AUDIT_REPLICATION_PORT=1999
-
-TARGET_DIR="${CONTAINER_VOLUME_PATH}/${CONTAINER_NAME}-${CONTAINER_TAG}"
-
-echo "==== Preparing Conjur node deployment for tag: ${CONTAINER_TAG} ===="
-
-# Create directory structure
-mkdir -p "${TARGET_DIR}"/{config,security,backups,seeds,logs,certs}
-
-# Copy seccomp configuration if present
-SECCOMP_OPT=""
-if [ -f "${SCRIPT_DIR}/seccomp.json" ]; then
-    cp -v "${SCRIPT_DIR}/seccomp.json" "${TARGET_DIR}/security/"
-    SECCOMP_OPT="--security-opt seccomp=${TARGET_DIR}/security/seccomp.json"
+# Use the seccomp profile shipped in the image, so each version gets the one it was built for
+step "Extracting seccomp profile from ${IMAGE}"
+if cm run --rm --entrypoint /bin/cat "$IMAGE" /usr/share/doc/conjur/examples/seccomp.json > "$DIR/security/seccomp.json"; then
+    SECCOMP="seccomp=${DIR}/security/seccomp.json"
 else
-    echo "Warning: seccomp.json not found in ${SCRIPT_DIR}. Proceeding without seccomp profile..."
+    echo "No profile in image - running unconfined"
+    rm -f "$DIR/security/seccomp.json"
+    SECCOMP="seccomp=unconfined"
 fi
 
-# Enable unprivileged port binding for non-root users
-if [ -z "${SUDO}" ] && [ "$(id -u)" -ne 0 ]; then
-    echo "Enabling usage of port 443 on non-root user..."
-    sudo sysctl net.ipv4.ip_unprivileged_port_start=443
-    echo "Enabling linger for non-root user..."
-    sudo loginctl enable-linger "$(whoami)"
+# Docker restarts the container itself; with Podman, systemd does (see common.sh)
+RESTART=unless-stopped
+if is_podman; then
+    RESTART=no
+    # Rootless Podman can't bind port 443 by default - persist it so it survives reboots
+    if [ -z "$SUDO" ] && [ "$(id -u)" -ne 0 ]; then
+        echo "net.ipv4.ip_unprivileged_port_start=443" | sudo tee /etc/sysctl.d/99-conjur.conf >/dev/null
+        sudo sysctl --quiet --system
+        sudo loginctl enable-linger "$(whoami)"
+    fi
 fi
 
-#================ Deploy Container =======================
-echo "==== Deploying Conjur container (${CONTAINER_NAME}-${CONTAINER_TAG}) ===="
-
-${SUDO} ${CONTAINER_MGR} run \
-    --name "${CONTAINER_NAME}-${CONTAINER_TAG}" \
+step "Starting ${NAME}"
+cm run \
+    --name "$NAME" \
     --detach \
-    --restart=unless-stopped \
-    ${SECCOMP_OPT} \
-    --publish "${SERVER_PORT}:443" \
-    --publish "${LB_VERIFICATION_PORT}:444" \
-    --publish "${DB_PORT}:5432" \
-    --publish "${AUDIT_REPLICATION_PORT}:1999" \
+    --restart="$RESTART" \
+    --security-opt "$SECCOMP" \
+    --publish 443:443 \
+    --publish 444:444 \
+    --publish 5432:5432 \
+    --publish 1999:1999 \
     --log-driver journald \
-    --volume "${TARGET_DIR}/config:/etc/conjur/config:Z" \
-    --volume "${TARGET_DIR}/security:/opt/cyberark/dap/security:Z" \
-    --volume "${TARGET_DIR}/backups:/opt/conjur/backup:Z" \
-    --volume "${TARGET_DIR}/seeds:/opt/cyberark/dap/seeds:Z" \
-    --volume "${TARGET_DIR}/logs:/var/log/conjur:Z" \
-    "${CONTAINER_IMG}:${CONTAINER_TAG}"
+    --volume "$DIR/config:/etc/conjur/config:Z" \
+    --volume "$DIR/security:/opt/cyberark/dap/security:Z" \
+    --volume "$DIR/backups:/opt/conjur/backup:Z" \
+    --volume "$DIR/seeds:/opt/cyberark/dap/seeds:Z" \
+    --volume "$DIR/logs:/var/log/conjur:Z" \
+    "$IMAGE"
 
-#================ Podman Auto-Start (Optional) =======================
-if [ "${CONTAINER_MGR}" == "podman" ] && [ "${IS_CREATE_AUTO_START}" == "true" ]; then
-    echo "Enabling auto start for podman container..."
-
-    if [ "$(id -u)" -eq 0 ]; then
-        SYSTEMD_DIR="/etc/systemd/system"
-        SYSTEMD_FLAG=""
-    else
-        SYSTEMD_DIR="${HOME}/.config/systemd/user"
-        SYSTEMD_FLAG="--user"
-        mkdir -p "${SYSTEMD_DIR}"
-    fi
-
-    ${SUDO} podman generate systemd "${CONTAINER_NAME}-${CONTAINER_TAG}" --name --container-prefix="" --separator="" > "${SCRIPT_DIR}/conjur.service"
-    mv "${SCRIPT_DIR}/conjur.service" "${SYSTEMD_DIR}/conjur.service"
-
-    if command -v selinuxenabled >/dev/null 2>&1 && selinuxenabled; then
-        restorecon -v "${SYSTEMD_DIR}/conjur.service" || true
-    fi
-
-    systemctl ${SYSTEMD_FLAG} daemon-reload
-    systemctl ${SYSTEMD_FLAG} enable conjur
-fi
-
-echo "[ Script finished successfully ]"
+podman_install_unit "$NAME"

@@ -1,2 +1,2 @@
-**/logs/*.log
-**/backup/*
+logs/
+backup/
