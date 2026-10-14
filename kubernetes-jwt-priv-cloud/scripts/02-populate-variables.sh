@@ -7,7 +7,7 @@ SAFE_PATH=data/kubernetes/applications/safe/
 # Using kubectl/oc
 COP_CLI=kubectl
 # If needed, modify the below to configure Conjur CLI location
-CONJUR_CLI=/Applications/ConjurCloudCLI.app/Contents/Resources/conjur/conjur
+CONJUR_CLI=conjur
 
 #============ Script ===============
 
@@ -15,7 +15,7 @@ CONJUR_CLI=/Applications/ConjurCloudCLI.app/Contents/Resources/conjur/conjur
 "$CONJUR_CLI" whoami
 
 # Populate messenger app value
-"$CONJUR_CLI" variable set -i data/kubernetes/applications/safe/messenger -v "$(cat "${SCRIPT_DIR}"/../go/bin/messenger.b64)"
+#"$CONJUR_CLI" variable set -i data/kubernetes/applications/safe/messenger -v "$(cat "${SCRIPT_DIR}"/../go/bin/messenger.b64)"
 
 # Populate authenticator values
 "$CONJUR_CLI" variable set -i conjur/authn-jwt/k8s-cluster1/identity-path -v "/data/kubernetes/applications"

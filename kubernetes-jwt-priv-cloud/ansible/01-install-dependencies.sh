@@ -12,27 +12,26 @@ command_exists() {
 install_ansible_macos() {
     echo "Installing Ansible on macOS..."
     brew install ansible
-    pip3 install xkcdpass
 }
 
 # Install Ansible on Debian/Ubuntu
 install_ansible_debian() {
     echo "Installing Ansible on Debian/Ubuntu..."
-    sudo apt update
-    sudo apt install -y software-properties-common
-    sudo add-apt-repository --yes --update ppa:ansible/ansible
-    sudo apt install -y ansible
-    sudo apt install -y python3-pip
-    pip3 install xkcdpass
+    sudo apt update -y
+    # התקנה ישירה מה-repositories הרשמיים ללא תלות ב-PPA
+    sudo apt install -y software-properties-common python3-pip ansible
 }
 
-# Install Ansible on RHEL/CentOS
+# Install Ansible on RHEL/CentOS/Fedora
 install_ansible_rhel() {
     echo "Installing Ansible on RHEL/CentOS..."
-    sudo yum install -y epel-release
-    sudo yum install -y ansible
-    sudo yum install -y python3-pip
-    pip3 install xkcdpass
+    if command_exists dnf; then
+        sudo dnf install -y epel-release || true
+        sudo dnf install -y ansible python3-pip
+    else
+        sudo yum install -y epel-release || true
+        sudo yum install -y ansible python3-pip
+    fi
 }
 
 # Check the OS and install Ansible if not installed
@@ -44,7 +43,7 @@ else
         if command_exists brew; then
             install_ansible_macos
         else
-            echo "Homebrew is not installed. Please install Homebrew first."
+            echo "Error: Homebrew is not installed. Please install Homebrew first."
             exit 1
         fi
     elif [[ -f /etc/debian_version ]]; then
@@ -52,23 +51,14 @@ else
     elif [[ -f /etc/redhat-release ]]; then
         install_ansible_rhel
     else
-        echo "Unsupported OS. Please install Ansible manually."
+        echo "Error: Unsupported OS. Please install Ansible manually."
         exit 1
     fi
 fi
 
-# Function to check if a collection is installed
-is_collection_installed() {
-    ansible-galaxy collection list "$1" | grep -q "$1"
-}
-
 # Collection name
 COLLECTION="community.general"
 
-# Check if the collection is installed
-if is_collection_installed "$COLLECTION"; then
-    echo "Collection $COLLECTION is already installed."
-else
-    echo "Collection $COLLECTION is not installed. Installing..."
-    ansible-galaxy collection install "$COLLECTION"
-fi
+# Install collection safely (ansible-galaxy is naturally idempotent)
+echo "Ensuring Ansible collection '$COLLECTION' is installed..."
+ansible-galaxy collection install "$COLLECTION"

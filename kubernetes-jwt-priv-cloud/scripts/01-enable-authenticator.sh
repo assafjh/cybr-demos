@@ -7,7 +7,7 @@
 #AUTHN_TO_ENABLE=authn-jwt/k8s-cluster1
 AUTHN_TO_ENABLE=authn-jwt/k8s-cluster1
 # If needed, modify the below to configure Conjur CLI location
-CONJUR_CLI=/Applications/ConjurCloudCLI.app/Contents/Resources/conjur/conjur
+CONJUR_CLI=conjur
 
 #============ Script ===============
 "$CONJUR_CLI" authenticator enable --id  "${AUTHN_TO_ENABLE}"

@@ -11,7 +11,7 @@ REMOTE_DB_HOST=ajh-postgres
 REMOTE_DB_PORT=5432
 #================ Script ==============
 $SUDO $CONTAINER_MGR run -i --rm -e PGPASSWORD=123456 docker.io/assafhazan/postgres-companydb:17-alpine \
-  psql -U admin "postgres://${REMOTE_DB_HOST}:${REMOTE_DB_PORT}/companydb" <<EOF
+  psql -U admin "postgres://${REMOTE_DB_HOST}:${REMOTE_DB_PORT}/postgres" <<EOF
 
 \x auto
 

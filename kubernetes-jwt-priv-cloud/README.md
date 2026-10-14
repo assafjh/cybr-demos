@@ -46,7 +46,7 @@ conjur login -i k8s-admin01
 ```
 ##### 2. Load kubernetes policy
 ```bash
-conjur policy update -b data/kubernetes -f policies/conjur-cloud/02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
+conjur policy update -b data/kubernetes -f 02-define-kubernetes-branch.yml | tee -a 02-define-kubernetes-branch.log
 ```
 ##### 3. Logout from Conjur CLI
 ```Bash
@@ -59,7 +59,7 @@ conjur login -i <username>
 ```
 ##### 2. Load the authenticator policy
 ```Bash
-conjur policy update -b conjur/authn-jwt -f policies/conjur-cloud/03-define-jwt-auth.yml | tee -a 03-define-jwt-auth.log
+conjur policy update -b conjur/authn-jwt -f 04-define-jwt-auth.yml | tee -a 04-define-jwt-auth.log
 ```
 ##### 4. Enable the authenticator
 - This step will work from the Conjur Leader VM only.
