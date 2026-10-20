@@ -1,4 +1,5 @@
 # Filename: 04-GetAIMPassword-REST.ps1
+# Works on Windows PowerShell 5.1 and PowerShell 7+
 
 # Configuration variables
 $baseUrl = "<ccp-url>/AIMWebService/api/Accounts"
@@ -7,25 +8,33 @@ $safe = "Credential-Providers"
 $object = "Database-PostgreSQL-reception"
 $folder = "Root"
 $reason = "Demo"
+$useWindowsAuth = $false # set $true if the CCP IIS app uses Windows Authentication
 
-# Construct the full URL with parameters, ensuring proper encoding
-$appIDEncoded = [System.Web.HttpUtility]::UrlEncode($appID)
-$safeEncoded = [System.Web.HttpUtility]::UrlEncode($safe)
-$objectEncoded = [System.Web.HttpUtility]::UrlEncode($object)
-$folderEncoded = [System.Web.HttpUtility]::UrlEncode($folder)
-$reasonEncoded = [System.Web.HttpUtility]::UrlEncode($reason)
+# Encode parameters (no dependency on System.Web)
+$enc = { param($v) [uri]::EscapeDataString($v) }
 
-$url = "${baseUrl}?AppID=$appIDEncoded&Safe=$safeEncoded&Object=$objectEncoded&Folder=$folderEncoded&Reason=$reasonEncoded"
+$url = "${baseUrl}?AppID=$(& $enc $appID)&Safe=$(& $enc $safe)&Object=$(& $enc $object)&Folder=$(& $enc $folder)&Reason=$(& $enc $reason)"
+Write-Host "Request URL: $url" -ForegroundColor Cyan
 
-# Make the web request with NTLM authentication
+$params = @{
+    Uri = $url
+    Method = 'GET'
+    ErrorAction = 'Stop'
+}
+if ($useWindowsAuth) { $params.UseDefaultCredentials = $true }
+
 try {
-    $response = Invoke-RestMethod -Uri $url -Method GET -ContentType "application/json"
-    Write-Host "Your password is:" $response.content -ForegroundColor Green
+    $response = Invoke-RestMethod @params
+    Write-Host "Your password is:" $response.Content -ForegroundColor Green
 } catch {
     Write-Host "Request failed:" -ForegroundColor Red
-    Write-Host $_.Exception.Message -ForegroundColor Red
-
-    # Print full exception details
-    $errorMessage = $_.Exception | Out-String
-    Write-Host $errorMessage -ForegroundColor Red
+    if ($_.Exception.Response) {
+        Write-Host "HTTP status:" ([int]$_.Exception.Response.StatusCode) -ForegroundColor Red
+    }
+    # CCP returns ErrorCode/ErrorMsg in the body - this is the useful part
+    if ($_.ErrorDetails.Message) {
+        Write-Host "CCP response:" $_.ErrorDetails.Message -ForegroundColor Red
+    } else {
+        Write-Host $_.Exception.Message -ForegroundColor Red
+    }
 }
