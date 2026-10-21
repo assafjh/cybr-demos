@@ -28,7 +28,8 @@ param(
     [string]$Object,
     [string]$UserName,
     [string]$Address,
-    [switch]$UseDefaultCredentials    # When the CCP uses Windows Authentication
+    [switch]$UseDefaultCredentials,    # When the CCP uses Windows
+    [switch]$SkipCertificateCheck
 )
 
 $ErrorActionPreference = 'Stop'
@@ -89,6 +90,7 @@ $baseUrl = if ($CcpUrl) { $CcpUrl } elseif ($settings) { $settings.Ccp.Url } els
 $serviceName = if ($WebServiceName) { $WebServiceName } elseif ($settings.Ccp.WebServiceName) { $settings.Ccp.WebServiceName } else { 'AIMWebService' }
 $url     = "$($baseUrl.TrimEnd('/'))/$serviceName/api/Accounts"
 $useWindowsAuth = $UseDefaultCredentials -or ($settings.Ccp.UseDefaultCredentials -eq $true)
+$options = Get-CCPRequestOptions -SkipCertificateCheck:($SkipCertificateCheck -or $settings.Ccp.SkipCertificateCheck -eq $true)
 
 Write-Host 'Read-only: this script changes nothing and never displays passwords' -ForegroundColor Cyan
 Write-Host ''
@@ -191,7 +193,7 @@ function Test-Retrieval {
 
     try {
         $response = Invoke-RestMethod -Method Post -Uri $url -ContentType 'application/json' -Body $body `
-            -UseDefaultCredentials:$useWindowsAuth -TimeoutSec 30
+            -UseDefaultCredentials:$useWindowsAuth -TimeoutSec 30 @options
         Write-Result ok "Retrieved account '$($response.UserName)' (Object: $($response.Name)) - password not displayed"
     } catch {
         $status = [int]$_.Exception.Response.StatusCode
