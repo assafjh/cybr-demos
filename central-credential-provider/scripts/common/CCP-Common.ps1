@@ -32,7 +32,7 @@ function Import-CCPSettings {
     foreach ($section in $Required) {
         if (-not $settings.ContainsKey($section)) { throw "Settings file $Path has no '$section' section" }
     }
-    $present = @($Required) + @($Optional | Where-Object { $settings.ContainsKey($_) })
+    $present = @($Required) + @(foreach ($section in $Optional) { if ($settings.ContainsKey($section)) { $section } })
     $unfilled = foreach ($section in $present) { Find-Placeholder $settings[$section] $section }
     if ($unfilled) { throw "Fill in these settings in ${Path}: $($unfilled -join ', ')" }
 
