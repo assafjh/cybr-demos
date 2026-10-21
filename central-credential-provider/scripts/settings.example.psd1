@@ -33,6 +33,7 @@
         SkipCertificateCheck = $false
     }
 
+    # Optional - remove the section when you log on as the admin who should own the Safes.
     # Human owners added to every Safe with full permissions. A Safe created through the API is
     # otherwise owned only by the API user, and the admins cannot see or manage it in the portal.
     # Type: User (default), Group or Role

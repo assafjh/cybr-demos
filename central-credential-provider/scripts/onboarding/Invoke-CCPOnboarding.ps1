@@ -94,11 +94,15 @@ $appsChanged = $false    # The Provider caches Applications - changes need a res
 $queries = @()    # Ready-to-use CCP request bodies, built from the actual Object names in the Vault
 
 try {
-    $config  = Import-CCPSettings -Path $ConfigPath -Required Connection, SafeOwners, Applications, Safes
+    $config = Import-CCPSettings -Path $ConfigPath -Required Connection, Applications, Safes -Optional SafeOwners
     $session = Connect-CCPVault -Connection $config.Connection -Credential $Credential -NewCredential:$NewCredential
 } catch {
     Write-Host "[error]    $($_.Exception.Message)" -ForegroundColor Red
     exit 1
+}
+
+if (-not $config.SafeOwners) {
+    Write-Result info 'No SafeOwners - new Safes are managed only by the logged-on user'
 }
 
 try {
@@ -160,9 +164,6 @@ try {
 
         $members = (Invoke-CCPApi -Session $session -Method Get -Path "/API/Safes/$safeEncoded/Members?limit=1000").value
 
-        if (-not $config.SafeOwners) {
-            Write-Result warn "  No SafeOwners configured - only the logged-on API user can manage this Safe"
-        }
         foreach ($owner in $config.SafeOwners) {
             $ownerType = if ($owner.Type) { $owner.Type } else { 'User' }
             Add-SafeMemberIfMissing $session $safe.Name $members $owner.Name $ownerPermissions $ownerType

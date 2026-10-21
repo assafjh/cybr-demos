@@ -10,7 +10,8 @@ function Import-CCPSettings {
     # Loads the settings file and fails early on placeholders (<...>) left in the required sections.
     param(
         [Parameter(Mandatory)] [string]$Path,
-        [string[]]$Required    # Top-level sections the calling script needs, e.g. 'Connection', 'Safes'
+        [string[]]$Required,    # Top-level sections the calling script needs, e.g. 'Connection', 'Safes'
+        [string[]]$Optional # Sections checked for placeholders only when present
     )
 
     if (-not (Test-Path $Path)) {
@@ -31,7 +32,8 @@ function Import-CCPSettings {
     foreach ($section in $Required) {
         if (-not $settings.ContainsKey($section)) { throw "Settings file $Path has no '$section' section" }
     }
-    $unfilled = foreach ($section in $Required) { Find-Placeholder $settings[$section] $section }
+    $present = @($Required) + @($Optional | Where-Object { $settings.ContainsKey($_) })
+    $unfilled = foreach ($section in $present) { Find-Placeholder $settings[$section] $section }
     if ($unfilled) { throw "Fill in these settings in ${Path}: $($unfilled -join ', ')" }
 
     $settings
