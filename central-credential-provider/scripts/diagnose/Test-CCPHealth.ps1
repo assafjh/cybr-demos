@@ -194,7 +194,7 @@ function Test-Retrieval {
     try {
         $response = Invoke-RestMethod -Method Post -Uri $url -ContentType 'application/json' -Body $body `
             -UseDefaultCredentials:$useWindowsAuth -TimeoutSec 30 @options
-        Write-Result ok "Retrieved account '$($response.UserName)' (Object: $($response.Name)) - password not displayed"
+        Write-Result ok "Retrieved account '$($response.UserName)@$($response.Address)' - password not displayed"
     } catch {
         $status = [int]$_.Exception.Response.StatusCode
         if ($status -eq 0) {
