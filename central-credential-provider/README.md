@@ -108,5 +108,11 @@ On the CCP server, as administrator:
 ./scripts/lab/New-CCPLabCertificate.ps1         # Self-signed HTTPS certificate on 443
 ```
 
+Copied the scripts as a zip / browser download? Windows marks them as downloaded and the
+execution policy blocks them - unblock the folder once (a `git clone` is not marked):
+```powershell
+Get-ChildItem .\central-credential-provider -Recurse -Include *.ps1, *.psd1 | Unblock-File
+```
+
 Edit the host names in `New-CCPLabCertificate.ps1` first. A client on another machine must
 trust the certificate (import it to its trusted root store).

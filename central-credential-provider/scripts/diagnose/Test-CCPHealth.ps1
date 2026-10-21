@@ -20,7 +20,7 @@ param(
     [string]$ConfigPath = (Join-Path $PSScriptRoot '../settings.psd1'),
     [string]$CcpUrl,                  # Overrides Ccp.Url - the host name must match the CCP certificate
     [string]$WebServiceName,          # Overrides Ccp.WebServiceName
-    [string]$ProviderPath = "${env:ProgramFiles(x86)}\CyberArk\ApplicationPasswordProvider",
+    [string]$ProviderPath,
 
     # One test retrieval instead of the ones in the settings file
     [string]$AppId,
@@ -46,7 +46,7 @@ $errorHints = [ordered]@{
     'APPAP004E'               = 'Object not found, or the AppID / Provider user has no permission on it - run Test-CCPAccess.ps1 for this AppID and Safe'
     'APPAP093E|APPAP127E'     = 'The Provider user is missing the Audit Users authorization, or its user type is not AppProvider'
     'APPAP282E'               = 'The CPM is changing this password right now - retry in a moment'
-    'APPEX003E'               = 'General Provider error - the reason is in APPConsole.log on the CCP server (the log check above shows the latest errors)'
+    'APPEX003E'               = 'General Provider error - often an authentication failure (APPAP306E / APPAP307E). The reason is in APPAudit.log on the CCP server'
 }
 
 function Get-ErrorHint {
@@ -111,30 +111,33 @@ if (-not $onWindows) {
     }
 
     # --- IIS and the web service ---------------------------------------------
+    # appcmd instead of the WebAdministration module, which is not fully usable from PowerShell 7
+    $appcmd = "$env:windir\System32\inetsrv\appcmd.exe"
     $w3svc = Get-Service -Name W3SVC -ErrorAction SilentlyContinue
     if (-not $w3svc -or $w3svc.Status -ne 'Running') {
         Write-Result fail 'IIS (W3SVC) is not running' -Hint 'Start the World Wide Web Publishing Service'
-    } elseif (-not (Get-Module -ListAvailable -Name WebAdministration)) {
-        Write-Result skip 'IIS application check - the WebAdministration module is not available'
+    } elseif (-not (Test-Path $appcmd)) {
+        Write-Result skip "IIS application check - $appcmd not found"
     } else {
-        Import-Module WebAdministration
-        $webApp = Get-WebApplication -Name $serviceName | Select-Object -First 1
+        $webApp = ([xml](& $appcmd list app /path:/$serviceName /xml)).appcmd.APP | Select-Object -First 1
         if (-not $webApp) {
-            Write-Result fail "IIS application '$serviceName' not found" -Hint 'Check the web service name (Ccp.WebServiceName / -WebServiceName) or the CCP installation'
+            Write-Result fail "IIS application '/$serviceName' not found" -Hint 'Check the web service name (Ccp.WebServiceName / -WebServiceName) or the CCP installation'
         } else {
-            $poolState = (Get-WebAppPoolState -Name $webApp.applicationPool).Value
+            $poolName = $webApp.'APPPOOL.NAME'
+            $poolState = ([xml](& $appcmd list apppool /apppool.name:$poolName /xml)).appcmd.APPPOOL.state
             if ($poolState -ne 'Started') {
-                Write-Result fail "IIS application '$serviceName' - application pool '$($webApp.applicationPool)' is $poolState" -Hint 'Start the application pool'
+                Write-Result fail "IIS application '$($webApp.'APP.NAME')' - application pool '$poolName' is $poolState" -Hint 'Start the application pool'
             } else {
-                Write-Result ok "IIS application '$serviceName' - application pool '$($webApp.applicationPool)' started"
+                Write-Result ok "IIS application '$($webApp.'APP.NAME')' - application pool '$poolName' started"
             }
 
             # The AppID the web service itself uses, and whether it trusts a load balancer's X-Forwarded-For
-            $webConfig = Join-Path ([Environment]::ExpandEnvironmentVariables($webApp.PhysicalPath)) 'web.config'
+            $vdir = ([xml](& $appcmd list vdir /app.name:$($webApp.'APP.NAME') /xml)).appcmd.VDIR | Select-Object -First 1
+            $webConfig = Join-Path ([Environment]::ExpandEnvironmentVariables($vdir.physicalPath)) 'web.config'
             if (Test-Path $webConfig) {
                 $appSettings = ([xml](Get-Content $webConfig -Raw)).configuration.appSettings.add
                 $serviceAppId = ($appSettings | Where-Object { $_.key -eq 'AppID' }).value
-                $proxies      = ($appSettings | Where-Object { $_.key -eq 'TrustedProxies' }).value
+                $proxies = ($appSettings | Where-Object { $_.key -eq 'TrustedProxies' }).value
                 Write-Result info "Web service AppID (web.config): '$serviceAppId' - its Allowed Machines must include this server's private IP / host name"
                 if ($proxies) {
                     Write-Result info "TrustedProxies: $proxies - client Allowed Machines are checked against X-Forwarded-For from these"
@@ -143,10 +146,16 @@ if (-not $onWindows) {
         }
     }
 
+    # --- Provider install folder ------------------------------------------------
+    if (-not $ProviderPath) {
+        $ProviderPath = "$env:ProgramFiles\CyberArk\ApplicationPasswordProvider", "${env:ProgramFiles(x86)}\CyberArk\ApplicationPasswordProvider" |
+            Where-Object { Test-Path $_ } | Select-Object -First 1
+    }
+
     # --- Vault connectivity ----------------------------------------------------
-    $vaultIni = Join-Path $ProviderPath 'Vault\Vault.ini'
-    if (-not (Test-Path $vaultIni)) {
-        Write-Result skip "Vault connectivity - $vaultIni not found" -Hint 'Use -ProviderPath if the Provider is installed elsewhere'
+    $vaultIni = if ($ProviderPath) { Get-ChildItem $ProviderPath -Recurse -Filter Vault.ini -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName }
+    if (-not $vaultIni) {
+        Write-Result skip 'Vault connectivity - Vault.ini not found under the Provider folder' -Hint 'Use -ProviderPath with the Provider install folder'
     } else {
         $ini       = Get-Content $vaultIni
         $addresses = (($ini | Where-Object { $_ -match '^\s*ADDRESS\s*=' }) -replace '^\s*ADDRESS\s*=\s*', '') -split ',' | ForEach-Object { $_.Trim() }
@@ -165,6 +174,7 @@ if (-not $onWindows) {
     # --- Provider logs ---------------------------------------------------------
     # APPConsole.log has service errors; APPAudit.log has the reason each request failed (e.g. APPAP133E)
     foreach ($logName in 'APPConsole.log', 'APPAudit.log') {
+        if (-not $ProviderPath) { Write-Result skip "$logName - Provider install folder not found (use -ProviderPath)"; continue }
         $log = Join-Path $ProviderPath "Logs\$logName"
         if (-not (Test-Path $log)) {
             Write-Result skip "$logName - not found under $ProviderPath\Logs"
@@ -199,7 +209,7 @@ function Test-Retrieval {
         $status = [int]$_.Exception.Response.StatusCode
         if ($status -eq 0) {
             Write-Result fail "Could not connect to $url - $($_.Exception.Message)" `
-                -Hint 'Check the URL, and that the certificate matches the host name (Ccp.Url / -CcpUrl)'
+                -Hint 'Check the URL, and that the certificate matches the host name (Ccp.Url / -CcpUrl). On the CCP server itself: -CcpUrl https://localhost'
             return
         }
 
@@ -210,8 +220,18 @@ function Test-Retrieval {
         } catch { }
 
         Write-Result fail "HTTP $status $code - $message" -Hint (Get-ErrorHint -Code $code -Status $status)
-        if ($code -eq 'APPAP306E' -or $status -eq 403) {
-            Write-Result info 'Note: a test from this server is checked against Allowed Machines too - run it from the application machine if this server is not allowed'
+
+        # On the CCP server the Provider log has the actual reason - show the latest entry
+        $auditLog = if ($ProviderPath) { Join-Path $ProviderPath 'Logs\APPAudit.log' }
+        if ($auditLog -and (Test-Path $auditLog)) {
+            Start-Sleep -Milliseconds 500 # Let the Provider write the entry
+            $reason = Get-Content $auditLog -Tail 20 | Where-Object { $_ -match '\b[A-Z]{3,6}\d{3}E\b' } | Select-Object -Last 1
+            if ($reason -match 'Failure reason: (.*)$') { $reason = $Matches[1] }
+            if ($reason) { Write-Result info "APPAudit.log: $reason" }
+        }
+
+        if ($code -in 'APPAP306E', 'APPEX003E' -or $status -eq 403) {
+            Write-Result info 'Note: Allowed Machines is checked for this request too - from the CCP server itself the CCP sees ::1 / 127.0.0.1. Run it from the application machine, or use a health-check AppID (see README)'
         }
     }
 }
