@@ -231,7 +231,7 @@ function Test-Retrieval {
         }
 
         if ($code -in 'APPAP306E', 'APPEX003E' -or $status -eq 403) {
-            Write-Result info 'Note: Allowed Machines is checked for this request too - from the CCP server itself the CCP sees ::1 / 127.0.0.1. Run it from the application machine, or use a health-check AppID (see README)'
+            Write-Result info 'Note: Allowed Machines is checked for this request too - from the CCP server itself the CCP sees ::1 / 127.0.0.1. Run it from the application machine, or allow this server in a health-check AppID that only has a dummy Safe'
         }
     }
 }

@@ -61,8 +61,8 @@ existing members are reported as warnings.
 | `Test-CCPAccess.ps1` | Anywhere with access to the PVWA | AppID and its authentication methods, Safe, members and permissions, Provider users (incl. Audit Users), the account and its exact Object name |
 | `Test-CCPHealth.ps1` | On the CCP server | Provider service, IIS and AIMWebService, connectivity to the Vault, errors in `APPConsole.log` / `APPAudit.log`, test retrievals with the CCP error code explained |
 
-Both are read-only and never display passwords. Tested against Privilege Cloud; the PAM
-Self-Hosted logon (`/API/auth/<type>/Logon`) is not tested yet. Without parameters they check everything in
+Both are read-only and never display passwords. Both are read-only and never display passwords. Tested against Privilege Cloud and PAM
+Self-Hosted. Without parameters they check everything in. Without parameters they check everything in
 the settings file; with parameters they check one target - e.g. a Safe the customer set up:
 
 ```powershell

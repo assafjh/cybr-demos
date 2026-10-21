@@ -975,7 +975,7 @@
         },
         {
           "name": "cCPUrl",
-          "value": "http://ajh-vault-components-01",
+          "value": "https://<ccp-server>",
           "enabled": true,
           "secret": false,
           "type": "text"
@@ -996,14 +996,14 @@
         },
         {
           "name": "providerName",
-          "value": "Prov_EC2AMAZ-O7AVQ1P",
+          "value": "Prov_<ccp-hostname>",
           "enabled": true,
           "secret": false,
           "type": "text"
         },
         {
           "name": "applicationID",
-          "value": "AIMWebService",
+          "value": "CCP-Demo-App",
           "enabled": true,
           "secret": false,
           "type": "text"
