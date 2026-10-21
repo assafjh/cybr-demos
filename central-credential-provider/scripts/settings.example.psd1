@@ -95,20 +95,5 @@
                 }
             )
         }
-
-        @{
-            # A Safe the AppID is NOT a member of - shows the AppID cannot reach other secrets.
-            # The Provider IS a member, so a denied request is about the AppID, not the Provider.
-            Name      = 'Credential-Providers-Other'
-            AppIds    = @()
-            Providers = @('Prov_<ccp-hostname>')
-            Accounts  = @(
-                @{
-                    PlatformId = 'PostgreSQL'
-                    Address    = 'db.lab.local'
-                    UserName   = 'admin'
-                }
-            )
-        }
     )
 }
