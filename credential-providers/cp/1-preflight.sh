@@ -53,12 +53,6 @@ result() {    # result <status> <message> [hint] - same format as the PowerShell
     if [ -n "${3:-}" ]; then printf '%s%-10s -> %s%s\n' "$color" '' "$3" "$reset"; fi
 }
 
-# --- Already installed? ---------------------------------------------------------
-if [ -e /etc/init.d/aimprv ] || [ -d /opt/CARKaim ]; then
-    result exists 'Provider already installed - check it with: /etc/init.d/aimprv status'
-    exit 0
-fi
-
 # --- Package format, and whether the CP is already installed --------------------
 # The CP ships as RPM (RHEL, CentOS, Oracle Linux) and DEB (Ubuntu). Installed = the package is
 # registered - folders such as /opt/CARKaim can stay behind after an uninstall.
