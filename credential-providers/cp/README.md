@@ -33,6 +33,6 @@ everything in the settings file; with parameters they check one target:
   `Address` avoids depending on it.
 - **Privilege Cloud IP allowlist** - the public IP each CP machine connects from must be
   allowlisted for the Vault connection (port 1858). Machines behind one NAT share one entry.
-  An open port is not enough: the Vault rejects a non-allowlisted IP after the connection opens.
+  A machine that is not allowlisted cannot open the connection at all - `1-Preflight` prints its public IP.
 - **The Vault address is a host name** - `vault-<subdomain>.privilegecloud.cyberark.cloud`, not the
   portal URL. The installer crashes without a message on a URL or a typo; `1-Preflight` checks it first.

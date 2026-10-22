@@ -4,8 +4,8 @@
 # the values for Vault.ini and /var/tmp/aimparms and the install commands.
 #
 # Checks: the Provider is not installed yet, a package manager the CP ships for (RPM or DEB),
-# the Vault address is a host name, it resolves, the Vault port is reachable, the public IP for
-# the Privilege Cloud allowlist, and disk space.
+# the Vault address is a host name, it resolves, the Vault port is reachable (for Privilege Cloud
+# this also means the public IP is in the allowlist), and disk space.
 #
 # Read-only: changes nothing. Needs only bash - copy it with settings.conf to the CP machine.
 #
@@ -86,6 +86,10 @@ if [[ "$vault" =~ ^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$ ]]; then
         result ok 'Vault address resolves'
         if timeout 3 bash -c "</dev/tcp/$vault/$port" 2>/dev/null; then
             result ok "Vault port $port is reachable"
+        elif [[ "$vault" == *.privilegecloud.cyberark.cloud ]]; then
+            # Privilege Cloud refuses connections from public IPs that are not in its allowlist
+            public_ip=$(curl -s --max-time 5 https://checkip.amazonaws.com 2>/dev/null || wget -qO- --timeout=5 https://checkip.amazonaws.com 2>/dev/null)
+            result fail "Vault port $port is not reachable" "Add this machine's public IP (${public_ip:-unknown}) to the Privilege Cloud IP allowlist, and check the firewall / security group"
         else
             result fail "Vault port $port is not reachable" 'Check the firewall / security group from this machine to the Vault'
         fi
@@ -96,22 +100,8 @@ else
     result fail "Vault address '$vault' is not a host name" 'Host name only - no https://, no path, no port. Privilege Cloud: vault-<subdomain>.privilegecloud.cyberark.cloud'
 fi
 
-# Privilege Cloud accepts the Vault protocol only from allowlisted public IPs - an open port is not enough
 privilege_cloud=0
-if [[ "$vault" == *.privilegecloud.cyberark.cloud ]]; then
-    privilege_cloud=1
-    public_ip=''
-    if command -v curl >/dev/null 2>&1; then
-        public_ip=$(curl -s --max-time 5 https://checkip.amazonaws.com)
-    elif command -v wget >/dev/null 2>&1; then
-        public_ip=$(wget -qO- --timeout=5 https://checkip.amazonaws.com)
-    fi
-    if [ -n "$public_ip" ]; then
-        result info "Public IP $public_ip - it must be in the Privilege Cloud IP allowlist"
-    else
-        result info 'Public IP unknown - the IP this machine connects from must be in the Privilege Cloud IP allowlist'
-    fi
-fi
+[[ "$vault" == *.privilegecloud.cyberark.cloud ]] && privilege_cloud=1
 
 # --- Disk space -----------------------------------------------------------------
 # The CP installs under /opt, /var/opt and /etc/opt

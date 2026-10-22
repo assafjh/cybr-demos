@@ -20,7 +20,7 @@ function Resolve-Vault {
 }
 
 function Invoke-Preflight {
-    # Checks the Vault address, DNS, the Vault port, the public IP for the Privilege Cloud allowlist and
+    # Checks the Vault address, DNS, the Vault port (for Privilege Cloud: the IP allowlist) and
     # disk space. Returns 'installed' when the Provider is already here, 'failed' or 'ready'.
     param([Parameter(Mandatory)] [hashtable]$Vault)
 
@@ -47,17 +47,15 @@ function Invoke-Preflight {
         Write-Check $resolves 'Vault address resolves' 'Check the address for typos, and DNS from this machine'
 
         if ($resolves) {
-            Write-Check (Test-TcpPort $Vault.Address $Vault.Port) "Vault port $($Vault.Port) is reachable" 'Check the firewall / security group from this machine to the Vault'
-        }
-    }
-
-    # Privilege Cloud accepts the Vault protocol only from allowlisted public IPs - an open port is not enough
-    if ($Vault.Address -like '*.privilegecloud.cyberark.cloud') {
-        try {
-            $publicIp = (Invoke-RestMethod https://checkip.amazonaws.com -TimeoutSec 5).Trim()
-            Write-Result info "Public IP $publicIp - it must be in the Privilege Cloud IP allowlist"
-        } catch {
-            Write-Result info 'Public IP unknown - the IP this machine connects from must be in the Privilege Cloud IP allowlist'
+            $reachable = Test-TcpPort $Vault.Address $Vault.Port
+            $hint = 'Check the firewall / security group from this machine to the Vault'
+            if (-not $reachable -and $Vault.Address -like '*.privilegecloud.cyberark.cloud') {
+                # Privilege Cloud refuses connections from public IPs that are not in its allowlist
+                $publicIp = 'unknown'
+                try { $publicIp = (Invoke-RestMethod https://checkip.amazonaws.com -TimeoutSec 5).Trim() } catch { }
+                $hint = "Add this machine's public IP ($publicIp) to the Privilege Cloud IP allowlist, and check the firewall / security group"
+            }
+            Write-Check $reachable "Vault port $($Vault.Port) is reachable" $hint
         }
     }
 
