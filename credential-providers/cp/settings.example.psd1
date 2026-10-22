@@ -25,12 +25,10 @@
         UserName    = '<service-user>'
     }
 
-    # The Vault the CP connects to - checked by 1-Preflight on the CP machine
-    Cp = @{
-        # Host name only - no https://, no path. Privilege Cloud: vault-<subdomain>.privilegecloud.cyberark.cloud
-        VaultAddress = '<vault-address>'
-        VaultPort    = 1858
-    }
+    # Optional - the Vault the Provider connects to, checked by 1-Preflight on the Provider machine.
+    # Privilege Cloud: derived from Connection.PvwaUrl (vault-<subdomain>.privilegecloud.cyberark.cloud).
+    # PAM Self-Hosted: required. Address is a host name only - no https://, no path.
+    # Vault = @{ Address = 'vault.lab.local'; Port = 1858 }
 
     # Optional - remove the section when you log on as the admin who should own the Safes.
     # Human owners added to every Safe with full permissions. A Safe created through the API is

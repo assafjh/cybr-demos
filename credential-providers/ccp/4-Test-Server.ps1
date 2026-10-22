@@ -1,4 +1,4 @@
-# Filename: 3-Test-Server.ps1
+# Filename: 4-Test-Server.ps1
 # Checks the machine side of the Central Credential Provider: the Provider service, IIS and the
 # AIMWebService application, connectivity to the Vault, recent errors in the Provider logs, and
 # test retrievals with the CCP error code explained.
@@ -9,12 +9,12 @@
 #
 # Read-only: changes nothing. A test retrieval reports success only - the password is never displayed.
 # Run it on the CCP server, as a local administrator, with Windows PowerShell 5.1 or PowerShell 7+.
-# For the Vault side (AppID, Safe members, Object name) use 2-Test-Vault.ps1.
+# For the Vault side (AppID, Safe members, Object name) use 3-Test-Vault.ps1.
 #
 # Examples:
-#   ./3-Test-Server.ps1
-#   ./3-Test-Server.ps1 -CcpUrl https://localhost
-#   ./3-Test-Server.ps1 -AppId MyApp -Safe App-Safe -UserName svc_db -Address db01
+#   ./4-Test-Server.ps1
+#   ./4-Test-Server.ps1 -CcpUrl https://localhost
+#   ./4-Test-Server.ps1 -AppId MyApp -Safe App-Safe -UserName svc_db -Address db01
 
 param(
     [string]$ConfigPath = (Join-Path $PSScriptRoot 'settings.psd1'),
@@ -43,7 +43,7 @@ function Get-ErrorHint {
     switch ($Status) {
         401     { 'Authentication required - the CCP may use Windows Authentication (-UseDefaultCredentials) or a client certificate' }
         403     { 'Forbidden - check the AppID authentication methods (Allowed Machines, OS user, certificate)' }
-        404     { 'Not found - check the web service name, or run 2-Test-Vault.ps1' }
+        404     { 'Not found - check the web service name, or run 3-Test-Vault.ps1' }
         default { 'Look up the error code in the CyberArk Credential Providers documentation' }
     }
 }

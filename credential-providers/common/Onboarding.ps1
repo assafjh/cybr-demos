@@ -1,5 +1,5 @@
 # Filename: Onboarding.ps1
-# Shared by the CP and CCP onboarding scripts (1-Onboard.ps1) - dot-source it, then call Invoke-Onboarding.
+# Shared by the CP and CCP onboarding scripts (2-Onboard.ps1) - dot-source it, then call Invoke-Onboarding.
 # Brings the Vault to the state described in the settings file: Applications (AppIDs +
 # authentication methods), Safes, Safe members and accounts.
 #
@@ -95,7 +95,7 @@ function Invoke-Onboarding {
         if ($existing) {
             Write-Result exists "Application '$($app.AppId)'"
         } else {
-            $description = if ($app.Description) { $app.Description } else { 'Created by 1-Onboard' }
+            $description = if ($app.Description) { $app.Description } else { 'Created by Credential Provider onboarding' }
             Invoke-VaultApi -Session $Session -Method Post -Path $appsPath -Body @{
                 application = @{ AppID = $app.AppId; Description = $description; Location = '\Applications' }
             } | Out-Null
@@ -135,7 +135,7 @@ function Invoke-Onboarding {
         } else {
             Invoke-VaultApi -Session $Session -Method Post -Path '/API/Safes' -Body @{
                 safeName    = $safe.Name
-                description = 'Created by 1-Onboard'
+                description = 'Created by Credential Provider onboarding'
                 managingCPM = ''    # No CPM - demo passwords are not rotated against real targets
             } | Out-Null
             Write-Result created "Safe '$($safe.Name)'"

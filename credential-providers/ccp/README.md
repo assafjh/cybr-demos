@@ -4,16 +4,21 @@ Copy `settings.example.psd1` to `settings.psd1` and fill in the `<...>` values, 
 
 | Step | Runs | Does |
 |---|---|---|
-| `./1-Onboard.ps1` | Anywhere with access to the PVWA | Creates the `AIMWebService` and client AppIDs, Safes, members and accounts - only what is missing. Prints a ready-to-use CCP request |
-| `./2-Test-Vault.ps1` | Anywhere with access to the PVWA | Checks the AppID, Safe, members and permissions, Provider users (incl. Audit Users) and the account's exact Object name |
-| `./3-Test-Server.ps1` | On the CCP server, as administrator | Checks the Provider service, IIS and AIMWebService, hardened-IIS settings, connectivity to the Vault, errors in the Provider logs, and test retrievals with the CCP error code explained |
+| `./1-Preflight.ps1` | On the CCP server | Checks the Vault address, DNS, port, the public IP for the Privilege Cloud allowlist and disk space, then prints what to enter in the installation |
+| *Install the CCP* | On the CCP server, as administrator | The Credential Provider, then the CCP web service, from the CCP package. Restart afterwards |
+| `./2-Onboard.ps1` | Anywhere with access to the PVWA | Creates the `AIMWebService` and client AppIDs, Safes, members - incl. the Provider user - and accounts - only what is missing. Prints a ready-to-use CCP request |
+| `./3-Test-Vault.ps1` | Anywhere with access to the PVWA | Checks the AppID, Safe, members and permissions, Provider users (incl. Audit Users) and the account's exact Object name |
+| `./4-Test-Server.ps1` | On the CCP server, as administrator | Checks the Provider service, IIS and AIMWebService, hardened-IIS settings, connectivity to the Vault, errors in the Provider logs, and test retrievals with the CCP error code explained |
+
+Install before onboarding: the Provider user only exists after the installation, and `2-Onboard`
+adds it to the Safes. Put its name (`Prov_<host name>` by default) in `Providers` in the settings file.
 
 The test scripts are read-only and never display passwords. Without parameters they check
 everything in the settings file; with parameters they check one target - e.g. a Safe the
 customer set up:
 
 ```powershell
-./2-Test-Vault.ps1 -AppId MyApp -Safe App-Safe -UserName svc_db -Address db01
+./3-Test-Vault.ps1 -AppId MyApp -Safe App-Safe -UserName svc_db -Address db01
 ```
 
 ## Retrieval examples
@@ -25,9 +30,11 @@ query by UserName + Address. Run them from a machine in the client AppID's Allow
 
 ## Lab
 
-`lab/Prepare-Lab.ps1` installs the IIS features and binds a self-signed HTTPS certificate -
-run it on a lab server before installing the CCP. A client on another machine must trust the
-certificate (import it to its trusted root store).
+`lab/Install-IISPrerequisites.ps1` installs the IIS features the CCP web service needs - safe to
+re-run. Customers usually prepare IIS themselves; they can use it too.
+
+`lab/New-LabCertificate.ps1` binds a self-signed HTTPS certificate on 443 - for a lab server only.
+A client on another machine must trust it (import it to its trusted root store).
 
 ## Things that commonly break a CCP request
 

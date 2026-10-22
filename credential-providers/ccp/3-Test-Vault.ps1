@@ -1,4 +1,4 @@
-# Filename: 2-Test-Vault.ps1
+# Filename: 3-Test-Vault.ps1
 # Checks the Vault side of CCP requests and prints the exact request to use: the AppID and its
 # authentication methods, the Safe, Safe members and permissions, the Provider users and the account.
 #
@@ -9,8 +9,8 @@
 # The user needs List Accounts + View Safe Members on the Safe, and Audit Users for the Provider checks.
 #
 # Examples:
-#   ./2-Test-Vault.ps1
-#   ./2-Test-Vault.ps1 -AppId MyApp -Safe App-Safe -UserName svc_db -Address db01
+#   ./3-Test-Vault.ps1
+#   ./3-Test-Vault.ps1 -AppId MyApp -Safe App-Safe -UserName svc_db -Address db01
 
 param(
     [string]$ConfigPath = (Join-Path $PSScriptRoot 'settings.psd1'),

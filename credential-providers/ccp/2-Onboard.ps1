@@ -1,4 +1,4 @@
-# Filename: 1-Onboard.ps1
+# Filename: 2-Onboard.ps1
 # Creates what the CCP needs in the Vault, as described in settings.psd1: the AIMWebService and
 # client AppIDs, Safes, Safe members and accounts. Prints a ready-to-use CCP request per account.
 #
@@ -6,8 +6,8 @@
 # Works on Windows PowerShell 5.1 and PowerShell 7+, against PAM Self-Hosted or Privilege Cloud.
 #
 # Examples:
-#   ./1-Onboard.ps1
-#   ./1-Onboard.ps1 -ConfigPath ./settings-customer.psd1
+#   ./2-Onboard.ps1
+#   ./2-Onboard.ps1 -ConfigPath ./settings-customer.psd1
 
 param(
     [string]$ConfigPath = (Join-Path $PSScriptRoot 'settings.psd1'),

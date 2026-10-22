@@ -1,5 +1,5 @@
 # Filename: VaultAccess.ps1
-# Shared by the CP and CCP Vault checks (2-Test-Vault.ps1 / 3-Test-Vault.ps1) - dot-source it, then
+# Shared by the CP and CCP Vault checks (3-Test-Vault.ps1) - dot-source it, then
 # call Test-VaultAccess. Checks the AppID and its authentication methods, the Safe, Safe membership and
 # permissions of the AppID and of the Provider users, and the account itself (its actual Object name).
 #

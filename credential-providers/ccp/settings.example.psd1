@@ -25,7 +25,12 @@
         UserName    = '<service-user>'
     }
 
-    # The CCP web service - used by 3-Test-Server and the examples for retrievals
+    # Optional - the Vault the Provider connects to, checked by 1-Preflight on the Provider machine.
+    # Privilege Cloud: derived from Connection.PvwaUrl (vault-<subdomain>.privilegecloud.cyberark.cloud).
+    # PAM Self-Hosted: required. Address is a host name only - no https://, no path.
+    # Vault = @{ Address = 'vault.lab.local'; Port = 1858 }
+
+    # The CCP web service - used by 4-Test-Server and the examples for retrievals
     Ccp = @{
         Url                   = 'https://<ccp-server>'    # Host name must match the CCP certificate
         WebServiceName        = 'AIMWebService'
