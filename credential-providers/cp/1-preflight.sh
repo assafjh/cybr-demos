@@ -5,7 +5,11 @@
 #
 # Checks: the Provider is not installed yet, a package manager the CP ships for (RPM or DEB),
 # the Vault address is a host name, it resolves, the Vault port is reachable (for Privilege Cloud
-# this also means the public IP is in the allowlist), and disk space.
+# this also means the public IP is in the allowlist), the Provider user name fits the Vault's
+# 28-character limit, and disk space.
+#
+# The steps it prints install the package without touching the Vault, then register the Provider
+# with createenv - the only way to choose the Provider user name on Linux.
 #
 # Read-only: changes nothing. Needs only bash - copy it with settings.conf to the CP machine.
 #
@@ -103,6 +107,15 @@ fi
 privilege_cloud=0
 [[ "$vault" == *.privilegecloud.cyberark.cloud ]] && privilege_cloud=1
 
+# --- Provider user name ------------------------------------------------------------
+# The installer would name it Prov_<full host name> - on AWS that is over the 28-character limit
+provider=$(setting PROVIDER_USER); provider=${provider:-Prov_$(hostname -s)}
+if [ ${#provider} -le 28 ]; then
+    result ok "Provider user '$provider' (${#provider} characters)"
+else
+    result fail "Provider user '$provider' is ${#provider} characters - the Vault accepts at most 28" 'Set a shorter PROVIDER_USER in the settings file'
+fi
+
 # --- Disk space -----------------------------------------------------------------
 # The CP installs under /opt, /var/opt and /etc/opt
 for dir in /opt /var; do
@@ -128,22 +141,33 @@ if [ "$privilege_cloud" -eq 1 ]; then environment='PrivilegeCloud'; installer='i
 else environment='PamSelfHosted'; installer='a Vault admin user'; fi
 install_cmd='rpm -ivh CARKaim-*.x86_64.rpm'
 if [ "$package" = 'deb' ]; then install_cmd='dpkg -i CARKaim-*.amd64.deb'; fi
+private_ip=$(hostname -I 2>/dev/null | awk '{print $1}'); private_ip=${private_ip:-<this machine private IP>}
 
 cat <<EOF
 
-${cyan}Ready. In the folder with the unpacked package, as root:${reset}
+${cyan}Ready. In the folder with the unpacked package (<package-folder> below):${reset}
 
   1. Vault.ini            ADDRESS=$vault
                           PORT=$port
-  2. Credential file      ./CreateCredFile user.cred     (Vault user: $installer)
-  3. Installation file    mv aimparms.sample /var/tmp/aimparms, then set:
-                            AcceptCyberArkEULA=Yes
+  2. Credential file      sudo ./CreateCredFile user.cred
+                            Vault user: $installer
+                            Answer yes to "Restrict to Entropy File" - it refuses to create an unrestricted file
+  3. Installation file    sudo cp aimparms.sample /var/tmp/aimparms, then set:
+                            AcceptCyberArkEULA=yes
+                            CreateVaultEnvironment=no     createenv registers the Provider in step 5
+                            HardenFSPermissions=no        yes makes the SDK root-only - applications cannot run it
                             CredFilePath=<package-folder>/user.cred
                             VaultFilePath=<package-folder>/Vault.ini
                             EnvironmentType=$environment
-                          Provider user: Prov_$(hostname) by default - AppProviderUser to change it
-  4. Install              $install_cmd
-  5. Clean up and check   rm user.cred; /etc/init.d/aimprv status
+  4. Install              sudo $install_cmd
+  5. Register             sudo /opt/CARKaim/bin/createenv -CredFilePath "<package-folder>/user.cred" \\
+                            -VaultFilePath "<package-folder>/Vault.ini" -AppProviderUser "$provider" -LicensedProducts "CP"
+                          Check: sudo grep -E "E |Error" /var/tmp/aim-install-logs/CreateEnv.log
+  6. Start, clean up      sudo /etc/init.d/aimprv start; rm user.cred*
 
-${cyan}Then put the Provider user in Providers in the settings file and run 2-Onboard.ps1${reset}
+${cyan}Then:${reset}
+  - In settings.psd1, on the machine you onboard from:
+      Providers       = @('$provider')
+      AllowedMachines = @('$private_ip')    # on the application's AppID
+  - Run 2-Onboard.ps1 - it prints the Provider restart and the test command for this machine
 EOF

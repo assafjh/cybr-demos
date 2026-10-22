@@ -69,12 +69,36 @@ function Invoke-Preflight {
     'ready'
 }
 
-function Write-InstallValues {
-    # What to enter in the installation wizard
-    param([Parameter(Mandatory)] [hashtable]$Vault)
+function Write-NextSteps {
+    # What to enter in the installation wizard, and what to do after it - with the exact commands
+    param(
+        [Parameter(Mandatory)] [hashtable]$Vault,
+        [Parameter(Mandatory)] [ValidateSet('CP', 'CCP')] [string]$Product
+    )
     $installer = if ($Vault.Address -like '*.privilegecloud.cyberark.cloud') { 'installeruser@cyberark.cloud.<tenant-id>' } else { 'a Vault admin user' }
+    $provider  = "Prov_$([Environment]::MachineName)"
+    $privateIp = [Net.Dns]::GetHostAddresses([Environment]::MachineName) |
+        Where-Object { $_.AddressFamily -eq 'InterNetwork' -and -not [Net.IPAddress]::IsLoopback($_) } |
+        Select-Object -First 1 -ExpandProperty IPAddressToString
+    if (-not $privateIp) { $privateIp = '<this machine private IP>' }
+    $appId = if ($Product -eq 'CCP') { 'AIMWebService' } else { "the application's AppID" }
+
+    Write-Host ''
+    if ($Product -eq 'CCP') {
+        Write-Host 'Ready. Install the Credential Provider from the CCP package as administrator, and enter:' -ForegroundColor Cyan
+    } else {
+        Write-Host 'Ready. Run setup.exe from the package as administrator, and enter:' -ForegroundColor Cyan
+    }
     Write-Host "  Vault address : $($Vault.Address)"
     Write-Host "  Port          : $($Vault.Port)"
     Write-Host "  Vault user    : $installer"
-    Write-Host "  Provider user : Prov_$env:COMPUTERNAME (the default - Custom installation lets you change it)"
+    Write-Host "  Provider user : $provider by default - Custom installation lets you change it. At most 28 characters"
+    Write-Host ''
+    Write-Host 'After the installation:' -ForegroundColor Cyan
+    if ($Product -eq 'CCP') { Write-Host '  - Install the CCP web service from the same package' }
+    Write-Host '  - Restart this machine - the installation requires it:  Restart-Computer'
+    Write-Host '  - In settings.psd1, on the machine you onboard from:'
+    Write-Host "      Providers       = @('$provider')    # or the name you chose"
+    Write-Host "      AllowedMachines = @('$privateIp')    # on $appId"
+    Write-Host '  - Run 2-Onboard.ps1 - it prints the Provider restart and the test commands'
 }

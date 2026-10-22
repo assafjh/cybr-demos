@@ -31,6 +31,12 @@ try {
         foreach ($t in $targets) {
             Write-Result info ([ordered]@{ AppID = $t.AppId; Safe = $t.Safe; Object = $t.Object } | ConvertTo-Json -Compress)
         }
+
+        Write-Host ''
+        Write-Result info 'Test on the CCP server (after the Provider restart above, if one was asked for):'
+        foreach ($t in $targets) {
+            Write-Host "             .\4-Test-Server.ps1 -AppId '$($t.AppId)' -Safe '$($t.Safe)' -UserName '$($t.UserName)' -Address '$($t.Address)'"
+        }
     }
 } catch {
     Write-Host "[error]    $($_.Exception.Message)" -ForegroundColor Red

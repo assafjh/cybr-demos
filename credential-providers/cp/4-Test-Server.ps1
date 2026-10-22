@@ -78,9 +78,9 @@ function Test-Retrieval {
     $hint = Get-ProviderErrorHint $code
     if (-not $hint) { $hint = 'Look up the error code in the CyberArk Credential Providers documentation' }
     Write-Result fail $message -Hint $hint
-    Write-LastAuditError -ProviderPath $ProviderPath
+    Write-LastAuditError -ProviderPath $ProviderPath -Code $code
 
-    if ($code -in 'APPAP306E', 'APPEX003E') {
+    if ($code -in 'APPAP133E', 'APPAP306E', 'APPEX003E') {
         Write-Result info "Note: this test runs as CLIPasswordSDK ($cli) under your user - an AppID that also checks Path, Hash or OS user accepts only the real application"
     }
 }

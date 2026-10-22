@@ -45,7 +45,7 @@ A client on another machine must trust it (import it to its trusted root store).
 - **`AIMWebService` Allowed Machines** must hold the address the CCP server knows itself by -
   its private IP or host name, not a public / Elastic IP in front of it (APPAP307E + APPAP133E
   in `APPAudit.log`).
-- **The Provider caches Applications.** After changing an AppID or its Allowed Machines,
+- **The Provider caches Applications and Safe permissions.** After changing an AppID, its Allowed Machines or Safe members,
   restart the Provider service (or wait for its cache refresh).
 - **Client Allowed Machines** is the address the CCP sees. Behind a load balancer that is the
   LB address, unless `TrustedProxies` is set in the CCP `web.config`.

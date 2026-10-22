@@ -35,7 +35,4 @@ switch (Invoke-Preflight -Vault $vault) {
     'failed'    { exit 1 }
 }
 
-Write-Host ''
-Write-Host 'Ready. Install the Credential Provider from the CCP package as administrator, and enter:' -ForegroundColor Cyan
-Write-InstallValues -Vault $vault
-Write-Host 'Then install the CCP web service, restart, put the Provider user in Providers in the settings file and run 2-Onboard.ps1' -ForegroundColor Cyan
+Write-NextSteps -Vault $vault -Product CCP

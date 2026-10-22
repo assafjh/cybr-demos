@@ -86,7 +86,7 @@ if (-not $onWindows) {
     $appcmd = "$env:windir\System32\inetsrv\appcmd.exe"
     $w3svc = Get-Service -Name W3SVC -ErrorAction SilentlyContinue
     if (-not $w3svc -or $w3svc.Status -ne 'Running') {
-        Write-Result fail 'IIS (W3SVC) is not running' -Hint 'Start the World Wide Web Publishing Service'
+        Write-Result fail 'IIS (W3SVC) is not running' -Hint 'Start it: Start-Service W3SVC'
     } elseif (-not (Test-Path $appcmd)) {
         Write-Result skip "IIS application check - $appcmd not found"
     } else {
@@ -97,7 +97,7 @@ if (-not $onWindows) {
             $poolName = $webApp.'APPPOOL.NAME'
             $poolState = ([xml](& $appcmd list apppool /apppool.name:$poolName /xml)).appcmd.APPPOOL.state
             if ($poolState -ne 'Started') {
-                Write-Result fail "IIS application '$($webApp.'APP.NAME')' - application pool '$poolName' is $poolState" -Hint 'Start the application pool'
+                Write-Result fail "IIS application '$($webApp.'APP.NAME')' - application pool '$poolName' is $poolState" -Hint "Start it: & `"$appcmd`" start apppool /apppool.name:`"$poolName`""
             } else {
                 Write-Result ok "IIS application '$($webApp.'APP.NAME')' - application pool '$poolName' started"
             }
@@ -178,7 +178,7 @@ function Test-Retrieval {
         Write-Result fail "HTTP $status $code - $message" -Hint (Get-ErrorHint -Code $code -Status $status)
 
         # On the CCP server the Provider log has the actual reason - show the latest entry
-        Write-LastAuditError -ProviderPath $ProviderPath
+        Write-LastAuditError -ProviderPath $ProviderPath -Code $code
 
         if ($code -in 'APPAP306E', 'APPEX003E' -or $status -eq 403) {
             Write-Result info 'Note: Allowed Machines is checked for this request too - from the CCP server itself the CCP sees ::1 / 127.0.0.1. Run it from the application machine, or allow this server in a health-check AppID that only has a dummy Safe'

@@ -34,7 +34,4 @@ switch (Invoke-Preflight -Vault $vault) {
     'failed'    { exit 1 }
 }
 
-Write-Host ''
-Write-Host 'Ready. Run setup.exe from the package as administrator, and enter:' -ForegroundColor Cyan
-Write-InstallValues -Vault $vault
-Write-Host 'Restart the machine after the installation, put the Provider user in Providers in the settings file, then run 2-Onboard.ps1' -ForegroundColor Cyan
+Write-NextSteps -Vault $vault -Product CP

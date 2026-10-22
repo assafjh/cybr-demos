@@ -41,7 +41,7 @@ function Add-SafeMemberIfMissing {
             permissions = $Permissions
         } | Out-Null
         Write-Result added "  Member '$MemberName'"
-        return
+        return $true    # The Provider caches Safe permissions - the caller asks for a restart
     }
 
     $missing = $Permissions.Keys | Where-Object { -not $member.permissions.$_ }
@@ -79,7 +79,7 @@ function Invoke-Onboarding {
         [Parameter(Mandatory)] [hashtable]$Config
     )
 
-    $appsChanged = $false    # The Provider caches Applications - changes need a restart (or its cache refresh)
+    $changed = $false    # The Provider caches Applications and Safe permissions - changes need a restart
 
     if (-not $Config.SafeOwners) {
         Write-Result info 'No SafeOwners - new Safes are managed only by the logged-on user'
@@ -100,7 +100,7 @@ function Invoke-Onboarding {
                 application = @{ AppID = $app.AppId; Description = $description; Location = '\Applications' }
             } | Out-Null
             Write-Result created "Application '$($app.AppId)'"
-            $appsChanged = $true
+            $changed = $true
         }
 
         $authPath = "$appsPath/$appIdEncoded/Authentications/"
@@ -116,7 +116,7 @@ function Invoke-Onboarding {
                         authentication = @{ AuthType = $type; AuthValue = $value }
                     } | Out-Null
                     Write-Result added "  $type $value"
-                    $appsChanged = $true
+                    $changed = $true
                 }
             }
         }
@@ -145,11 +145,11 @@ function Invoke-Onboarding {
 
         foreach ($owner in $Config.SafeOwners) {
             $ownerType = if ($owner.Type) { $owner.Type } else { 'User' }
-            Add-SafeMemberIfMissing $Session $safe.Name $members $owner.Name $ownerPermissions $ownerType
+            Add-SafeMemberIfMissing $Session $safe.Name $members $owner.Name $ownerPermissions $ownerType | Out-Null
         }
 
         foreach ($appId in $safe.AppIds) {
-            Add-SafeMemberIfMissing $Session $safe.Name $members $appId $appIdPermissions
+            if (Add-SafeMemberIfMissing $Session $safe.Name $members $appId $appIdPermissions) { $changed = $true }
         }
 
         if (-not $safe.Providers) {
@@ -163,7 +163,7 @@ function Invoke-Onboarding {
                 Write-Result warn "  Provider '$provider' not found in the Vault - skipped (install the Provider and re-run)"
                 continue
             }
-            Add-SafeMemberIfMissing $Session $safe.Name $members $provider $providerPermissions
+            if (Add-SafeMemberIfMissing $Session $safe.Name $members $provider $providerPermissions) { $changed = $true }
         }
 
         $filter   = [uri]::EscapeDataString("safeName eq $($safe.Name)")
@@ -212,7 +212,10 @@ function Invoke-Onboarding {
         }
     }
 
-    if ($appsChanged) {
-        Write-Result warn 'Applications changed - the Provider caches them: restart the Provider service on each Provider host to apply the change now'
+    if ($changed) {
+        Write-Host ''
+        Write-Result warn 'AppIDs or Safe members changed - the Provider caches them. Restart it on each Provider machine now:'
+        Write-Host "             Windows: Restart-Service -DisplayName '*Application Password Provider*'"
+        Write-Host '             Linux:   sudo /etc/init.d/aimprv restart'
     }
 }

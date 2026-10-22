@@ -1,20 +1,23 @@
 #!/usr/bin/env bash
 # Filename: 4-test-server.sh
 # Checks the machine side of the Credential Provider on Linux: the Provider service, connectivity
-# to the Vault from vault.ini, recent errors in the Provider logs, and a test retrieval through
-# clipasswordsdk with the Provider error code explained.
+# to the Vault from vault.ini, recent errors in the Provider logs, whether applications can run the
+# SDK, and a test retrieval through clipasswordsdk - as the application's OS user, not root - with
+# the Provider error code explained.
 #
 # Read-only: changes nothing. The test retrieval asks for the account's user name - never the password.
-# Run it on the CP machine, as root (the Provider logs are readable by root only).
+# Run it on the CP machine with sudo (the Provider logs and vault.ini are readable by root only).
 # For the Vault side use 3-Test-Vault.ps1.
 #
-# Usage:
-#   ./4-test-server.sh                   # Uses settings.conf next to the script
-#   ./4-test-server.sh settings-customer.conf
+# Usage - 2-Onboard.ps1 prints the command with the AppID and account:
+#   sudo ./4-test-server.sh                                        # Machine checks only
+#   sudo ./4-test-server.sh <AppID> <Safe> <UserName> [Address]    # And a test retrieval
+# The optional settings.conf next to the script sets APP_OS_USER.
 
 set -u
 
-config="${1:-$(dirname "$0")/settings.conf}"
+config="$(dirname "$0")/settings.conf"
+app_id="${1:-}"; safe="${2:-}"; username="${3:-}"; address="${4:-}"
 
 # CP paths on Linux (The UNIX environment on the Credential Provider machine, CP docs)
 vault_ini=/etc/opt/CARKaim/vault/vault.ini
@@ -22,7 +25,7 @@ logs=/var/opt/CARKaim/logs
 sdk=/opt/CARKaim/sdk
 
 setting() {    # setting <KEY> - its value in the settings file (KEY=VALUE, no quotes); read as data, never executed
-    sed -n "s/^$1=//p" "$config" | tail -n 1 | tr -d '\r'
+    [ -f "$config" ] && sed -n "s/^$1=//p" "$config" | tail -n 1 | tr -d '\r'
 }
 
 if [ -t 1 ]; then
@@ -48,8 +51,9 @@ error_hint() {    # error_hint <code> - what to check for a Provider error code
     case "$1" in
         APPAP22[7-9]E|APPAP230E) echo 'More than one account matches - narrow the query with UserName and Address' ;;
         APPAP007E|APPBC007E)     echo 'The Provider cannot reach the Vault - check the Provider service and the network to the Vault' ;;
-        APPAP306E)               echo 'Application authentication failed - check the AppID Allowed Machines / OS user / path / hash. APPAudit.log (APPAP133E) shows the value that was rejected. Already fixed in the Vault? Restart the Provider - it caches Applications' ;;
-        APPAP004E)               echo 'Object not found, or the AppID / Provider user has no permission on it - run 3-Test-Vault.ps1 for this AppID and Safe' ;;
+        APPAP133E|APPAP306E)     echo "The AppID authentication failed - the APPAudit.log line below shows the values this machine sent. Add its private IP (Allowed Machines), OS user or path to the AppID, then restart the Provider - it caches Applications: sudo /etc/init.d/aimprv restart" ;;
+        APPAP425E)               echo 'The AppID does not exist in the Vault - check APP_ID in the settings file against 3-Test-Vault.ps1' ;;
+        APPAP004E)               echo 'Object not found, or the AppID / Provider user has no permission on it - run 3-Test-Vault.ps1 for this AppID and Safe. Just added the Provider to the Safe? Restart it - it caches Safe permissions: sudo /etc/init.d/aimprv restart' ;;
         APPAP093E|APPAP127E)     echo 'The Provider user is missing the Audit Users authorization, or its user type is not AppProvider' ;;
         APPAP282E)               echo 'The CPM is changing this password right now - retry in a moment' ;;
         *)                       echo 'Look up the error code in the CyberArk Credential Providers documentation' ;;
@@ -59,6 +63,11 @@ error_hint() {    # error_hint <code> - what to check for a Provider error code
 echo "${cyan}Read-only: this script changes nothing and never displays passwords${reset}"
 echo
 
+if [ "$(id -u)" -ne 0 ]; then
+    result fail 'Not running as root - the Provider service, vault.ini and logs are root-only' 'Run: sudo ./4-test-server.sh'
+    exit 1
+fi
+
 # --- Provider service --------------------------------------------------------------
 if [ ! -e /etc/init.d/aimprv ]; then
     result fail 'Provider not installed - /etc/init.d/aimprv not found' 'Install the CP - run 1-preflight.sh for the steps'
@@ -67,13 +76,22 @@ fi
 if /etc/init.d/aimprv status >/dev/null 2>&1; then
     result ok 'Provider service (aimprv) is running'
 else
-    result fail 'Provider service (aimprv) is not running' 'Start it with /etc/init.d/aimprv start and check APPConsole.log for the reason it stopped'
+    result fail 'Provider service (aimprv) is not running' 'Start it: sudo /etc/init.d/aimprv start - if it stops again, APPConsole.log has the reason'
+fi
+
+# --- Registered in the Vault? ----------------------------------------------------
+# The installer reports success even when it could not create the Provider in the Vault
+if [ -f /etc/opt/CARKaim/vault/appprovideruser.cred ]; then
+    result ok 'Provider registered in the Vault (appprovideruser.cred)'
+else
+    result fail 'Provider not registered in the Vault - /etc/opt/CARKaim/vault/appprovideruser.cred is missing' \
+        'Register it with createenv - 1-preflight.sh prints the command. Its log: /var/tmp/aim-install-logs/CreateEnv.log'
 fi
 
 # --- Vault connectivity, from the vault.ini the Provider uses --------------------------
 if [ -r "$vault_ini" ]; then
     addresses=$(sed -n 's/^[[:space:]]*ADDRESS[[:space:]]*=[[:space:]]*//p' "$vault_ini" | tr -d '\r' | tr ',' ' ')
-    port=$(sed -n 's/^[[:space:]]*PORT[[:space:]]*=[[:space:]]*//p' "$vault_ini" | tr -d '\r'); port=${port:-1858}
+    port=$(sed -n 's/^[[:space:]]*PORT[[:space:]]*=[[:space:]]*//p' "$vault_ini" | tr -d '[:space:]'); port=${port:-1858}
     for vault in $addresses; do
         if timeout 3 bash -c "</dev/tcp/$vault/$port" 2>/dev/null; then
             result ok "Vault $vault:$port is reachable"
@@ -82,7 +100,7 @@ if [ -r "$vault_ini" ]; then
         fi
     done
 else
-    result skip "Vault connectivity - $vault_ini not readable (run as root)"
+    result skip "Vault connectivity - $vault_ini not found"
 fi
 
 # --- Provider logs ---------------------------------------------------------------
@@ -90,7 +108,7 @@ fi
 for name in APPConsole.log APPAudit.log; do
     log="$logs/$name"
     if [ ! -r "$log" ]; then
-        result skip "$name - not readable under $logs (run as root)"
+        result skip "$name - not found under $logs"
         continue
     fi
     errors=$(tail -n 300 "$log" | grep -E '\b[A-Z]{3,6}[0-9]{3}E\b')
@@ -102,15 +120,26 @@ for name in APPConsole.log APPAudit.log; do
     fi
 done
 
+# --- Can applications run the SDK? ------------------------------------------------
+# HardenFSPermissions=yes (the installer default) removes the "other" permissions - then only root can run it
+sdk_mode=$(stat -c %a "$sdk" 2>/dev/null)
+if [ -z "$sdk_mode" ]; then
+    result fail "SDK folder $sdk not found" 'Check the CP installation'
+elif [ $((${sdk_mode: -1} & 1)) -eq 1 ]; then
+    result ok "SDK folder $sdk is open to applications ($sdk_mode)"
+else
+    result warn "SDK folder $sdk is $sdk_mode ($(stat -c %U:%G "$sdk")) - applications not running as root cannot use the SDK" \
+        'Installed with HardenFSPermissions=yes - reinstall with HardenFSPermissions=no in /var/tmp/aimparms'
+fi
+
 # --- Test retrieval ----------------------------------------------------------------
-if [ ! -f "$config" ]; then
-    result skip "Test retrieval - no settings file ($config)"
+if [ -z "$app_id" ]; then
+    result skip 'Test retrieval - pass the AppID, Safe and account; 2-Onboard.ps1 prints the command'
     exit 0
 fi
-app_id=$(setting APP_ID); safe=$(setting SAFE); username=$(setting USERNAME); address=$(setting ADDRESS)
-if [ -z "$app_id" ] || [ -z "$safe" ] || { [ -z "$username" ] && [ -z "$address" ]; }; then
-    result skip "Test retrieval - set APP_ID, SAFE and USERNAME / ADDRESS in $config"
-    exit 0
+if [ -z "$safe" ] || { [ -z "$username" ] && [ -z "$address" ]; }; then
+    result fail 'Test retrieval - pass <AppID> <Safe> <UserName> [Address]'
+    exit 1
 fi
 
 cli=$(find "$sdk" -maxdepth 1 -iname clipasswordsdk -type f 2>/dev/null | head -n 1)
@@ -119,20 +148,35 @@ if [ -z "$cli" ]; then
     exit 0
 fi
 
+# As the application would run it - not as root. Default: the user who ran sudo.
+run_as=$(setting APP_OS_USER); run_as=${run_as:-${SUDO_USER:-root}}
+if ! id "$run_as" >/dev/null 2>&1; then
+    result fail "Test retrieval - OS user '$run_as' does not exist" 'Set APP_OS_USER in settings.conf to the OS user the application runs as'
+    exit 1
+fi
+
 query="Safe=$safe;Folder=Root"
 [ -n "$username" ] && query="$query;UserName=$username"
 [ -n "$address" ] && query="$query;Address=$address"
-result info "Test retrieval: AppID $app_id, Query $query"
+result info "Test retrieval as $run_as: AppID $app_id, Query $query"
 
 # PassProps.UserName returns the account's user name - proves the retrieval without the password
-if output=$("$cli" GetPassword -p "AppDescs.AppID=$app_id" -p "Query=$query" -p 'Reason=CP health check' -o PassProps.UserName 2>&1); then
+if output=$(sudo -u "$run_as" "$cli" GetPassword -p "AppDescs.AppID=$app_id" -p "Query=$query" -p 'Reason=CP health check' -o PassProps.UserName 2>&1); then
     result ok "Retrieved account '$output' - password not requested"
 else
     code=$(echo "$output" | grep -oE '\b[A-Z]{3,6}[0-9]{3}E\b' | head -n 1)
-    result fail "$output" "$(error_hint "$code")"
     reason=$(tail -n 20 "$logs/APPAudit.log" 2>/dev/null | grep -E '\b[A-Z]{3,6}[0-9]{3}E\b' | tail -n 1)
+    # APPEX003E is generic - the specific code is the last one in the APPAudit.log line
+    if [ "$code" = 'APPEX003E' ] && [ -n "$reason" ]; then
+        code=$(echo "$reason" | grep -oE '\b[A-Z]{3,6}[0-9]{3}E\b' | tail -n 1)
+    fi
+    if echo "$output" | grep -qi 'permission denied'; then
+        result fail "$output" "OS user $run_as cannot run the SDK - see the SDK folder check above"
+    else
+        result fail "$output" "$(error_hint "$code")"
+    fi
     [ -n "$reason" ] && result info "APPAudit.log: $reason"
-    if [ "$code" = 'APPAP306E' ]; then
-        result info "Note: this test runs as $cli under $(id -un) - an AppID that also checks Path, Hash or OS user accepts only the real application"
+    if [ "$code" = 'APPAP133E' ] || [ "$code" = 'APPAP306E' ]; then
+        result info "Note: this test runs $cli as $run_as - an AppID that also checks Path, Hash or OS user accepts only the real application"
     fi
 fi

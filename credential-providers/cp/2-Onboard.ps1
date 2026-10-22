@@ -33,6 +33,13 @@ try {
         foreach ($t in $targets) {
             Write-Result info "CLIPasswordSDK GetPassword /p AppDescs.AppID=$($t.AppId) /p Query=""Safe=$($t.Safe);Folder=Root;Object=$($t.Object)"" /o Password"
         }
+
+        Write-Host ''
+        Write-Result info 'Test on each CP machine (after the Provider restart above, if one was asked for):'
+        foreach ($t in $targets) {
+            Write-Host "             Windows: .\4-Test-Server.ps1 -AppId '$($t.AppId)' -Safe '$($t.Safe)' -UserName '$($t.UserName)' -Address '$($t.Address)'"
+            Write-Host "             Linux:   sudo ./4-test-server.sh '$($t.AppId)' '$($t.Safe)' '$($t.UserName)' '$($t.Address)'"
+        }
     }
 } catch {
     Write-Host "[error]    $($_.Exception.Message)" -ForegroundColor Red
