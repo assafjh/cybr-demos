@@ -22,7 +22,7 @@ setting() {    # setting <KEY> - its value in the settings file (KEY=VALUE, no q
 }
 
 if [ ! -f "$config" ]; then
-    echo "Settings file not found: $config - copy settings.conf.example to settings.conf and fill it in"
+    echo "Settings file not found: $config - copy settings.example.conf to settings.conf and fill it in"
     exit 1
 fi
 vault=$(setting VAULT_ADDRESS)
@@ -59,15 +59,29 @@ if [ -e /etc/init.d/aimprv ] || [ -d /opt/CARKaim ]; then
     exit 0
 fi
 
-# --- Package format -------------------------------------------------------------
-# The CP ships as RPM (RHEL, CentOS, Oracle Linux) and DEB (Ubuntu)
+# --- Package format, and whether the CP is already installed --------------------
+# The CP ships as RPM (RHEL, CentOS, Oracle Linux) and DEB (Ubuntu). Installed = the package is
+# registered - folders such as /opt/CARKaim can stay behind after an uninstall.
 if command -v rpm >/dev/null 2>&1 && ! command -v dpkg >/dev/null 2>&1; then
-    package='rpm'; result ok 'RPM-based distribution - install CARKaim-<version>.x86_64.rpm'
+    package='rpm'
+    installed=$(rpm -qa | grep -i '^carkaim')
 elif command -v dpkg >/dev/null 2>&1; then
-    package='deb'; result ok 'DEB-based distribution - install CARKaim-<version>.amd64.deb'
+    package='deb'
+    installed=$(dpkg-query -W 2>/dev/null | grep -i '^carkaim')
 else
-    package=''; result fail 'Neither rpm nor dpkg found' 'The CP ships as RPM (RHEL, CentOS, Oracle Linux) and DEB (Ubuntu)'
+    package=''; installed=''
 fi
+
+if [ -n "$installed" ]; then
+    result exists "Provider already installed ($installed) - check it with: /etc/init.d/aimprv status"
+    exit 0
+fi
+
+case "$package" in
+    rpm) result ok 'RPM-based distribution - install CARKaim-<version>.x86_64.rpm' ;;
+    deb) result ok 'DEB-based distribution - install CARKaim-<version>.amd64.deb' ;;
+    *) result fail 'Neither rpm nor dpkg found' 'The CP ships as RPM (RHEL, CentOS, Oracle Linux) and DEB (Ubuntu)' ;;
+esac
 
 # --- Vault address and connectivity ------------------------------------------------
 # The installation fails on a URL or a typo here, so check it first

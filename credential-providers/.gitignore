@@ -2,3 +2,7 @@ settings.psd1
 settings-*.psd1
 settings.*.psd1
 !settings.example.psd1
+settings.conf
+settings-*.conf
+settings.*.conf
+!settings.example.conf
