@@ -143,6 +143,30 @@ if (-not $onWindows) {
                     Write-Result info "TrustedProxies: $proxies - client Allowed Machines are checked against X-Forwarded-For from these"
                 }
             }
+            
+            # Hardened IIS images (CIS baselines) break the web service in ways that look like a broken install
+            $appPath = $webApp.'APP.NAME'
+
+            $trust = ([xml](& $appcmd list config $appPath /section:system.web/trust | Out-String)).'system.web'.trust.level
+            if ($trust -and $trust -ne 'Full') {
+                Write-Result fail ".NET trust level is '$trust'" -Hint 'The web service needs Full trust (<trust level="Full" />). If the section is locked in machine.config, unlock it there - overriding a locked section gives HTTP 500.19'
+            } else {
+                Write-Result ok '.NET trust level: Full'
+            }
+            
+            $filtering = ([xml](& $appcmd list config $appPath /section:system.webServer/security/requestFiltering | Out-String)).'system.webServer'.security.requestFiltering
+            if ($filtering.fileExtensions.allowUnlisted -eq 'false') {
+                Write-Result fail 'Request filtering blocks unlisted file name extensions - requests return HTTP 404.7' -Hint 'Allow unlisted file name extensions for this application only (IIS Manager > Request Filtering > Edit Feature Settings)'
+            } else {
+                Write-Result ok 'Request filtering allows the web service requests'
+            }
+
+            # Windows Server 2022+: client certificate authentication does not work over TLS 1.3 (IIS requests
+            # the certificate after the handshake). The connection is reset - there is no HTTP error to see.
+            $sslFlags = ([xml](& $appcmd list config $appPath /section:system.webServer/security/access | Out-String)).'system.webServer'.security.access.sslFlags
+            if ([Environment]::OSVersion.Version.Build -ge 20348 -and $sslFlags -match 'SslRequireCert|SslNegotiateCert') {
+                Write-Result info "Client certificates are used ($sslFlags) on Windows Server 2022+ - over TLS 1.3 the connection is reset ('Request Cancelled' in the IIS log)" -Hint 'If client certificate requests fail, disable TLS 1.3 over TCP and HTTP/2 on the HTTPS binding (IIS Manager > Site Bindings)'
+            }
         }
     }
 
