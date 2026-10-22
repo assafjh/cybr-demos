@@ -1,14 +1,15 @@
-# Filename: 1-Onboard.ps1
+# Filename: 2-Onboard.ps1
 # Creates what the CP needs in the Vault, as described in settings.psd1: the application AppIDs
 # and their authentication methods, Safes, Safe members and accounts.
 # Prints a ready-to-use CP query per account (CLIPasswordSDK).
+# Run it after installing the CP, so the Provider user exists and can be added to the Safes.
 #
 # Idempotent - safe to re-run. Never deletes and never overwrites passwords or permissions.
 # Works on Windows PowerShell 5.1 and PowerShell 7+, against PAM Self-Hosted or Privilege Cloud.
 #
 # Examples:
-#   ./1-Onboard.ps1
-#   ./1-Onboard.ps1 -ConfigPath ./settings-customer.psd1
+#   ./2-Onboard.ps1
+#   ./2-Onboard.ps1 -ConfigPath ./settings-customer.psd1
 
 param(
     [string]$ConfigPath = (Join-Path $PSScriptRoot 'settings.psd1'),

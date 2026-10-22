@@ -25,6 +25,13 @@
         UserName    = '<service-user>'
     }
 
+    # The Vault the CP connects to - checked by 1-Preflight on the CP machine
+    Cp = @{
+        # Host name only - no https://, no path. Privilege Cloud: vault-<subdomain>.privilegecloud.cyberark.cloud
+        VaultAddress = '<vault-address>'
+        VaultPort    = 1858
+    }
+
     # Optional - remove the section when you log on as the admin who should own the Safes.
     # Human owners added to every Safe with full permissions. A Safe created through the API is
     # otherwise owned only by the API user, and the admins cannot see or manage it in the portal.
@@ -57,7 +64,7 @@
             AppIds    = @('CP-Demo-App')
 
             # Provider user of each CP host that serves this Safe - gets Retrieve + List + View Safe Members.
-            # Leave empty to list the Providers that exist in the Vault.
+            # The installation creates it - Prov_<host name> by default. Leave empty to list the Providers in the Vault.
             Providers = @('Prov_<cp-hostname>')
 
             Accounts  = @(

@@ -11,7 +11,7 @@ Demo and POC tooling for the CyberArk Credential Provider (CP) and Central Crede
 | Folder | For | Steps |
 |---|---|---|
 | [`ccp/`](ccp/) | Central Credential Provider - applications call a web service | `1-Onboard` → `2-Test-Vault` → `3-Test-Server` |
-| [`cp/`](cp/) | Credential Provider - an agent on the application machine | `1-Onboard` → `3-Test-Vault` |
+| [`cp/`](cp/) | Credential Provider - an agent on the application machine | `1-Preflight` → install → `2-Onboard` → `3-Test-Vault` → `4-Test-Server` |
 
 In the folder: copy `settings.example.psd1` to `settings.psd1`, fill in the `<...>` values, and run
 the numbered scripts in order. Every script is safe to re-run. `common/` holds the code both

@@ -37,7 +37,7 @@ Pick a scenario based on your use case:
 * **Kubernetes integrations** → `kubernetes-*`
 * **CI/CD pipelines** → `jenkins`, `github-actions`, `gitlab-ci`, `azure-devops`, `circleci`, `teamcity`
 * **Infrastructure as Code** → `terraform`, `ansible`, `ansible-awx-tower`, `argocd`
-* **Traditional apps / servers** → `credential-provider`, `central-credential-provider`, `application-server-credential-provider` (Tomcat, WebLogic, WebSphere, IIS)
+* **Traditional apps / servers** → `credential-providers`, `credential-provider`, `application-server-credential-provider` (Tomcat, WebLogic, WebSphere, IIS)
 * **Cloud & advanced use cases** → `aws-iam`, `secure-cloud-access`, `secure-ai-access`, `dynamic-privileged-access`
 
 Each demo includes its own instructions and execution flow.
@@ -85,7 +85,7 @@ Each demo includes its own instructions and execution flow.
 
 **🏢 Traditional Infrastructure & Application Servers**
 * `credential-provider`: CP agent deployed on Linux and Plain Old Java app demo
-* `central-credential-provider`: CCP demo (REST, SOAP)
+* `credential-providers`: CP and CCP tooling - onboarding, diagnostics, examples
 * `application-server-credential-provider`: Integration pattern for traditional application servers (Tomcat, WebLogic, WebSphere, IIS) using JDBC Driver Proxy
 
 **💻 Developer Tools & SDKs**

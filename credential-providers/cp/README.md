@@ -2,13 +2,21 @@
 
 Copy `settings.example.psd1` to `settings.psd1` and fill in the `<...>` values, then:
 
+`1-preflight.sh` is self-contained - copy just that file to a Linux CP machine; it needs only bash.
+
 | Step | Runs | Does |
 |---|---|---|
-| `./1-Onboard.ps1` | Anywhere with access to the PVWA | Creates the application AppIDs with their authentication methods (Allowed Machines, OS user, path, hash), Safes, members and accounts - only what is missing. Prints a ready-to-use CP query |
+| `./1-Preflight.ps1` (Windows)<br>`./1-preflight.sh <vault-address> [port]` (Linux) | On the CP machine | Checks the Vault address, DNS, port, the public IP for the Privilege Cloud allowlist and disk space, then prints what to enter in the installation |
+| *Install the CP* | On the CP machine, as administrator / root | Windows: run `setup.exe` from the package, then restart. Linux: the steps `1-preflight.sh` prints (Vault.ini, credential file, aimparms, rpm / dpkg) |
+| `./2-Onboard.ps1` | Anywhere with access to the PVWA | Creates the application AppIDs with their authentication methods (Allowed Machines, OS user, path, hash), Safes, members - incl. the Provider user - and accounts. Prints a ready-to-use CP query |
 | `./3-Test-Vault.ps1` | Anywhere with access to the PVWA | Checks the AppID, Safe, members and permissions, Provider users (incl. Audit Users) and the account's exact Object name |
+| `./4-Test-Server.ps1` | On the CP machine | Checks the Provider service, connectivity to the Vault, errors in the Provider logs, and test retrievals through CLIPasswordSDK with the error code explained |
 
-`3-Test-Vault.ps1` is read-only and never displays passwords. Without parameters it checks
-everything in the settings file; with parameters it checks one target:
+Install before onboarding: the Provider user only exists after the installation, and `2-Onboard`
+adds it to the Safes. Put its name (`Prov_<host name>` by default) in `Providers` in the settings file.
+
+The test scripts are read-only and never display passwords. Without parameters they check
+everything in the settings file; with parameters they check one target:
 
 ```powershell
 ./3-Test-Vault.ps1 -AppId MyApp -Safe App-Safe -UserName svc_db -Address db01
@@ -24,3 +32,6 @@ everything in the settings file; with parameters it checks one target:
   `Address` avoids depending on it.
 - **Privilege Cloud IP allowlist** - the public IP each CP machine connects from must be
   allowlisted for the Vault connection (port 1858). Machines behind one NAT share one entry.
+  An open port is not enough: the Vault rejects a non-allowlisted IP after the connection opens.
+- **The Vault address is a host name** - `vault-<subdomain>.privilegecloud.cyberark.cloud`, not the
+  portal URL. The installer crashes without a message on a URL or a typo; `1-Preflight` checks it first.
