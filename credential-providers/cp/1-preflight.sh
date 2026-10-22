@@ -7,22 +7,30 @@
 # the Vault address is a host name, it resolves, the Vault port is reachable, the public IP for
 # the Privilege Cloud allowlist, and disk space.
 #
-# Read-only: changes nothing. Self-contained - copy this one file to the CP machine and run it.
+# Read-only: changes nothing. Needs only bash - copy it with settings.conf to the CP machine.
 #
 # Usage:
-#   ./1-preflight.sh <vault-address> [port]
-#   ./1-preflight.sh vault-mytenant.privilegecloud.cyberark.cloud
+#   ./1-preflight.sh                   # Uses settings.conf next to the script
+#   ./1-preflight.sh settings-customer.conf
 
 set -u
 
-if [ $# -lt 1 ]; then
-    echo "Usage: $0 <vault-address> [port]"
-    echo "  vault-address  Host name only - Privilege Cloud: vault-<subdomain>.privilegecloud.cyberark.cloud"
-    echo "  port           Default 1858"
+config="${1:-$(dirname "$0")/settings.conf}"
+
+setting() {    # setting <KEY> - its value in the settings file (KEY=VALUE, no quotes); read as data, never executed
+    sed -n "s/^$1=//p" "$config" | tail -n 1 | tr -d '\r'
+}
+
+if [ ! -f "$config" ]; then
+    echo "Settings file not found: $config - copy settings.conf.example to settings.conf and fill it in"
     exit 1
 fi
-vault="$1"
-port="${2:-1858}"
+vault=$(setting VAULT_ADDRESS)
+port=$(setting VAULT_PORT); port=${port:-1858}
+if [ -z "$vault" ] || [[ "$vault" == *'<'* ]]; then
+    echo "Fill in VAULT_ADDRESS in $config"
+    exit 1
+fi
 failed=0
 
 # Colors only on a terminal, so a saved log has no escape codes

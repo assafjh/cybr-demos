@@ -2,15 +2,16 @@
 
 Copy `settings.example.psd1` to `settings.psd1` and fill in the `<...>` values, then:
 
-`1-preflight.sh` is self-contained - copy just that file to a Linux CP machine; it needs only bash.
+On a Linux CP machine the machine-side scripts are bash: copy `1-preflight.sh`, `4-test-server.sh` and
+`settings.conf.example` (as `settings.conf`) to it - they need nothing else.
 
 | Step | Runs | Does |
 |---|---|---|
-| `./1-Preflight.ps1` (Windows)<br>`./1-preflight.sh <vault-address> [port]` (Linux) | On the CP machine | Checks the Vault address, DNS, port, the public IP for the Privilege Cloud allowlist and disk space, then prints what to enter in the installation |
+| `./1-Preflight.ps1` (Windows)<br>`./1-preflight.sh` (Linux) | On the CP machine | Checks the Vault address, DNS, port, the public IP for the Privilege Cloud allowlist and disk space, then prints what to enter in the installation |
 | *Install the CP* | On the CP machine, as administrator / root | Windows: run `setup.exe` from the package, then restart. Linux: the steps `1-preflight.sh` prints (Vault.ini, credential file, aimparms, rpm / dpkg) |
 | `./2-Onboard.ps1` | Anywhere with access to the PVWA | Creates the application AppIDs with their authentication methods (Allowed Machines, OS user, path, hash), Safes, members - incl. the Provider user - and accounts. Prints a ready-to-use CP query |
 | `./3-Test-Vault.ps1` | Anywhere with access to the PVWA | Checks the AppID, Safe, members and permissions, Provider users (incl. Audit Users) and the account's exact Object name |
-| `./4-Test-Server.ps1` | On the CP machine | Checks the Provider service, connectivity to the Vault, errors in the Provider logs, and test retrievals through CLIPasswordSDK with the error code explained |
+| `./4-Test-Server.ps1` (Windows)<br>`./4-test-server.sh` (Linux, as root) | On the CP machine | Checks the Provider service, connectivity to the Vault, errors in the Provider logs, and test retrievals through CLIPasswordSDK with the error code explained |
 
 Install before onboarding: the Provider user only exists after the installation, and `2-Onboard`
 adds it to the Safes. Put its name (`Prov_<host name>` by default) in `Providers` in the settings file.

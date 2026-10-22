@@ -17,8 +17,9 @@ In the folder: copy `settings.example.psd1` to `settings.psd1`, fill in the `<..
 the numbered scripts in order. Every script is safe to re-run. `common/` holds the code both
 products share - you don't run anything there.
 
-All scripts run on Windows PowerShell 5.1 and PowerShell 7+ (Windows, macOS, Linux), using the
-Vault REST API directly - no modules to install.
+All PowerShell scripts run on Windows PowerShell 5.1 and PowerShell 7+ (Windows, macOS, Linux), using
+the Vault REST API directly - no modules to install. On a Linux CP machine, the machine-side CP
+scripts are bash and read `settings.conf` instead.
 
 ## Settings
 

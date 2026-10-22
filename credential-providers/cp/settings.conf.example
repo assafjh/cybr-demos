@@ -1,0 +1,13 @@
+# Settings for the Linux CP scripts (1-preflight.sh, 4-test-server.sh) - run on the CP machine.
+# Copy to settings.conf next to the scripts and fill in the <...> values. One KEY=VALUE per line, no quotes.
+# settings.conf is git-ignored. It is read as data, never executed.
+
+# Host name only - no https://, no path. Privilege Cloud: vault-<subdomain>.privilegecloud.cyberark.cloud
+VAULT_ADDRESS=<vault-address>
+VAULT_PORT=1858
+
+# Test retrieval in 4-test-server.sh - an AppID and account set up by 2-Onboard.ps1
+APP_ID=CP-Demo-App
+SAFE=Credential-Providers
+USERNAME=reception
+ADDRESS=db.lab.local
