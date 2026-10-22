@@ -32,7 +32,7 @@ function Import-ProviderSettings {
     foreach ($section in $Required) {
         if (-not $settings.ContainsKey($section)) { throw "Settings file $Path has no '$section' section" }
     }
-    $present = @($Required) + @(foreach ($section in $Optional) { if ($settings.ContainsKey($section)) { $section } })
+    $present = @($Required | Where-Object { $_ }) + @(foreach ($section in $Optional) { if ($settings.ContainsKey($section)) { $section } })
     $unfilled = foreach ($section in $present) { Find-Placeholder $settings[$section] $section }
     if ($unfilled) { throw "Fill in these settings in ${Path}: $($unfilled -join ', ')" }
 
