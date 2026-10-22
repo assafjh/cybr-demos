@@ -1,0 +1,13 @@
+vars {
+  identityURL: <tenant>.id.cyberark.cloud
+  pCloudURL: <tenant>.privilegecloud.cyberark.cloud
+  cCPUrl: https://<ccp-server>
+  clientID: myClientID
+  safeName: Credential-Providers
+  providerName: Prov_<ccp-hostname>
+  applicationID: CCP-Demo-App
+}
+vars:secret [
+  clientSecret,
+  identityToken
+]
